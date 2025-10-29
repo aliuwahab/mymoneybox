@@ -1,8 +1,35 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 42" {{ $attributes }}>
-    <path 
-        fill="currentColor" 
-        fill-rule="evenodd" 
-        clip-rule="evenodd"
-        d="M17.2 5.633 8.6.855 0 5.633v26.51l16.2 9 16.2-9v-8.442l7.6-4.223V9.856l-8.6-4.777-8.6 4.777V18.3l-5.6 3.111V5.633ZM38 18.301l-5.6 3.11v-6.157l5.6-3.11V18.3Zm-1.06-7.856-5.54 3.078-5.54-3.079 5.54-3.078 5.54 3.079ZM24.8 18.3v-6.157l5.6 3.111v6.158L24.8 18.3Zm-1 1.732 5.54 3.078-13.14 7.302-5.54-3.078 13.14-7.3v-.002Zm-16.2 7.89 7.6 4.222V38.3L2 30.966V7.92l5.6 3.111v16.892ZM8.6 9.3 3.06 6.222 8.6 3.143l5.54 3.08L8.6 9.3Zm21.8 15.51-13.2 7.334V38.3l13.2-7.334v-6.156ZM9.6 11.034l5.6-3.11v14.6l-5.6 3.11v-14.6Z"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 48" {{ $attributes }}>
+    <!-- Letter M (Bold and Clean) -->
+    <path
+        fill="currentColor"
+        d="M 2 10 L 2 38 L 6 38 L 6 19 L 11 32 L 16 19 L 16 38 L 20 38 L 20 10 L 14 10 L 11 25 L 8 10 Z"
     />
+
+    <!-- Money Box (Simple 3D box) -->
+    <path
+        fill="currentColor"
+        d="M 26 22 L 26 40 L 54 40 L 54 22 Z M 29 25 L 51 25 L 51 37 L 29 37 Z"
+    />
+
+    <!-- Coin slot on top of box -->
+    <rect
+        x="34"
+        y="19"
+        width="12"
+        height="3"
+        rx="1.5"
+        fill="currentColor"
+    />
+
+    <!-- Dollar sign above the box -->
+    <g transform="translate(40, 5)">
+        <!-- $ vertical line -->
+        <rect x="-0.8" y="0" width="1.6" height="12" fill="currentColor"/>
+
+        <!-- $ top curve -->
+        <path
+            fill="currentColor"
+            d="M -3.5 3 Q -3.5 2 -2 2 L 2 2 Q 3 2 3 3 L 3 4 L 1 4 L 1 3.5 Q 1 3.2 0.5 3.2 L -1.5 3.2 Q -2 3.2 -2 3.7 Q -2 4.2 -1.5 4.2 L 1.5 4.2 Q 3 4.2 3 6 Q 3 7.5 1.5 7.5 L -1.5 7.5 Q -3 7.5 -3 6 L -3 5 L -1 5 L -1 5.8 Q -1 6.3 -0.5 6.3 L 1.5 6.3 Q 2 6.3 2 5.8 Q 2 5.3 1.5 5.3 L -1.5 5.3 Q -3.5 5.3 -3.5 3.5 Z"
+        />
+    </g>
 </svg>
