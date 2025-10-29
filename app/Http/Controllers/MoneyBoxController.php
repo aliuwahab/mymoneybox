@@ -175,4 +175,20 @@ class MoneyBoxController extends Controller
 
         return view('money-boxes.share', compact('moneyBox'));
     }
+
+    /**
+     * Generate QR code for a money box
+     */
+    public function generateQrCode(MoneyBox $moneyBox)
+    {
+        $this->authorize('update', $moneyBox);
+
+        $generateQRCodeAction = app(\App\Actions\GenerateQRCodeAction::class);
+        $qrCodePath = $generateQRCodeAction->execute($moneyBox);
+
+        $moneyBox->update(['qr_code_path' => $qrCodePath]);
+
+        return redirect()->route('money-boxes.share', $moneyBox)
+            ->with('success', 'QR Code generated successfully!');
+    }
 }

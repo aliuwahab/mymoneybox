@@ -16,6 +16,13 @@
                 </div>
             </div>
 
+            <!-- Success Message -->
+            @if(session('success'))
+                <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
+                    {{ session('success') }}
+                </div>
+            @endif
+
             <div class="space-y-6">
                 <!-- Direct Link -->
                 <div class="bg-white rounded-lg shadow p-6">
@@ -30,7 +37,7 @@
                         />
                         <button
                             onclick="copyLink()"
-                            class="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition"
+                            class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition"
                         >
                             Copy
                         </button>
@@ -43,20 +50,35 @@
                     <div class="flex flex-col items-center">
                         @if($moneyBox->qr_code_path)
                             <img
-                                src="{{ Storage::url($moneyBox->qr_code_path) }}"
+                                src="{{ asset('storage/' . $moneyBox->qr_code_path) }}"
                                 alt="QR Code"
                                 class="w-64 h-64 border-2 border-gray-200 rounded-lg"
                             />
                             <a
-                                href="{{ Storage::url($moneyBox->qr_code_path) }}"
+                                href="{{ asset('storage/' . $moneyBox->qr_code_path) }}"
                                 download="moneybox-qr-{{ $moneyBox->slug }}.png"
-                                class="mt-4 px-6 py-2 bg-gray-700 hover:bg-gray-800 text-white font-semibold rounded-lg transition"
+                                class="mt-4 px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition"
                             >
                                 Download QR Code
                             </a>
                         @else
                             <div class="text-center py-8">
-                                <p class="text-gray-500">QR Code not available</p>
+                                <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                                </svg>
+                                <p class="text-gray-600 mb-4">QR Code not generated yet</p>
+                                <form action="{{ route('money-boxes.generate-qr', $moneyBox) }}" method="POST">
+                                    @csrf
+                                    <button
+                                        type="submit"
+                                        class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition inline-flex items-center space-x-2"
+                                    >
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        <span>Generate QR Code</span>
+                                    </button>
+                                </form>
                             </div>
                         @endif
                     </div>

@@ -52,7 +52,8 @@ class PublicBoxController extends Controller
     }
 
     /**
-     * Display a specific public money box
+     * Display a specific money box (public or private via direct link)
+     * Private boxes are accessible via direct link for contributions/donations
      */
     public function show(string $slug)
     {
@@ -62,11 +63,9 @@ class PublicBoxController extends Controller
             }])
             ->firstOrFail();
 
-        // Check if box is public or belongs to current user
-        if ($moneyBox->visibility->value !== 'public' &&
-            (!auth()->check() || auth()->id() !== $moneyBox->user_id)) {
-            abort(404);
-        }
+        // Both public and private boxes can be accessed via their direct link
+        // Private boxes just won't be listed in the browse/homepage
+        // This allows sharing private campaign links for contributions
 
         return view('public.show', compact('moneyBox'));
     }

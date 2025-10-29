@@ -1,10 +1,10 @@
 <x-layouts.app>
-    <div class="min-h-screen bg-gray-50 py-8">
+    <div class="min-h-screen bg-gray-50 dark:bg-zinc-900 py-8">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Header -->
             <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-900">Create Money Box</h1>
-                <p class="mt-2 text-gray-600">Set up a new money box to collect contributions</p>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Create Money Box</h1>
+                <p class="mt-2 text-gray-600 dark:text-gray-300">Set up a new money box to collect contributions</p>
             </div>
 
             <!-- Form -->
@@ -12,8 +12,8 @@
                 @csrf
 
                 <!-- Basic Information -->
-                <div class="bg-white rounded-lg shadow p-6 space-y-4">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+                <div class="bg-white dark:bg-zinc-800 rounded-lg shadow p-6 space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Basic Information</h2>
 
                     <!-- Title -->
                     <div>
@@ -25,7 +25,6 @@
                             name="title"
                             id="title"
                             required
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                             value="{{ old('title') }}"
                             placeholder="e.g., Birthday Gift for Mom"
                         />
@@ -43,7 +42,6 @@
                             name="description"
                             id="description"
                             rows="4"
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                             placeholder="Tell people about this money box..."
                         >{{ old('description') }}</textarea>
                         @error('description')
@@ -56,11 +54,7 @@
                         <label for="category_id" class="block text-sm font-medium text-gray-700 mb-1">
                             Category
                         </label>
-                        <select
-                            name="category_id"
-                            id="category_id"
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                        >
+                        <select name="category_id" id="category_id">
                             <option value="">Select a category (optional)</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
@@ -75,8 +69,8 @@
                 </div>
 
                 <!-- Contribution Settings -->
-                <div class="bg-white rounded-lg shadow p-6 space-y-4">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Contribution Settings</h2>
+                <div class="bg-white dark:bg-zinc-800 rounded-lg shadow p-6 space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Contribution Settings</h2>
 
                     <!-- Amount Type -->
                     <div>
@@ -87,7 +81,6 @@
                             name="amount_type"
                             id="amount_type"
                             required
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                             onchange="toggleAmountFields()"
                         >
                             <option value="variable" {{ old('amount_type') == 'variable' ? 'selected' : '' }}>Variable - Contributors choose amount</option>
@@ -112,7 +105,6 @@
                             id="fixed_amount"
                             step="0.01"
                             min="0"
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                             value="{{ old('fixed_amount') }}"
                         />
                         @error('fixed_amount')
@@ -130,7 +122,6 @@
                             id="minimum_amount"
                             step="0.01"
                             min="0"
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                             value="{{ old('minimum_amount') }}"
                         />
                         @error('minimum_amount')
@@ -148,7 +139,6 @@
                             id="maximum_amount"
                             step="0.01"
                             min="0"
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                             value="{{ old('maximum_amount') }}"
                         />
                         @error('maximum_amount')
@@ -167,7 +157,6 @@
                             id="goal_amount"
                             step="0.01"
                             min="0"
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                             value="{{ old('goal_amount') }}"
                             placeholder="Set a fundraising goal"
                         />
@@ -185,7 +174,6 @@
                             name="contributor_identity"
                             id="contributor_identity"
                             required
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                         >
                             <option value="user_choice" {{ old('contributor_identity') == 'user_choice' ? 'selected' : '' }}>Let contributors choose</option>
                             <option value="must_identify" {{ old('contributor_identity') == 'must_identify' ? 'selected' : '' }}>Must identify (no anonymous)</option>
@@ -198,8 +186,8 @@
                 </div>
 
                 <!-- Visibility & Timeline -->
-                <div class="bg-white rounded-lg shadow p-6 space-y-4">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Visibility & Timeline</h2>
+                <div class="bg-white dark:bg-zinc-800 rounded-lg shadow p-6 space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Visibility & Timeline</h2>
 
                     <!-- Visibility -->
                     <div>
@@ -210,7 +198,6 @@
                             name="visibility"
                             id="visibility"
                             required
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                         >
                             <option value="public" {{ old('visibility') == 'public' ? 'selected' : '' }}>Public - Listed on homepage</option>
                             <option value="private" {{ old('visibility') == 'private' ? 'selected' : '' }}>Private - Only accessible via link</option>
@@ -229,7 +216,6 @@
                             type="datetime-local"
                             name="start_date"
                             id="start_date"
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                             value="{{ old('start_date') }}"
                         />
                         @error('start_date')
@@ -245,7 +231,6 @@
                             name="is_ongoing"
                             id="is_ongoing"
                             value="1"
-                            class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                             {{ old('is_ongoing') ? 'checked' : '' }}
                             onchange="toggleEndDate()"
                         />
@@ -263,7 +248,6 @@
                             type="datetime-local"
                             name="end_date"
                             id="end_date"
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                             value="{{ old('end_date') }}"
                         />
                         @error('end_date')
@@ -282,7 +266,7 @@
                     </a>
                     <button
                         type="submit"
-                        class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition"
+                        class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition"
                     >
                         Create Money Box
                     </button>

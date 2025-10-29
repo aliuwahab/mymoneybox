@@ -11,6 +11,19 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
+    /* Gray/Zinc Colors */
+    --color-gray-50: #fafafa;
+    --color-gray-100: #f5f5f5;
+    --color-gray-200: #e5e5e5;
+    --color-gray-300: #d4d4d4;
+    --color-gray-400: #a3a3a3;
+    --color-gray-500: #737373;
+    --color-gray-600: #525252;
+    --color-gray-700: #404040;
+    --color-gray-800: #262626;
+    --color-gray-900: #171717;
+    --color-gray-950: #0a0a0a;
+
     --color-zinc-50: #fafafa;
     --color-zinc-100: #f5f5f5;
     --color-zinc-200: #e5e5e5;
@@ -23,7 +36,7 @@
     --color-zinc-900: #171717;
     --color-zinc-950: #0a0a0a;
 
-    /* Primary Colors - Deeper Green */
+    /* Primary Colors - Deeper Green (#16a34a) */
     --color-primary-50: #f0fdf4;
     --color-primary-100: #dcfce7;
     --color-primary-200: #bbf7d0;
@@ -36,7 +49,20 @@
     --color-primary-900: #14532d;
     --color-primary-950: #052e16;
 
-    /* Secondary Colors - Lighter Green */
+    /* Green colors (for standard green-* classes) */
+    --color-green-50: #f0fdf4;
+    --color-green-100: #dcfce7;
+    --color-green-200: #bbf7d0;
+    --color-green-300: #86efac;
+    --color-green-400: #4ade80;
+    --color-green-500: #22c55e;
+    --color-green-600: #16a34a;
+    --color-green-700: #15803d;
+    --color-green-800: #166534;
+    --color-green-900: #14532d;
+    --color-green-950: #052e16;
+
+    /* Secondary Colors - Lighter Green (#4ade80) */
     --color-secondary-50: #f0fdf4;
     --color-secondary-100: #dcfce7;
     --color-secondary-200: #bbf7d0;
@@ -47,6 +73,18 @@
     --color-secondary-700: #15803d;
     --color-secondary-800: #166534;
     --color-secondary-900: #14532d;
+
+    /* Red colors for errors */
+    --color-red-50: #fef2f2;
+    --color-red-100: #fee2e2;
+    --color-red-200: #fecaca;
+    --color-red-300: #fca5a5;
+    --color-red-400: #f87171;
+    --color-red-500: #ef4444;
+    --color-red-600: #dc2626;
+    --color-red-700: #b91c1c;
+    --color-red-800: #991b1b;
+    --color-red-900: #7f1d1d;
 
     --color-accent: var(--color-primary-600);
     --color-accent-content: var(--color-primary-600);
@@ -62,13 +100,39 @@
 }
 
 @layer base {
-
     *,
     ::after,
     ::before,
     ::backdrop,
     ::file-selector-button {
-        border-color: var(--color-gray-200, currentColor);
+        border-color: var(--color-gray-300, currentColor);
+    }
+}
+
+/* Form input styling */
+@layer components {
+    label {
+        @apply text-gray-700 dark:text-gray-300;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    input[type="datetime-local"],
+    input[type="password"],
+    textarea,
+    select {
+        @apply w-full rounded-lg border border-gray-300 dark:border-zinc-600 px-4 py-2.5;
+        @apply text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500;
+        @apply bg-white dark:bg-zinc-700;
+        @apply focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-0;
+        @apply transition-colors duration-200;
+    }
+
+    input[type="checkbox"] {
+        @apply rounded border-gray-300 dark:border-zinc-600 text-green-600;
+        @apply bg-white dark:bg-zinc-700;
+        @apply focus:ring-green-600 focus:ring-offset-0;
     }
 }
 

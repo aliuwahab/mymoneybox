@@ -1,31 +1,27 @@
-<x-layouts.app>
+<x-layouts.guest>
     <div class="min-h-screen bg-gray-50">
         <!-- Header -->
         <div class="bg-white border-b">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <h1 class="text-3xl font-bold text-gray-900">Discover Money Boxes</h1>
-                <p class="mt-2 text-gray-600">Support causes you care about</p>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Discover Money Boxes</h1>
+                <p class="mt-2 text-sm sm:text-base text-gray-600">Support causes you care about</p>
             </div>
         </div>
 
         <!-- Filters -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <form method="GET" class="flex flex-col sm:flex-row gap-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+            <form method="GET" action="{{ route('browse') }}" class="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <div class="flex-1">
                     <input
                         type="text"
                         name="search"
                         placeholder="Search money boxes..."
                         value="{{ request('search') }}"
-                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                     />
                 </div>
 
                 <div class="sm:w-64">
-                    <select
-                        name="category"
-                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                    >
+                    <select name="category">
                         <option value="">All Categories</option>
                         @foreach($categories as $category)
                             <option
@@ -40,24 +36,54 @@
 
                 <button
                     type="submit"
-                    class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
+                    class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 shadow-sm transition"
                 >
                     Search
                 </button>
+
+                @if(request('search') || request('category'))
+                    <a
+                        href="{{ route('browse') }}"
+                        class="px-6 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+                    >
+                        Clear
+                    </a>
+                @endif
             </form>
+
+            <!-- Active Filters Indicator -->
+            @if(request('search') || request('category'))
+                <div class="mt-4 flex flex-wrap gap-2">
+                    @if(request('search'))
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
+                            Search: "{{ request('search') }}"
+                        </span>
+                    @endif
+                    @if(request('category'))
+                        @php
+                            $selectedCategory = $categories->find(request('category'));
+                        @endphp
+                        @if($selectedCategory)
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
+                                Category: {{ $selectedCategory->icon }} {{ $selectedCategory->name }}
+                            </span>
+                        @endif
+                    @endif
+                </div>
+            @endif
         </div>
 
         <!-- Money Boxes Grid -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 pb-12">
             @if($moneyBoxes->count() > 0)
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     @foreach($moneyBoxes as $moneyBox)
                         <x-money-box-card :moneyBox="$moneyBox" />
                     @endforeach
                 </div>
 
                 <div class="mt-8">
-                    {{ $moneyBoxes->links() }}
+                    {{ $moneyBoxes->appends(request()->query())->links() }}
                 </div>
             @else
                 <div class="text-center py-12">
@@ -70,4 +96,4 @@
             @endif
         </div>
     </div>
-</x-layouts.app>
+</x-layouts.guest>
