@@ -109,6 +109,11 @@
     }
 }
 
+/* Alpine.js cloak */
+[x-cloak] {
+    display: none !important;
+}
+
 /* Form input styling */
 @layer components {
     label {

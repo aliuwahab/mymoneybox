@@ -111,9 +111,48 @@
                     </div>
                 </div>
 
+                <!-- Main Image & Gallery -->
+                @if($moneyBox->hasMedia('main_image') || $moneyBox->hasMedia('gallery'))
+                    <div class="lg:col-span-3">
+                        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Images</h2>
+                                <a href="{{ route('money-boxes.edit', $moneyBox) }}" 
+                                   class="text-sm text-green-600 hover:text-green-700">
+                                    Manage Images
+                                </a>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                @if($moneyBox->hasMedia('main_image'))
+                                    <div>
+                                        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Main Image</h3>
+                                        <img src="{{ $moneyBox->getFirstMediaUrl('main_image') }}" 
+                                             alt="Main image"
+                                             class="w-full max-h-64 object-cover rounded-lg">
+                                    </div>
+                                @endif
+                                
+                                @if($moneyBox->hasMedia('gallery'))
+                                    <div>
+                                        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Gallery ({{ $moneyBox->getMedia('gallery')->count() }} images)</h3>
+                                        <div class="grid grid-cols-3 gap-2">
+                                            @foreach($moneyBox->getMedia('gallery') as $image)
+                                                <img src="{{ $image->getUrl() }}" 
+                                                     alt="Gallery image"
+                                                     class="w-full h-24 object-cover rounded">
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Recent Contributions -->
                 <div class="lg:col-span-2">
-                    <div class="bg-white rounded-lg shadow">
+                    <div class="bg-white dark:bg-zinc-800 rounded-lg shadow">
                         <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                             <h2 class="text-lg font-semibold text-gray-900">Recent Contributions</h2>
                             <a

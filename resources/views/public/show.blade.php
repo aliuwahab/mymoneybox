@@ -21,8 +21,17 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 <!-- Main Content -->
                 <div class="lg:col-span-2 space-y-4 sm:space-y-6">
+                    <!-- Main Image -->
+                    @if($moneyBox->hasMedia('main_image'))
+                        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-md overflow-hidden">
+                            <img src="{{ $moneyBox->getFirstMediaUrl('main_image') }}" 
+                                 alt="{{ $moneyBox->title }}"
+                                 class="w-full h-64 sm:h-96 object-cover">
+                        </div>
+                    @endif
+
                     <!-- Money Box Details -->
-                    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                    <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-md p-4 sm:p-6">
                         <!-- Category -->
                         @if($moneyBox->category)
                             <div class="mb-3 sm:mb-4">
@@ -90,11 +99,27 @@
                         <!-- Description -->
                         @if($moneyBox->description)
                             <div class="prose prose-sm sm:prose max-w-none">
-                                <h2 class="text-lg sm:text-xl font-semibold text-gray-900 mb-2 sm:mb-3">About</h2>
-                                <p class="text-sm sm:text-base text-gray-700 whitespace-pre-line leading-relaxed">{{ $moneyBox->description }}</p>
+                                <h2 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3">About</h2>
+                                <p class="text-sm sm:text-base text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">{{ $moneyBox->description }}</p>
                             </div>
                         @endif
                     </div>
+
+                    <!-- Gallery -->
+                    @if($moneyBox->hasMedia('gallery'))
+                        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-md p-4 sm:p-6">
+                            <h2 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">Gallery</h2>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
+                                @foreach($moneyBox->getMedia('gallery') as $image)
+                                    <a href="{{ $image->getUrl() }}" target="_blank" class="group">
+                                        <img src="{{ $image->getUrl() }}" 
+                                             alt="Gallery image"
+                                             class="w-full h-32 sm:h-48 object-cover rounded-lg transition-transform group-hover:scale-105">
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
 
                     <!-- Recent Contributions -->
                     @if($moneyBox->contributions->count() > 0)

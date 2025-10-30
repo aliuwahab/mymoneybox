@@ -9,10 +9,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class MoneyBox extends Model
+class MoneyBox extends Model implements HasMedia
 {
-    use SoftDeletes;
+    use SoftDeletes, InteractsWithMedia;
 
     protected $fillable = [
         'user_id',
@@ -163,5 +165,18 @@ class MoneyBox extends Model
         }
 
         return min(100, ($this->total_contributions / $this->goal_amount) * 100);
+    }
+
+    // Media Collections
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('main_image')
+            ->singleFile() // Only one main image
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
+            ->maxFileSize(5 * 1024 * 1024); // 5MB max
+
+        $this->addMediaCollection('gallery')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
+            ->maxFileSize(5 * 1024 * 1024); // 5MB max
     }
 }

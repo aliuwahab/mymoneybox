@@ -43,7 +43,7 @@ class MoneyBoxController extends Controller
     public function create()
     {
         $categories = Category::active()->ordered()->get();
-        return view('money-boxes.create', compact('categories'));
+        return view('money-boxes.create-steps', compact('categories'));
     }
 
     /**
@@ -73,6 +73,16 @@ class MoneyBoxController extends Controller
 
         $moneyBox = $createMoneyBoxAction->execute($validated);
 
+        // Return JSON for AJAX requests (multi-step form)
+        if ($request->wantsJson() || $request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'id' => $moneyBox->id,
+                'message' => 'Money Box created successfully!'
+            ]);
+        }
+
+        // Traditional redirect for non-AJAX
         return redirect()->route('money-boxes.show', $moneyBox)
             ->with('success', 'Money Box created successfully!');
     }
@@ -124,9 +134,45 @@ class MoneyBoxController extends Controller
             'end_date' => 'nullable|date|after:start_date',
             'is_ongoing' => 'boolean',
             'is_active' => 'boolean',
+            // Media validation
+            'main_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'remove_main_image' => 'nullable|in:0,1',
+            'remove_gallery_images' => 'nullable|string',
         ]);
 
         $moneyBox->update($validated);
+
+        // Handle main image removal
+        if ($request->filled('remove_main_image') && $request->remove_main_image == '1') {
+            $moneyBox->clearMediaCollection('main');
+        }
+
+        // Handle main image upload
+        if ($request->hasFile('main_image')) {
+            $moneyBox->clearMediaCollection('main');
+            $moneyBox->addMediaFromRequest('main_image')
+                ->toMediaCollection('main');
+        }
+
+        // Handle gallery images removal
+        if ($request->filled('remove_gallery_images')) {
+            $mediaIds = explode(',', $request->remove_gallery_images);
+            foreach ($mediaIds as $mediaId) {
+                $media = $moneyBox->getMedia('gallery')->firstWhere('id', $mediaId);
+                if ($media) {
+                    $media->delete();
+                }
+            }
+        }
+
+        // Handle gallery images upload
+        if ($request->hasFile('gallery_images')) {
+            foreach ($request->file('gallery_images') as $image) {
+                $moneyBox->addMedia($image)
+                    ->toMediaCollection('gallery');
+            }
+        }
 
         return redirect()->route('money-boxes.show', $moneyBox)
             ->with('success', 'Money Box updated successfully!');
@@ -190,5 +236,44 @@ class MoneyBoxController extends Controller
 
         return redirect()->route('money-boxes.share', $moneyBox)
             ->with('success', 'QR Code generated successfully!');
+    }
+
+    /**
+     * Upload media (main image and gallery) for a money box
+     */
+    public function uploadMedia(Request $request, MoneyBox $moneyBox)
+    {
+        $this->authorize('update', $moneyBox);
+
+        $request->validate([
+            'main_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120', // 5MB
+            'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120', // 5MB each
+        ]);
+
+        try {
+            // Upload main image
+            if ($request->hasFile('main_image')) {
+                $moneyBox->addMediaFromRequest('main_image')
+                    ->toMediaCollection('main_image');
+            }
+
+            // Upload gallery images
+            if ($request->hasFile('gallery')) {
+                foreach ($request->file('gallery') as $image) {
+                    $moneyBox->addMedia($image)
+                        ->toMediaCollection('gallery');
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Images uploaded successfully!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error uploading images: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

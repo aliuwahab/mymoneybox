@@ -35,6 +35,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('money-boxes.share');
     Route::post('/money-boxes/{moneyBox}/generate-qr', [MoneyBoxController::class, 'generateQrCode'])
         ->name('money-boxes.generate-qr');
+    Route::post('/money-boxes/{moneyBox}/upload-media', [MoneyBoxController::class, 'uploadMedia'])
+        ->name('money-boxes.upload-media');
 
     // Settings Routes
     Route::redirect('settings', 'settings/profile');

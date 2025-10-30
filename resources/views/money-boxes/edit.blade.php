@@ -287,6 +287,97 @@
                     </div>
                 </div>
 
+                <!-- Media Management -->
+                <div class="space-y-6 p-6 bg-gray-50 rounded-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Media Management</h3>
+
+                    <!-- Main Image -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Main Image
+                        </label>
+                        
+                        @if($moneyBox->hasMedia('main'))
+                            <div class="mb-3 relative inline-block">
+                                <img src="{{ $moneyBox->getFirstMediaUrl('main') }}" 
+                                     alt="Main image" 
+                                     class="w-48 h-48 object-cover rounded-lg border border-gray-300">
+                                <button
+                                    type="button"
+                                    onclick="if(confirm('Remove this image?')) document.getElementById('remove_main_image').value = '1'; this.parentElement.style.display='none';"
+                                    class="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 transition"
+                                    title="Remove image"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <input type="hidden" name="remove_main_image" id="remove_main_image" value="0">
+                        @endif
+                        
+                        <input
+                            type="file"
+                            name="main_image"
+                            id="main_image"
+                            accept="image/*"
+                            class="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer"
+                            onchange="previewImage(event, 'main_preview')"
+                        />
+                        <div id="main_preview" class="mt-2"></div>
+                        @error('main_image')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Gallery Images -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Gallery Images
+                        </label>
+                        
+                        @if($moneyBox->hasMedia('gallery'))
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-3">
+                                @foreach($moneyBox->getMedia('gallery') as $media)
+                                    <div class="relative">
+                                        <img src="{{ $media->getUrl() }}" 
+                                             alt="Gallery image" 
+                                             class="w-full h-32 object-cover rounded-lg border border-gray-300">
+                                        <button
+                                            type="button"
+                                            onclick="if(confirm('Remove this image?')) { let input = document.getElementById('remove_gallery_images'); input.value = input.value ? input.value + ',' + {{ $media->id }} : {{ $media->id }}; this.parentElement.style.display='none'; }"
+                                            class="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 transition"
+                                            title="Remove image"
+                                        >
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <input type="hidden" name="remove_gallery_images" id="remove_gallery_images" value="">
+                        @endif
+                        
+                        <input
+                            type="file"
+                            name="gallery_images[]"
+                            id="gallery_images"
+                            accept="image/*"
+                            multiple
+                            class="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer"
+                            onchange="previewMultipleImages(event, 'gallery_preview')"
+                        />
+                        <div id="gallery_preview" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-2"></div>
+                        @error('gallery_images')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                        @error('gallery_images.*')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
                 <!-- Submit Buttons -->
                 <div class="flex items-center justify-between">
                     <button
@@ -355,6 +446,40 @@
                 document.getElementById('end_date').value = '';
             } else {
                 endDateField.classList.remove('hidden');
+            }
+        }
+
+        function previewImage(event, previewId) {
+            const preview = document.getElementById(previewId);
+            const file = event.target.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = '<img src="' + e.target.result + '" class="w-48 h-48 object-cover rounded-lg border border-gray-300" alt="Preview">';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.innerHTML = '';
+            }
+        }
+
+        function previewMultipleImages(event, previewId) {
+            const preview = document.getElementById(previewId);
+            const files = event.target.files;
+            preview.innerHTML = '';
+            
+            if (files.length > 0) {
+                Array.from(files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const div = document.createElement('div');
+                        div.className = 'relative';
+                        div.innerHTML = '<img src="' + e.target.result + '" class="w-full h-32 object-cover rounded-lg border border-gray-300" alt="Preview">';
+                        preview.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                });
             }
         }
 
