@@ -11,7 +11,7 @@ return [
     |
     */
 
-    'default' => env('PAYMENT_PROVIDER', 'paystack'),
+    'default' => env('PAYMENT_PROVIDER', 'trendipay'),
 
     /*
     |--------------------------------------------------------------------------
@@ -23,18 +23,15 @@ return [
     |
     */
 
-    'paystack' => [
-        'public_key' => env('PAYSTACK_PUBLIC_KEY'),
-        'secret_key' => env('PAYSTACK_SECRET_KEY'),
+    'trendipay' => [
+        'api_key' => env('TRENDIPAY_API_KEY'),
+        'merchant_id' => env('TRENDIPAY_MERCHANT_ID'),
+        'base_url' => env('TRENDIPAY_BASE_URL', 'https://test-api.bsl.com.gh'),
     ],
 
+    // Kept as reference for future providers
     'stripe' => [
         'public_key' => env('STRIPE_PUBLIC_KEY'),
         'secret_key' => env('STRIPE_SECRET_KEY'),
-    ],
-
-    'flutterwave' => [
-        'public_key' => env('FLUTTERWAVE_PUBLIC_KEY'),
-        'secret_key' => env('FLUTTERWAVE_SECRET_KEY'),
     ],
 ];

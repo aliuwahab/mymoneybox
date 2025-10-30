@@ -8,7 +8,8 @@ use App\Listeners\NotifyMoneyBoxOwner;
 use App\Listeners\SendContributionThankYouEmail;
 use App\Listeners\SendMoneyBoxCreatedNotification;
 use App\Payment\PaymentManager;
-use App\Payment\Providers\PaystackProvider;
+use App\Payment\Providers\TrendiPayProvider;
+use App\Payment\Providers\PaystackProvider; // Kept as reference
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,8 +24,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(PaymentManager::class, function ($app) {
             $manager = new PaymentManager();
 
-            // Register Paystack provider
-            $manager->extend('paystack', new PaystackProvider());
+            // Register TrendiPay as default provider
+            $manager->extend('trendipay', new TrendiPayProvider());
+
+            // Register Stripe provider (kept as reference for extending to other providers)
+            // $manager->extend('stripe', new StripeProvider());
 
             return $manager;
         });

@@ -141,7 +141,23 @@ class MoneyBoxController extends Controller
             'remove_gallery_images' => 'nullable|string',
         ]);
 
-        $moneyBox->update($validated);
+        // Update only non-media fields
+        $moneyBox->update([
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'category_id' => $validated['category_id'] ?? null,
+            'visibility' => $validated['visibility'],
+            'contributor_identity' => $validated['contributor_identity'],
+            'amount_type' => $validated['amount_type'],
+            'fixed_amount' => $validated['fixed_amount'] ?? null,
+            'minimum_amount' => $validated['minimum_amount'] ?? null,
+            'maximum_amount' => $validated['maximum_amount'] ?? null,
+            'goal_amount' => $validated['goal_amount'] ?? null,
+            'start_date' => $validated['start_date'] ?? null,
+            'end_date' => $validated['end_date'] ?? null,
+            'is_ongoing' => $validated['is_ongoing'] ?? false,
+            'is_active' => $validated['is_active'] ?? true,
+        ]);
 
         // Handle main image removal
         if ($request->filled('remove_main_image') && $request->remove_main_image == '1') {
@@ -247,14 +263,16 @@ class MoneyBoxController extends Controller
 
         $request->validate([
             'main_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120', // 5MB
+            'gallery' => 'nullable|array',
             'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120', // 5MB each
         ]);
 
         try {
             // Upload main image
             if ($request->hasFile('main_image')) {
+                $moneyBox->clearMediaCollection('main');
                 $moneyBox->addMediaFromRequest('main_image')
-                    ->toMediaCollection('main_image');
+                    ->toMediaCollection('main');
             }
 
             // Upload gallery images
@@ -270,6 +288,14 @@ class MoneyBoxController extends Controller
                 'message' => 'Images uploaded successfully!'
             ]);
         } catch (\Exception $e) {
+            \Log::error('Media upload error', [
+                'money_box_id' => $moneyBox->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'has_main_image' => $request->hasFile('main_image'),
+                'has_gallery' => $request->hasFile('gallery'),
+            ]);
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Error uploading images: ' . $e->getMessage()

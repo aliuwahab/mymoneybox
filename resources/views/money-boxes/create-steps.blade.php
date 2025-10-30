@@ -433,8 +433,8 @@
                             formData.append('main_image', this.mainImageFile);
                         }
                         
-                        this.galleryFiles.forEach((file, index) => {
-                            formData.append(`gallery[${index}]`, file);
+                        this.galleryFiles.forEach((file) => {
+                            formData.append('gallery[]', file);
                         });
 
                         const response = await fetch(`/money-boxes/${this.createdMoneyBoxId}/upload-media`, {

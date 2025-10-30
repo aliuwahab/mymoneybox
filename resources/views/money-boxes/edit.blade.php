@@ -8,7 +8,7 @@
             </div>
 
             <!-- Form -->
-            <form method="POST" action="{{ route('money-boxes.update', $moneyBox) }}" class="space-y-6">
+            <form method="POST" action="{{ route('money-boxes.update', $moneyBox) }}" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 @method('PUT')
 
@@ -304,7 +304,7 @@
                                      class="w-48 h-48 object-cover rounded-lg border border-gray-300">
                                 <button
                                     type="button"
-                                    onclick="if(confirm('Remove this image?')) document.getElementById('remove_main_image').value = '1'; this.parentElement.style.display='none';"
+                                    onclick="confirmDelete(() => { document.getElementById('remove_main_image').value = '1'; this.parentElement.style.display='none'; }, { title: 'Remove Image?', text: 'This image will be removed when you save.', confirmText: 'Yes, remove it!' })"
                                     class="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 transition"
                                     title="Remove image"
                                 >
@@ -345,7 +345,7 @@
                                              class="w-full h-32 object-cover rounded-lg border border-gray-300">
                                         <button
                                             type="button"
-                                            onclick="if(confirm('Remove this image?')) { let input = document.getElementById('remove_gallery_images'); input.value = input.value ? input.value + ',' + {{ $media->id }} : {{ $media->id }}; this.parentElement.style.display='none'; }"
+                                            onclick="confirmDelete(() => { let input = document.getElementById('remove_gallery_images'); input.value = input.value ? input.value + ',' + {{ $media->id }} : {{ $media->id }}; this.parentElement.style.display='none'; }, { title: 'Remove Image?', text: 'This image will be removed when you save.', confirmText: 'Yes, remove it!' })"
                                             class="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 transition"
                                             title="Remove image"
                                         >
@@ -361,14 +361,15 @@
                         
                         <input
                             type="file"
-                            name="gallery_images[]"
-                            id="gallery_images"
+                            id="gallery_images_input"
                             accept="image/*"
                             multiple
                             class="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer"
-                            onchange="previewMultipleImages(event, 'gallery_preview')"
+                            onchange="handleGallerySelection(event)"
                         />
-                        <div id="gallery_preview" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-2"></div>
+                        <div id="gallery_preview" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 mt-3"></div>
+                        <!-- Hidden container for actual file inputs that will be submitted -->
+                        <div id="gallery_files_container"></div>
                         @error('gallery_images')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -382,7 +383,7 @@
                 <div class="flex items-center justify-between">
                     <button
                         type="button"
-                        onclick="if(confirm('Are you sure you want to delete this money box?')) document.getElementById('delete-form').submit()"
+                        onclick="confirmDelete(() => document.getElementById('delete-form').submit(), { title: 'Delete Money Box?', text: 'All contributions and data will be permanently deleted!', confirmText: 'Yes, delete it!' })"
                         class="px-6 py-3 text-red-700 bg-red-50 border border-red-300 rounded-lg hover:bg-red-100 transition"
                     >
                         Delete
@@ -417,7 +418,6 @@
         </div>
     </div>
 
-    @push('scripts')
     <script>
         function toggleAmountFields() {
             const amountType = document.getElementById('amount_type').value;
@@ -456,7 +456,12 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    preview.innerHTML = '<img src="' + e.target.result + '" class="w-48 h-48 object-cover rounded-lg border border-gray-300" alt="Preview">';
+                    preview.innerHTML = `
+                        <div class="mt-3">
+                            <p class="text-sm font-medium text-gray-700 mb-2">Preview (New Main Image):</p>
+                            <img src="${e.target.result}" class="w-48 h-48 object-cover rounded-lg border-2 border-green-300 shadow-sm" alt="Preview">
+                        </div>
+                    `;
                 };
                 reader.readAsDataURL(file);
             } else {
@@ -464,23 +469,104 @@
             }
         }
 
-        function previewMultipleImages(event, previewId) {
-            const preview = document.getElementById(previewId);
-            const files = event.target.files;
-            preview.innerHTML = '';
+        // Gallery file management
+        let galleryFiles = [];
+        let fileCounter = 0;
+
+        function handleGallerySelection(event) {
+            const newFiles = Array.from(event.target.files);
             
-            if (files.length > 0) {
-                Array.from(files).forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const div = document.createElement('div');
-                        div.className = 'relative';
-                        div.innerHTML = '<img src="' + e.target.result + '" class="w-full h-32 object-cover rounded-lg border border-gray-300" alt="Preview">';
-                        preview.appendChild(div);
-                    };
-                    reader.readAsDataURL(file);
-                });
-            }
+            newFiles.forEach(file => {
+                const fileId = fileCounter++;
+                galleryFiles.push({ id: fileId, file: file });
+                addGalleryPreview(file, fileId);
+            });
+            
+            // Clear the input so the same file can be selected again
+            event.target.value = '';
+            updateGalleryFilesInput();
+        }
+
+        function addGalleryPreview(file, fileId) {
+            const preview = document.getElementById('gallery_preview');
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'relative';
+                div.id = `gallery_preview_${fileId}`;
+                div.innerHTML = `
+                    <img src="${e.target.result}" class="w-full h-32 object-cover rounded-lg border-2 border-green-300 shadow-sm" alt="Preview">
+                    <button
+                        type="button"
+                        onclick="removeGalleryFile(${fileId})"
+                        class="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 transition"
+                        title="Remove image"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                    <span class="absolute bottom-1 left-1 bg-green-600 text-white text-xs px-2 py-0.5 rounded">${galleryFiles.length}</span>
+                `;
+                preview.appendChild(div);
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        function removeGalleryFile(fileId) {
+            confirmDelete(() => {
+                // Remove from array
+                galleryFiles = galleryFiles.filter(f => f.id !== fileId);
+                
+                // Remove preview
+                const previewElement = document.getElementById(`gallery_preview_${fileId}`);
+                if (previewElement) {
+                    previewElement.remove();
+                }
+                
+                // Update file input
+                updateGalleryFilesInput();
+                
+                // Update numbering on remaining previews
+                updateGalleryNumbering();
+            }, { 
+                title: 'Remove Image?', 
+                text: 'This will remove the image from the upload queue.', 
+                confirmText: 'Yes, remove it!' 
+            });
+        }
+
+        function updateGalleryNumbering() {
+            const previews = document.getElementById('gallery_preview').children;
+            Array.from(previews).forEach((preview, index) => {
+                const badge = preview.querySelector('span');
+                if (badge) {
+                    badge.textContent = index + 1;
+                }
+            });
+        }
+
+        function updateGalleryFilesInput() {
+            const container = document.getElementById('gallery_files_container');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            // Create a DataTransfer object to hold files
+            const dt = new DataTransfer();
+            galleryFiles.forEach(({ file }) => {
+                dt.items.add(file);
+            });
+            
+            // Create a new file input with all the files
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.name = 'gallery_images[]';
+            input.multiple = true;
+            input.files = dt.files;
+            container.appendChild(input);
         }
 
         // Initialize on page load
@@ -489,5 +575,4 @@
             toggleEndDate();
         });
     </script>
-    @endpush
 </x-layouts.app>

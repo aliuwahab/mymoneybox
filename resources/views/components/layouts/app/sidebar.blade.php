@@ -131,5 +131,39 @@
         {{ $slot }}
 
         @fluxScripts
+        
+        <!-- SweetAlert2 Theme Configuration -->
+        <script>
+            // Configure SweetAlert2 with our theme colors (green primary)
+            const SwalTheme = Swal.mixin({
+                customClass: {
+                    confirmButton: 'px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow transition mx-1',
+                    cancelButton: 'px-5 py-2.5 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold rounded-lg shadow transition mx-1',
+                    popup: 'rounded-lg',
+                    title: 'text-gray-900',
+                    htmlContainer: 'text-gray-600'
+                },
+                buttonsStyling: false,
+                reverseButtons: true
+            });
+
+            // Global function for confirmation dialogs
+            window.confirmDelete = function(callback, options = {}) {
+                const defaultOptions = {
+                    title: options.title || 'Are you sure?',
+                    text: options.text || "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: options.confirmText || 'Yes, delete it!',
+                    cancelButtonText: options.cancelText || 'Cancel',
+                };
+
+                SwalTheme.fire(defaultOptions).then((result) => {
+                    if (result.isConfirmed) {
+                        if (callback) callback();
+                    }
+                });
+            };
+        </script>
     </body>
 </html>

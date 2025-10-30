@@ -59,6 +59,8 @@ class ContributionController extends Controller
 
         $payment = $this->paymentManager->initializePayment($paymentData);
 
+        dd($payment);
+
         if (!$payment['success']) {
             return back()->with('error', $payment['message'] ?? 'Payment initialization failed.');
         }
@@ -66,7 +68,7 @@ class ContributionController extends Controller
         // Create contribution record with pending status
         $contributionData = [
             ...$validated,
-            'payment_provider' => 'paystack',
+            'payment_provider' => 'trendipay',
             'payment_reference' => $payment['reference'],
             'payment_status' => PaymentStatus::Pending,
         ];

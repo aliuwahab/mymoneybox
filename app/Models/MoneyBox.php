@@ -170,13 +170,9 @@ class MoneyBox extends Model implements HasMedia
     // Media Collections
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('main_image')
-            ->singleFile() // Only one main image
-            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
-            ->maxFileSize(5 * 1024 * 1024); // 5MB max
+        $this->addMediaCollection('main')
+            ->singleFile(); // Only one main image
 
-        $this->addMediaCollection('gallery')
-            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
-            ->maxFileSize(5 * 1024 * 1024); // 5MB max
+        $this->addMediaCollection('gallery');
     }
 }
