@@ -19,41 +19,41 @@
         </div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Header with Actions -->
-            <div class="bg-white rounded-lg shadow mb-6 p-6">
-                <div class="flex justify-between items-start">
+            <div class="bg-white rounded-lg shadow mb-6 p-4 sm:p-6">
+                <div class="flex flex-col space-y-4">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-900">{{ $moneyBox->title }}</h1>
-                        <div class="mt-2 flex items-center space-x-3">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $moneyBox->visibility->value === 'public' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                        <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3">{{ $moneyBox->title }}</h1>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium {{ $moneyBox->visibility->value === 'public' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
                                 {{ $moneyBox->visibility->value === 'public' ? 'Public' : 'Private' }}
                             </span>
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $moneyBox->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium {{ $moneyBox->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                 {{ $moneyBox->is_active ? 'Active' : 'Inactive' }}
                             </span>
                             @if($moneyBox->category)
-                                <span class="text-sm text-gray-600">
+                                <span class="text-xs sm:text-sm text-gray-600">
                                     {{ $moneyBox->category->icon }} {{ $moneyBox->category->name }}
                                 </span>
                             @endif
                         </div>
                     </div>
-                    <div class="flex space-x-3">
+                    <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
                         <a
                             href="{{ route('box.show', $moneyBox->slug) }}"
                             target="_blank"
-                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                            class="flex-1 sm:flex-none text-center px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
                         >
                             View Public Page
                         </a>
                         <a
                             href="{{ route('money-boxes.share', $moneyBox) }}"
-                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                            class="flex-1 sm:flex-none text-center px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
                         >
                             Share
                         </a>
                         <a
                             href="{{ route('money-boxes.edit', $moneyBox) }}"
-                            class="px-4 py-2 text-sm font-medium text-green-700 bg-green-50 border border-green-300 rounded-lg hover:bg-green-100 transition"
+                            class="flex-1 sm:flex-none text-center px-4 py-2 text-xs sm:text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition"
                         >
                             Edit
                         </a>

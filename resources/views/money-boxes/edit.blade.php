@@ -380,24 +380,24 @@
                 </div>
 
                 <!-- Submit Buttons -->
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <button
                         type="button"
                         onclick="confirmDelete(() => document.getElementById('delete-form').submit(), { title: 'Delete Money Box?', text: 'All contributions and data will be permanently deleted!', confirmText: 'Yes, delete it!' })"
-                        class="px-6 py-3 text-red-700 bg-red-50 border border-red-300 rounded-lg hover:bg-red-100 transition"
+                        class="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base text-red-700 bg-red-50 border border-red-300 rounded-lg hover:bg-red-100 transition"
                     >
                         Delete
                     </button>
-                    <div class="flex items-center space-x-4">
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                         <a
                             href="{{ route('money-boxes.show', $moneyBox) }}"
-                            class="px-6 py-3 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                            class="text-center px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
                         >
                             Cancel
                         </a>
                         <button
                             type="submit"
-                            class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition"
+                            class="px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition"
                         >
                             Update Money Box
                         </button>

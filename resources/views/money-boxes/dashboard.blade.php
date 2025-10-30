@@ -2,15 +2,15 @@
     <div class="min-h-screen bg-gray-50">
         <!-- Header -->
         <div class="bg-white border-b">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div class="flex justify-between items-center">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-900">My Dashboard</h1>
-                        <p class="mt-2 text-gray-600">Manage your money boxes</p>
+                        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">My Dashboard</h1>
+                        <p class="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">Manage your money boxes</p>
                     </div>
                     <a
                         href="{{ route('money-boxes.create') }}"
-                        class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition"
+                        class="inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 bg-green-600 hover:bg-green-700 text-white text-sm sm:text-base font-semibold rounded-lg transition whitespace-nowrap"
                     >
                         Create Money Box
                     </a>
@@ -66,80 +66,86 @@
                 </div>
             </div>
 
-            <!-- Money Boxes List -->
+            <!-- Money Boxes Grid -->
             @if($moneyBoxes->count() > 0)
-                <div class="bg-white rounded-lg shadow">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h2 class="text-lg font-semibold text-gray-900">Your Money Boxes</h2>
-                    </div>
-                    <div class="divide-y divide-gray-200">
-                        @foreach($moneyBoxes as $moneyBox)
-                            <div class="p-6 hover:bg-gray-50 transition">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex-1">
-                                        <div class="flex items-center space-x-3 mb-2">
-                                            <h3 class="text-lg font-semibold text-gray-900">
-                                                {{ $moneyBox->title }}
-                                            </h3>
-                                            @if($moneyBox->visibility->value === 'public')
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
-                                                    Public
-                                                </span>
-                                            @else
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                                    Private
-                                                </span>
-                                            @endif
-                                        </div>
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Your Money Boxes</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach($moneyBoxes as $moneyBox)
+                        <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden">
+                            <!-- Card Header -->
+                            <div class="p-6">
+                                <div class="flex items-start justify-between mb-4">
+                                    <h3 class="text-lg font-semibold text-gray-900 line-clamp-2 flex-1">
+                                        {{ $moneyBox->title }}
+                                    </h3>
+                                    @if($moneyBox->visibility->value === 'public')
+                                        <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            Public
+                                        </span>
+                                    @else
+                                        <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                            Private
+                                        </span>
+                                    @endif
+                                </div>
 
-                                        <div class="flex items-center space-x-6 text-sm text-gray-600">
-                                            <div>
-                                                <span class="font-semibold text-gray-900">{{ $moneyBox->formatAmount($moneyBox->total_contributions) }}</span>
-                                                @if($moneyBox->goal_amount)
-                                                    / {{ $moneyBox->formatAmount($moneyBox->goal_amount) }}
-                                                @endif
-                                            </div>
-                                            <div>
-                                                {{ $moneyBox->contribution_count }} {{ Str::plural('contribution', $moneyBox->contribution_count) }}
-                                            </div>
-                                        </div>
-
+                                <!-- Stats -->
+                                <div class="space-y-3">
+                                    <div class="flex items-baseline justify-between">
+                                        <span class="text-2xl font-bold text-gray-900">{{ $moneyBox->formatAmount($moneyBox->total_contributions) }}</span>
                                         @if($moneyBox->goal_amount)
-                                            <div class="mt-3">
-                                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                                    <div
-                                                        class="bg-primary-600 h-2 rounded-full transition-all"
-                                                        style="width: {{ min(100, $moneyBox->getProgressPercentage()) }}%"
-                                                    ></div>
-                                                </div>
-                                            </div>
+                                            <span class="text-sm text-gray-600">of {{ $moneyBox->formatAmount($moneyBox->goal_amount) }}</span>
                                         @endif
                                     </div>
 
-                                    <div class="ml-6 flex items-center space-x-2">
-                                        <a
-                                            href="{{ route('money-boxes.show', $moneyBox) }}"
-                                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-                                        >
-                                            View
-                                        </a>
-                                        <a
-                                            href="{{ route('money-boxes.statistics', $moneyBox) }}"
-                                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-                                        >
-                                            Stats
-                                        </a>
-                                        <a
-                                            href="{{ route('money-boxes.edit', $moneyBox) }}"
-                                            class="px-4 py-2 text-sm font-medium text-primary-700 bg-primary-50 border border-primary-300 rounded-lg hover:bg-primary-100 transition"
-                                        >
-                                            Edit
-                                        </a>
+                                    @if($moneyBox->goal_amount)
+                                        <div>
+                                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                                <div
+                                                    class="bg-green-600 h-2.5 rounded-full transition-all"
+                                                    style="width: {{ min(100, $moneyBox->getProgressPercentage()) }}%"
+                                                ></div>
+                                            </div>
+                                            <p class="text-xs text-gray-600 mt-1">{{ round($moneyBox->getProgressPercentage()) }}% funded</p>
+                                        </div>
+                                    @endif
+
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                        {{ $moneyBox->contribution_count }} {{ Str::plural('contribution', $moneyBox->contribution_count) }}
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
+
+                            <!-- Card Actions -->
+                            <div class="border-t border-gray-200 bg-gray-50 px-6 py-4">
+                                <div class="flex items-center justify-between space-x-2">
+                                    <a
+                                        href="{{ route('money-boxes.show', $moneyBox) }}"
+                                        class="flex-1 text-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                                    >
+                                        View
+                                    </a>
+                                    <a
+                                        href="{{ route('money-boxes.statistics', $moneyBox) }}"
+                                        class="flex-1 text-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                                    >
+                                        Stats
+                                    </a>
+                                    <a
+                                        href="{{ route('money-boxes.edit', $moneyBox) }}"
+                                        class="flex-1 text-center px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition"
+                                    >
+                                        Edit
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             @else
                 <div class="bg-white rounded-lg shadow p-12 text-center">
