@@ -5,8 +5,8 @@
         <div class="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
             <!-- Header -->
             <div class="mb-6 sm:mb-8">
-                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Create Money Box</h1>
-                <p class="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">Set up a new money box to collect contributions</p>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Create Piggy Box</h1>
+                <p class="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">Set up a new piggy box to collect contributions</p>
             </div>
 
             <!-- Progress Steps -->
@@ -62,7 +62,7 @@
                                 <input type="text" x-model="formData.title" required 
                                        placeholder="e.g., Birthday Gift for Mom"
                                        class="w-full">
-                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Give your money box a clear, descriptive title</p>
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Give your piggy box a clear, descriptive title</p>
                             </div>
 
                             <!-- Description -->
@@ -71,8 +71,8 @@
                                     Description
                                 </label>
                                 <textarea x-model="formData.description" rows="4"
-                                          placeholder="Tell people about this money box..."></textarea>
-                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Explain the purpose and story behind your money box</p>
+                                          placeholder="Tell people about this piggy box..."></textarea>
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Explain the purpose and story behind your piggy box</p>
                             </div>
 
                             <!-- Category -->
@@ -186,7 +186,7 @@
                             <div class="flex items-center">
                                 <input type="checkbox" x-model="formData.is_ongoing" id="is_ongoing" class="mr-2">
                                 <label for="is_ongoing" class="text-sm text-gray-700 dark:text-gray-300">
-                                    This money box is ongoing (no end date)
+                                    This piggy box is ongoing (no end date)
                                 </label>
                             </div>
 
@@ -201,7 +201,7 @@
 
                         <div class="mt-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
                             <p class="text-sm text-green-800 dark:text-green-200">
-                                <strong>Next step:</strong> After creating your money box, you'll be able to upload images to make it more appealing to contributors.
+                                <strong>Next step:</strong> After creating your piggy box, you'll be able to upload images to make it more appealing to contributors.
                             </p>
                         </div>
                     </div>
@@ -215,7 +215,7 @@
                                 <svg class="mx-auto h-12 w-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
-                                <h3 class="mt-2 text-lg font-medium text-gray-900 dark:text-white">Money Box Created!</h3>
+                                <h3 class="mt-2 text-lg font-medium text-gray-900 dark:text-white">Piggy Box Created!</h3>
                                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Now add images to make it more appealing</p>
                             </div>
 
@@ -290,7 +290,7 @@
                                     x-show="currentStep === 3"
                                     :disabled="isSubmitting"
                                     class="px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold rounded-lg shadow-sm transition">
-                                <span x-show="!isSubmitting">Create Money Box</span>
+                                <span x-show="!isSubmitting">Create Piggy Box</span>
                                 <span x-show="isSubmitting">Creating...</span>
                             </button>
 
@@ -383,10 +383,10 @@
                             this.createdMoneyBoxId = data.id;
                             this.currentStep = 4; // Move to media upload step
                         } else {
-                            alert('Error: ' + (data.message || 'Failed to create money box'));
+                            alert('Error: ' + (data.message || 'Failed to create piggy box'));
                         }
                     } catch (error) {
-                        alert('Error creating money box. Please try again.');
+                        alert('Error creating piggy box. Please try again.');
                         console.error(error);
                     } finally {
                         this.isSubmitting = false;

@@ -74,7 +74,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get all money boxes created by the user
+     * Get all piggy boxes created by the user
      */
     public function moneyBoxes(): HasMany
     {

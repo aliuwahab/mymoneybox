@@ -25,7 +25,7 @@ class ContributionController extends Controller
         $moneyBox = MoneyBox::where('slug', $slug)->firstOrFail();
 
         if (!$moneyBox->canAcceptContributions()) {
-            return back()->with('error', 'This money box is not accepting contributions.');
+            return back()->with('error', 'This piggy box is not accepting contributions.');
         }
 
         $validated = $request->validate([
@@ -37,9 +37,9 @@ class ContributionController extends Controller
             'is_anonymous' => 'boolean',
         ]);
 
-        // Validate contribution amount based on money box rules
+        // Validate contribution amount based on piggy box rules
         if (!$moneyBox->validateContributionAmount($validated['amount'])) {
-            return back()->with('error', 'Invalid contribution amount based on the money box rules.');
+            return back()->with('error', 'Invalid contribution amount based on the piggy box rules.');
         }
 
         // Initialize payment
@@ -114,7 +114,7 @@ class ContributionController extends Controller
             'payment_status' => PaymentStatus::Completed,
         ]);
 
-        // Update money box stats
+        // Update piggy box stats
         $this->updateStatsAction->execute($contribution->moneyBox, $contribution);
 
         return redirect()->route('box.show', $contribution->moneyBox->slug)

@@ -5,7 +5,7 @@
         d="M 2 10 L 2 38 L 6 38 L 6 19 L 11 32 L 16 19 L 16 38 L 20 38 L 20 10 L 14 10 L 11 25 L 8 10 Z"
     />
 
-    <!-- Money Box (Simple 3D box) -->
+    <!-- Piggy Box (Simple 3D box) -->
     <path
         fill="currentColor"
         d="M 26 22 L 26 40 L 54 40 L 54 22 Z M 29 25 L 51 25 L 51 37 L 29 37 Z"

@@ -1,33 +1,33 @@
-# MyMoneyBox - Contribution Collection Platform
+# MyPiggyBox - Contribution Collection Platform
 
-A modern Laravel-based platform for creating and managing money boxes (contribution collections) with payment integration, QR codes, and social sharing.
+A modern Laravel-based platform for creating and managing piggy boxes (contribution collections) with payment integration, QR codes, and social sharing.
 
 ## 🚀 Features
 
 ### Core Functionality
-- **Money Box Management**: Create, edit, and manage multiple money boxes
+- **Piggy Box Management**: Create, edit, and manage multiple piggy boxes
 - **Flexible Contribution Rules**:
   - Variable amounts
   - Fixed amounts
   - Minimum/Maximum/Range limits
   - Anonymous or identified contributors
 - **Payment Integration**: Paystack integration with extensible manager pattern for additional providers
-- **QR Code Generation**: Automatic QR code creation for each money box
+- **QR Code Generation**: Automatic QR code creation for each piggy box
 - **Social Sharing**: WhatsApp, Facebook, and Twitter sharing
 - **Progress Tracking**: Real-time progress bars and goal tracking
 - **Statistics & Analytics**: Detailed contribution tracking and reporting
 
 ### Public Features
-- Browse public money boxes
+- Browse public piggy boxes
 - Filter by category and search
-- Contribute to money boxes
+- Contribute to piggy boxes
 - View contribution history
 
 ### User Features (Authenticated)
 - Personal dashboard with statistics
-- Create and manage money boxes
+- Create and manage piggy boxes
 - View detailed analytics
-- Share money boxes
+- Share piggy boxes
 - Track contributions
 - Export-ready data views
 
@@ -43,7 +43,7 @@ A modern Laravel-based platform for creating and managing money boxes (contribut
 
 ## 🎨 Color Scheme
 
-MyMoneyBox uses a green color palette to represent growth and money:
+MyPiggyBox uses a green color palette to represent growth and money:
 
 - **Primary Color**: Deeper Green (#16a34a) - Used for main branding, CTAs, and important UI elements
 - **Secondary Color**: Lighter Green (#4ade80) - Used for secondary actions and accents
@@ -137,7 +137,7 @@ app/
 resources/
 └── views/
     ├── public/          # Public pages
-    ├── money-boxes/     # Authenticated money box pages
+    ├── money-boxes/     # Authenticated piggy box pages
     └── components/      # Reusable Blade components
 ```
 
@@ -174,9 +174,9 @@ All major actions fire events that trigger listeners:
 ## 🔐 Authorization
 
 Authorization is handled via Laravel Policies:
-- Users can only view/edit/delete their own money boxes
-- Public money boxes are viewable by anyone
-- Private money boxes require direct link access
+- Users can only view/edit/delete their own piggy boxes
+- Public piggy boxes are viewable by anyone
+- Private piggy boxes require direct link access
 
 ## 🧪 Testing
 
@@ -202,7 +202,7 @@ php artisan test
 
 ## 🔄 Payment Flow
 
-1. User creates money box
+1. User creates piggy box
 2. Contributor fills contribution form
 3. System initializes payment with provider (Paystack)
 4. User redirected to payment gateway
@@ -242,7 +242,7 @@ php artisan db:seed --class=CategorySeeder
 
 Key environment variables:
 ```env
-APP_NAME=MyMoneyBox
+APP_NAME=MyPiggyBox
 APP_URL=http://localhost:8000
 
 PAYMENT_PROVIDER=paystack

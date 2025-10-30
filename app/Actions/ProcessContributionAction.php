@@ -44,7 +44,7 @@ class ProcessContributionAction
                 'user_agent' => request()->userAgent(),
             ]);
 
-            // Update money box stats if payment is completed
+            // Update piggy box stats if payment is completed
             if ($contribution->payment_status === PaymentStatus::Completed) {
                 $this->updateStatsAction->execute($moneyBox, $contribution);
             }

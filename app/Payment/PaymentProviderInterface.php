@@ -18,8 +18,10 @@ interface PaymentProviderInterface
 
     /**
      * Handle webhook callback
+     * 
+     * @return array Processed webhook data with payment status
      */
-    public function handleWebhook(array $payload): void;
+    public function handleWebhook(array $payload): array;
 
     /**
      * Get provider name

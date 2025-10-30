@@ -30,7 +30,7 @@
                         </div>
                     @endif
 
-                    <!-- Money Box Details -->
+                    <!-- Piggy Box Details -->
                     <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-md p-4 sm:p-6">
                         <!-- Category -->
                         @if($moneyBox->category)
@@ -263,7 +263,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                 </svg>
                                 <h3 class="mt-2 text-sm font-medium text-gray-900">Not Accepting Contributions</h3>
-                                <p class="mt-1 text-sm text-gray-500">This money box is currently not accepting contributions.</p>
+                                <p class="mt-1 text-sm text-gray-500">This piggy box is currently not accepting contributions.</p>
                             </div>
                         @endif
 

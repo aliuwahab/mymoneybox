@@ -4,19 +4,19 @@
             <!-- Header -->
             <div class="flex justify-between items-center mb-8">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">My Money Boxes</h1>
-                    <p class="mt-2 text-gray-600">Manage all your money boxes</p>
+                    <h1 class="text-3xl font-bold text-gray-900">My Piggy Boxes</h1>
+                    <p class="mt-2 text-gray-600">Manage all your piggy boxes</p>
                 </div>
                 <a
                     href="{{ route('money-boxes.create') }}"
                     class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition"
                 >
-                    Create Money Box
+                    Create Piggy Box
                 </a>
             </div>
 
             @if($moneyBoxes->count() > 0)
-                <!-- Grid of Money Boxes -->
+                <!-- Grid of Piggy Boxes -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($moneyBoxes as $moneyBox)
                         <div class="bg-white rounded-lg shadow hover:shadow-lg transition">
@@ -107,8 +107,8 @@
                     <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                     </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">No money boxes</h3>
-                    <p class="mt-1 text-sm text-gray-500">Get started by creating your first money box.</p>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No piggy boxes</h3>
+                    <p class="mt-1 text-sm text-gray-500">Get started by creating your first piggy box.</p>
                     <div class="mt-6">
                         <a
                             href="{{ route('money-boxes.create') }}"
@@ -117,7 +117,7 @@
                             <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
-                            Create Money Box
+                            Create Piggy Box
                         </a>
                     </div>
                 </div>

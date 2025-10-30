@@ -10,7 +10,7 @@
                         </svg>
                     </a>
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-900">Share Money Box</h1>
+                        <h1 class="text-3xl font-bold text-gray-900">Share Piggy Box</h1>
                         <p class="mt-1 text-gray-600">{{ $moneyBox->title }}</p>
                     </div>
                 </div>
@@ -130,7 +130,7 @@
                 <div class="bg-white rounded-lg shadow p-6">
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Embed Code (Coming Soon)</h2>
                     <p class="text-sm text-gray-600">
-                        Embed this money box on your website with a simple code snippet.
+                        Embed this piggy box on your website with a simple code snippet.
                     </p>
                 </div>
             </div>

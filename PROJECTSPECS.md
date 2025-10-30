@@ -1,7 +1,7 @@
-# MyMoneyBox - Technical Specification
+# MyPiggyBox - Technical Specification
 
 ## Product Name
-**MyMoneyBox** (one word) - Final Implementation
+**MyPiggyBox** (one word) - Final Implementation
 
 Originally suggested names (archived):
 1. FundFlow
@@ -10,13 +10,13 @@ Originally suggested names (archived):
 4. GiftPool
 5. CollectBox
 
-**Implementation uses: Money Box (not Flow Box)**
+**Implementation uses: Piggy Box (not Flow Box)**
 
 ---
 
 ## Core Features Overview
 
-### 1. Flow Box (Money Box) Management
+### 1. Flow Box (Piggy Box) Management
 
 #### Flow Box Attributes
 - **Title & Description**
@@ -84,7 +84,7 @@ categories
   - is_active
   - timestamps
 
--- Flow Boxes (Money Boxes)
+-- Flow Boxes (Piggy Boxes)
 flow_boxes
   - id
   - user_id (FK)
@@ -721,9 +721,9 @@ export default {
 
 #### 5. Action Pattern Architecture (Instead of Services)
 - ✅ `GenerateQRCodeAction` - Creates QR codes using endroid/qr-code
-- ✅ `CreateMoneyBoxAction` - Creates money box with auto-generated slug and QR code
+- ✅ `CreateMoneyBoxAction` - Creates piggy box with auto-generated slug and QR code
 - ✅ `ProcessContributionAction` - Validates and processes contributions
-- ✅ `UpdateMoneyBoxStatsAction` - Updates money box statistics
+- ✅ `UpdateMoneyBoxStatsAction` - Updates piggy box statistics
 - ✅ All actions fire events upon completion
 
 #### 6. Events & Listeners
@@ -754,19 +754,19 @@ export default {
 
 #### 8. Controllers
 - ✅ `MoneyBoxController` - Full CRUD operations:
-  - dashboard() - User's money boxes overview
-  - index() - List user's money boxes
+  - dashboard() - User's piggy boxes overview
+  - index() - List user's piggy boxes
   - create() - Show creation form
-  - store() - Create new money box
-  - show() - View specific money box
+  - store() - Create new piggy box
+  - show() - View specific piggy box
   - edit() - Edit form
-  - update() - Update money box
-  - destroy() - Delete money box
+  - update() - Update piggy box
+  - destroy() - Delete piggy box
   - statistics() - View statistics
   - share() - Share options
 - ✅ `PublicBoxController`:
   - index() - Public homepage with filtering
-  - show() - Public money box contribution page
+  - show() - Public piggy box contribution page
 - ✅ `ContributionController`:
   - store() - Process contribution and initialize payment
   - callback() - Handle payment callback
@@ -777,12 +777,12 @@ export default {
 
 #### 10. Routes
 - ✅ Public routes:
-  - `/` - Hero home page with featured money boxes
-  - `/browse` - Browse all public money boxes with filters
-  - `/box/{slug}` - Individual money box contribution page
-- ✅ Authenticated routes (dashboard, money box management)
+  - `/` - Hero home page with featured piggy boxes
+  - `/browse` - Browse all public piggy boxes with filters
+  - `/box/{slug}` - Individual piggy box contribution page
+- ✅ Authenticated routes (dashboard, piggy box management)
 - ✅ Payment callback and webhook routes
-- ✅ Resource routes for money boxes
+- ✅ Resource routes for piggy boxes
 - ✅ Additional routes for statistics and sharing
 
 ---
@@ -799,23 +799,23 @@ export default {
 
 #### 12. Views & Blade Templates
 - ✅ Public Pages:
-  - `public/index.blade.php` - Homepage with money boxes feed, search, and filtering
-  - `public/show.blade.php` - Public money box contribution page with payment form
+  - `public/index.blade.php` - Homepage with piggy boxes feed, search, and filtering
+  - `public/show.blade.php` - Public piggy box contribution page with payment form
 - ✅ Authenticated Pages:
   - `money-boxes/dashboard.blade.php` - User dashboard with stats overview
-  - `money-boxes/index.blade.php` - Grid list of user's money boxes
-  - `money-boxes/create.blade.php` - Comprehensive create money box form with dynamic fields
-  - `money-boxes/edit.blade.php` - Edit money box form with delete option
+  - `money-boxes/index.blade.php` - Grid list of user's piggy boxes
+  - `money-boxes/create.blade.php` - Comprehensive create piggy box form with dynamic fields
+  - `money-boxes/edit.blade.php` - Edit piggy box form with delete option
   - `money-boxes/show.blade.php` - Money box details (owner view) with recent contributions
   - `money-boxes/statistics.blade.php` - Detailed statistics and all contributions
   - `money-boxes/share.blade.php` - Sharing options with QR code and social media links
-- ✅ `home.blade.php` - Beautiful hero landing page with featured money boxes
+- ✅ `home.blade.php` - Beautiful hero landing page with featured piggy boxes
 - ✅ Layouts:
   - `components/layouts/guest.blade.php` - Public-facing layout with navigation and footer
   - `components/layouts/app.blade.php` - Authenticated layout
   - `components/layouts/auth/*` - Authentication layouts (card, simple, split)
 - ✅ Components:
-  - `money-box-card.blade.php` - Reusable money box card with progress bars
+  - `money-box-card.blade.php` - Reusable piggy box card with progress bars
   - `app-logo.blade.php` - App name display component
   - `app-logo-icon.blade.php` - Custom SVG logo (M + box + dollar sign)
   - Integrated contribution forms in public views
@@ -827,8 +827,8 @@ export default {
   - Form validation
 
 #### 13. Frontend Styling & Branding
-- ✅ **App Name**: MyMoneyBox (one word)
-- ✅ **Custom Logo**: SVG logo design with M + money box + dollar sign
+- ✅ **App Name**: MyPiggyBox (one word)
+- ✅ **Custom Logo**: SVG logo design with M + piggy box + dollar sign
 - ✅ **Color Scheme**: Complete green theme implementation
   - Primary: #16a34a (deeper green) - main branding, CTAs, primary actions
   - Secondary: #4ade80 (lighter green) - accents and highlights
@@ -837,7 +837,7 @@ export default {
 - ✅ **Color Application**:
   - Auth pages (login, register, forgot password, reset password, 2FA)
   - Dashboard and statistics pages
-  - All money box management pages (create, edit, show, index, statistics, share)
+  - All piggy box management pages (create, edit, show, index, statistics, share)
   - Public pages (browse, contribution forms)
   - Settings pages (profile, password, two-factor, appearance)
   - Form inputs with green focus states
@@ -926,7 +926,7 @@ export default {
 
 ## ✅ CORE APPLICATION COMPLETE
 
-The MyMoneyBox application is now fully functional and production-ready with:
+The MyPiggyBox application is now fully functional and production-ready with:
 
 ### Backend Architecture ✅
 - Complete Action pattern implementation with event-driven architecture
@@ -936,13 +936,13 @@ The MyMoneyBox application is now fully functional and production-ready with:
 - Comprehensive validation and error handling
 
 ### Frontend & UI ✅
-- **Branding**: MyMoneyBox (one word) with custom M+box+$ logo
+- **Branding**: MyPiggyBox (one word) with custom M+box+$ logo
 - **Color Scheme**: Professional green theme (#16a34a primary, #4ade80 secondary)
 - **Pages**:
   - Beautiful hero landing page
-  - Public money box browsing with filters
+  - Public piggy box browsing with filters
   - Complete authenticated dashboard
-  - Full CRUD for money boxes
+  - Full CRUD for piggy boxes
   - Contribution forms with payment integration
   - Statistics and analytics views
   - Sharing page with QR codes and social media
@@ -976,7 +976,7 @@ The MyMoneyBox application is now fully functional and production-ready with:
 
 ### High Priority
 1. **Email Notifications** - Implement email templates and sending:
-   - Welcome email when money box is created
+   - Welcome email when piggy box is created
    - Thank you email to contributors
    - Notification to owner on new contributions
    - Milestone notifications (50%, 100% goal reached)

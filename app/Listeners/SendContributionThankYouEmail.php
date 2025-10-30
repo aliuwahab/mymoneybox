@@ -10,7 +10,7 @@ class SendContributionThankYouEmail implements ShouldQueue
     public function handle(ContributionProcessed $event): void
     {
         // Send thank you email to contributor
-        // Send notification to money box owner about new contribution
+        // Send notification to piggy box owner about new contribution
 
         // Example:
         // if ($event->contribution->contributor_email) {

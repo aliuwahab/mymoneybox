@@ -9,7 +9,7 @@ class SendMoneyBoxCreatedNotification implements ShouldQueue
 {
     public function handle(MoneyBoxCreated $event): void
     {
-        // Send notification to money box creator
+        // Send notification to piggy box creator
         // This can be implemented with Laravel Notifications
         // Example: $event->moneyBox->user->notify(new MoneyBoxCreatedNotification($event->moneyBox));
     }

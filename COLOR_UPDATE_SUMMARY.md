@@ -1,7 +1,7 @@
-# MyMoneyBox - Green Color Scheme Implementation
+# MyPiggyBox - Green Color Scheme Implementation
 
 ## Summary
-Successfully applied the green color scheme across all pages in the MyMoneyBox application, including authentication pages, dashboard, forms, and public-facing pages.
+Successfully applied the green color scheme across all pages in the MyPiggyBox application, including authentication pages, dashboard, forms, and public-facing pages.
 
 ## Changes Made
 
@@ -51,7 +51,7 @@ Successfully applied the green color scheme across all pages in the MyMoneyBox a
 
 ### 2. Updated View Files
 
-#### Dashboard & Money Boxes
+#### Dashboard & Piggy Boxes
 - **`money-boxes/dashboard.blade.php`**
   - Line 40-41: Money icon → `bg-secondary-100 text-secondary-600`
   - Line 56-57: Contributors icon → `bg-primary-100 text-primary-600`
@@ -194,7 +194,7 @@ php artisan route:clear
 ✅ Dashboard statistics cards
 ✅ Money box creation form
 ✅ Money box listing pages
-✅ Public money box pages
+✅ Public piggy box pages
 ✅ Contribution forms
 ✅ Auth pages (login, register, forgot password)
 ✅ Settings pages (profile, password, 2FA)

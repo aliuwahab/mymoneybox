@@ -9,11 +9,11 @@ use Illuminate\Http\Request;
 class PublicBoxController extends Controller
 {
     /**
-     * Display the homepage with hero and featured money boxes
+     * Display the homepage with hero and featured piggy boxes
      */
     public function home()
     {
-        // Get 6 featured public money boxes
+        // Get 6 featured public piggy boxes
         $featuredMoneyBoxes = MoneyBox::with(['category', 'user'])
             ->public()
             ->active()
@@ -26,7 +26,7 @@ class PublicBoxController extends Controller
     }
 
     /**
-     * Display the browse page with all public money boxes and filters
+     * Display the browse page with all public piggy boxes and filters
      */
     public function index(Request $request)
     {
@@ -52,7 +52,7 @@ class PublicBoxController extends Controller
     }
 
     /**
-     * Display a specific money box (public or private via direct link)
+     * Display a specific piggy box (public or private via direct link)
      * Private boxes are accessible via direct link for contributions/donations
      */
     public function show(string $slug)

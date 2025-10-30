@@ -1,4 +1,4 @@
-# MyMoneyBox Color Scheme
+# MyPiggyBox Color Scheme
 
 ## Primary Color - Deeper Green
 The primary color is a deeper green (emerald/green scale), used for main branding, CTAs, and important UI elements.

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ContributionController;
 use App\Http\Controllers\MoneyBoxController;
 use App\Http\Controllers\PublicBoxController;
+use App\Http\Controllers\TrendiPayWebhookController;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
@@ -18,6 +19,10 @@ Route::get('/box/{slug}', [PublicBoxController::class, 'show'])->name('box.show'
 // Contribution Routes (Public)
 Route::post('/box/{slug}/contribute', [ContributionController::class, 'store'])->name('box.contribute');
 Route::get('/contributions/callback', [ContributionController::class, 'callback'])->name('contributions.callback');
+
+// Webhook Routes (Provider-Specific)
+Route::put('/webhooks/trendipay', [TrendiPayWebhookController::class, 'handle'])->name('webhooks.trendipay');
+// Legacy webhook route (kept for backward compatibility)
 Route::post('/contributions/webhook', [ContributionController::class, 'webhook'])->name('contributions.webhook');
 
 // Authenticated Routes
@@ -25,10 +30,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [MoneyBoxController::class, 'dashboard'])->name('dashboard');
 
-    // Money Box Resource Routes
+    // Piggy Box Resource Routes
     Route::resource('money-boxes', MoneyBoxController::class);
 
-    // Additional Money Box Routes
+    // Additional Piggy Box Routes
     Route::get('/money-boxes/{moneyBox}/statistics', [MoneyBoxController::class, 'statistics'])
         ->name('money-boxes.statistics');
     Route::get('/money-boxes/{moneyBox}/share', [MoneyBoxController::class, 'share'])

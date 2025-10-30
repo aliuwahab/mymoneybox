@@ -6,13 +6,13 @@
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                     <div>
                         <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">My Dashboard</h1>
-                        <p class="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">Manage your money boxes</p>
+                        <p class="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">Manage your piggy boxes</p>
                     </div>
                     <a
                         href="{{ route('money-boxes.create') }}"
                         class="inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 bg-green-600 hover:bg-green-700 text-white text-sm sm:text-base font-semibold rounded-lg transition whitespace-nowrap"
                     >
-                        Create Money Box
+                        Create Piggy Box
                     </a>
                 </div>
             </div>
@@ -29,7 +29,7 @@
                             </svg>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">Total Money Boxes</p>
+                            <p class="text-sm font-medium text-gray-600">Total Piggy Boxes</p>
                             <p class="text-2xl font-semibold text-gray-900">{{ $moneyBoxes->count() }}</p>
                         </div>
                     </div>
@@ -66,10 +66,10 @@
                 </div>
             </div>
 
-            <!-- Money Boxes Grid -->
+            <!-- Piggy Boxes Grid -->
             @if($moneyBoxes->count() > 0)
                 <div class="mb-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Your Money Boxes</h2>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Your Piggy Boxes</h2>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($moneyBoxes as $moneyBox)
@@ -152,8 +152,8 @@
                     <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                     </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">No money boxes</h3>
-                    <p class="mt-1 text-sm text-gray-500">Get started by creating your first money box.</p>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No piggy boxes</h3>
+                    <p class="mt-1 text-sm text-gray-500">Get started by creating your first piggy box.</p>
                     <div class="mt-6">
                         <a
                             href="{{ route('money-boxes.create') }}"
@@ -162,7 +162,7 @@
                             <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
-                            Create Money Box
+                            Create Piggy Box
                         </a>
                     </div>
                 </div>

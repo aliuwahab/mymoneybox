@@ -3,8 +3,8 @@
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Header -->
             <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Create Money Box</h1>
-                <p class="mt-2 text-gray-600 dark:text-gray-300">Set up a new money box to collect contributions</p>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Create Piggy Box</h1>
+                <p class="mt-2 text-gray-600 dark:text-gray-300">Set up a new piggy box to collect contributions</p>
             </div>
 
             <!-- Form -->
@@ -42,7 +42,7 @@
                             name="description"
                             id="description"
                             rows="4"
-                            placeholder="Tell people about this money box..."
+                            placeholder="Tell people about this piggy box..."
                         >{{ old('description') }}</textarea>
                         @error('description')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -235,7 +235,7 @@
                             onchange="toggleEndDate()"
                         />
                         <label for="is_ongoing" class="ml-2 text-sm text-gray-700">
-                            This money box is ongoing (no end date)
+                            This piggy box is ongoing (no end date)
                         </label>
                     </div>
 
@@ -268,7 +268,7 @@
                         type="submit"
                         class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition"
                     >
-                        Create Money Box
+                        Create Piggy Box
                     </button>
                 </div>
             </form>

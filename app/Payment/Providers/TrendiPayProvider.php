@@ -9,39 +9,61 @@ use Illuminate\Support\Facades\Log;
 class TrendiPayProvider implements PaymentProviderInterface
 {
     protected string $apiKey;
-    protected string $merchantId;
-    protected string $baseUrl = 'https://test-api.bsl.com.gh';
+    protected string $terminalExternalId;
+    protected string $baseUrl;
 
     public function __construct()
     {
         $this->apiKey = config('payment.trendipay.api_key');
-        $this->merchantId = config('payment.trendipay.merchant_id');
+        $this->terminalExternalId = config('payment.trendipay.terminal_external_id');
+        $this->baseUrl = config('payment.trendipay.base_url', 'https://test-api.bsl.com.gh');
     }
 
     public function initializePayment(array $data): array
     {
         try {
+            // Amount should be in minor units (pesewas for GHS)
+            $amountInMinorUnits = (int) ($data['amount'] * 100);
+
+            $payload = [
+                'terminalExternalId' => $this->terminalExternalId,
+                'amount' => $amountInMinorUnits,
+                'description' => $data['description'] ?? 'Piggy Box Contribution',
+                'reference' => $data['reference'] ?? 'trendipay_' . uniqid(),
+                'returnUrl' => $data['callback_url'] ?? route('contributions.callback'),
+                'callbackUrl' => route('webhooks.trendipay'),
+                'paymentMethods' => ['cards', 'mobile money', 'bank'],
+            ];
+
+            // Add metadata as items if provided
+            if (isset($data['metadata'])) {
+                $payload['items'] = [[
+                    'name' => $data['metadata']['money_box_title'] ?? 'Contribution',
+                    'price' => (string) $amountInMinorUnits,
+                    'currency' => 'GHS'
+                ]];
+            }
+
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->apiKey,
                 'Content-Type' => 'application/json',
-            ])->post("{$this->baseUrl}/checkout", [
-                'amount' => $data['amount'],
-                'currency' => $data['currency'] ?? 'GHS',
-                'email' => $data['email'],
-                'reference' => $data['reference'] ?? 'trendipay_' . uniqid(),
-                'callback_url' => $data['callback_url'] ?? route('contributions.callback'),
-                'metadata' => $data['metadata'] ?? [],
-            ]);
+            ])->post("{$this->baseUrl}/v1/payment-links", $payload);
 
             $result = $response->json();
 
             dd($result);
 
-            if ($response->successful() && isset($result['data']['checkout_url'])) {
+            Log::info('TrendiPay initialization response', [
+                'status' => $response->status(),
+                'response' => $result
+            ]);
+
+            if ($response->successful() && isset($result['data']['paymentLink'])) {
                 return [
                     'success' => true,
-                    'payment_url' => $result['data']['checkout_url'],
-                    'reference' => $result['data']['reference'],
+                    'payment_url' => $result['data']['paymentLink'],
+                    'reference' => $payload['reference'],
+                    'transaction_rrn' => $result['data']['transactionRRN'] ?? null,
                     'provider' => 'trendipay',
                 ];
             }
@@ -53,6 +75,7 @@ class TrendiPayProvider implements PaymentProviderInterface
         } catch (\Exception $e) {
             Log::error('TrendiPay initialization error', [
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
                 'data' => $data
             ]);
 
@@ -66,32 +89,43 @@ class TrendiPayProvider implements PaymentProviderInterface
     public function verifyPayment(string $reference): array
     {
         try {
+            // The reference is actually the transaction RRN
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->apiKey,
-                'Content-Type' => 'application/json',
-            ])->get("{$this->baseUrl}/transaction/verify/{$reference}");
+            ])->get("{$this->baseUrl}/v1/transactions/{$reference}/status");
 
             $result = $response->json();
 
-            if ($response->successful() && $result['data']['status'] === 'successful') {
+            Log::info('TrendiPay verification response', [
+                'status' => $response->status(),
+                'response' => $result
+            ]);
+
+            if ($response->successful() && isset($result['data'])) {
+                $data = $result['data'];
+                $isSuccessful = strtolower($data['status']) === 'success';
+
                 return [
-                    'success' => true,
-                    'status' => 'completed',
-                    'amount' => $result['data']['amount'],
-                    'reference' => $result['data']['reference'],
-                    'currency' => $result['data']['currency'],
-                    'paid_at' => $result['data']['paid_at'] ?? now()->toDateTimeString(),
+                    'success' => $isSuccessful,
+                    'status' => $isSuccessful ? 'completed' : 'failed',
+                    'amount' => ($data['amount'] ?? 0) / 100, // Convert from minor units
+                    'reference' => $data['reference'] ?? $reference,
+                    'transaction_rrn' => $data['rrn'] ?? null,
+                    'currency' => 'GHS',
+                    'paid_at' => now()->toDateTimeString(),
+                    'raw_data' => $data,
                 ];
             }
 
             return [
                 'success' => false,
-                'status' => $result['data']['status'] ?? 'failed',
+                'status' => 'failed',
                 'message' => $result['message'] ?? 'Payment verification failed',
             ];
         } catch (\Exception $e) {
             Log::error('TrendiPay verification error', [
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
                 'reference' => $reference
             ]);
 
@@ -103,28 +137,42 @@ class TrendiPayProvider implements PaymentProviderInterface
         }
     }
 
-    public function handleWebhook(array $payload): void
+    public function handleWebhook(array $payload): array
     {
         try {
-            // Verify webhook signature if TrendiPay provides one
-            $signature = request()->header('X-TrendiPay-Signature');
+            Log::info('TrendiPay webhook received', [
+                'payload' => $payload,
+                'headers' => request()->headers->all()
+            ]);
 
-            if ($signature) {
-                $computedSignature = hash_hmac('sha256', json_encode($payload), $this->apiKey);
-
-                if ($signature !== $computedSignature) {
-                    throw new \Exception('Invalid webhook signature');
-                }
+            // Extract data from webhook
+            if (!isset($payload['data'])) {
+                throw new \Exception('Invalid webhook payload: missing data');
             }
 
-            // Log webhook for debugging
-            Log::info('TrendiPay webhook received', $payload);
+            $data = $payload['data'];
+            $isSuccessful = strtolower($data['status']) === 'success';
 
-            // Process webhook events
-            // Event types might include: payment.success, payment.failed, etc.
+            return [
+                'success' => $isSuccessful,
+                'status' => $isSuccessful ? 'completed' : 'failed',
+                'amount' => ($data['amount'] ?? 0) / 100, // Convert from minor units
+                'reference' => $data['reference'] ?? null,
+                'transaction_rrn' => $data['rrn'] ?? null,
+                'transaction_id' => $data['internalId'] ?? null,
+                'external_id' => $data['externalId'] ?? null,
+                'account_number' => $data['accountNumber'] ?? null,
+                'payment_method' => $data['rSwitch'] ?? null,
+                'response_code' => $data['responseCode'] ?? null,
+                'reason' => $data['reason'] ?? null,
+                'currency' => 'GHS',
+                'paid_at' => now()->toDateTimeString(),
+                'raw_data' => $data,
+            ];
         } catch (\Exception $e) {
             Log::error('TrendiPay webhook error', [
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
                 'payload' => $payload
             ]);
 

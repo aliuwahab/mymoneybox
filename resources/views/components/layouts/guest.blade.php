@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'MyMoneyBox') }}</title>
+    <title>{{ config('app.name', 'MyPiggyBox') }}</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -17,7 +17,7 @@
                 <div class="flex items-center">
                     <a href="{{ route('home') }}" class="flex items-center space-x-2">
                         <x-app-logo-icon class="w-8 h-8 text-green-600" />
-                        <span class="text-xl font-bold text-gray-900">{{ config('app.name', 'MyMoneyBox') }}</span>
+                        <span class="text-xl font-bold text-gray-900">{{ config('app.name', 'MyPiggyBox') }}</span>
                     </a>
                 </div>
 
@@ -54,14 +54,14 @@
                         <span class="text-xl font-bold">{{ config('app.name') }}</span>
                     </div>
                     <p class="text-gray-400 mb-4">
-                        Create and share money boxes for any occasion. Collect contributions easily and securely.
+                        Create and share piggy boxes for any occasion. Collect contributions easily and securely.
                     </p>
                 </div>
 
                 <div>
                     <h3 class="font-semibold mb-4">Platform</h3>
                     <ul class="space-y-2 text-gray-400">
-                        <li><a href="{{ route('browse') }}" class="hover:text-white transition">Browse Money Boxes</a></li>
+                        <li><a href="{{ route('browse') }}" class="hover:text-white transition">Browse Piggy Boxes</a></li>
                         <li><a href="{{ route('register') }}" class="hover:text-white transition">Create Account</a></li>
                     </ul>
                 </div>

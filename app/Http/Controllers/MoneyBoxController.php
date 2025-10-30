@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class MoneyBoxController extends Controller
 {
     /**
-     * Display user's dashboard with their money boxes
+     * Display user's dashboard with their piggy boxes
      */
     public function dashboard()
     {
@@ -24,7 +24,7 @@ class MoneyBoxController extends Controller
     }
 
     /**
-     * Display a listing of the user's money boxes
+     * Display a listing of the user's piggy boxes
      */
     public function index()
     {
@@ -38,7 +38,7 @@ class MoneyBoxController extends Controller
     }
 
     /**
-     * Show the form for creating a new money box
+     * Show the form for creating a new piggy box
      */
     public function create()
     {
@@ -47,7 +47,7 @@ class MoneyBoxController extends Controller
     }
 
     /**
-     * Store a newly created money box
+     * Store a newly created piggy box
      */
     public function store(Request $request, CreateMoneyBoxAction $createMoneyBoxAction)
     {
@@ -78,17 +78,17 @@ class MoneyBoxController extends Controller
             return response()->json([
                 'success' => true,
                 'id' => $moneyBox->id,
-                'message' => 'Money Box created successfully!'
+                'message' => 'Piggy Box created successfully!'
             ]);
         }
 
         // Traditional redirect for non-AJAX
         return redirect()->route('money-boxes.show', $moneyBox)
-            ->with('success', 'Money Box created successfully!');
+            ->with('success', 'Piggy Box created successfully!');
     }
 
     /**
-     * Display the specified money box
+     * Display the specified piggy box
      */
     public function show(MoneyBox $moneyBox)
     {
@@ -102,7 +102,7 @@ class MoneyBoxController extends Controller
     }
 
     /**
-     * Show the form for editing the specified money box
+     * Show the form for editing the specified piggy box
      */
     public function edit(MoneyBox $moneyBox)
     {
@@ -113,7 +113,7 @@ class MoneyBoxController extends Controller
     }
 
     /**
-     * Update the specified money box
+     * Update the specified piggy box
      */
     public function update(Request $request, MoneyBox $moneyBox)
     {
@@ -191,11 +191,11 @@ class MoneyBoxController extends Controller
         }
 
         return redirect()->route('money-boxes.show', $moneyBox)
-            ->with('success', 'Money Box updated successfully!');
+            ->with('success', 'Piggy Box updated successfully!');
     }
 
     /**
-     * Remove the specified money box
+     * Remove the specified piggy box
      */
     public function destroy(MoneyBox $moneyBox)
     {
@@ -204,11 +204,11 @@ class MoneyBoxController extends Controller
         $moneyBox->delete();
 
         return redirect()->route('money-boxes.index')
-            ->with('success', 'Money Box deleted successfully!');
+            ->with('success', 'Piggy Box deleted successfully!');
     }
 
     /**
-     * Display statistics for a money box
+     * Display statistics for a piggy box
      */
     public function statistics(MoneyBox $moneyBox)
     {
@@ -229,7 +229,7 @@ class MoneyBoxController extends Controller
     }
 
     /**
-     * Display share options for a money box
+     * Display share options for a piggy box
      */
     public function share(MoneyBox $moneyBox)
     {
@@ -239,7 +239,7 @@ class MoneyBoxController extends Controller
     }
 
     /**
-     * Generate QR code for a money box
+     * Generate QR code for a piggy box
      */
     public function generateQrCode(MoneyBox $moneyBox)
     {
@@ -255,7 +255,7 @@ class MoneyBoxController extends Controller
     }
 
     /**
-     * Upload media (main image and gallery) for a money box
+     * Upload media (main image and gallery) for a piggy box
      */
     public function uploadMedia(Request $request, MoneyBox $moneyBox)
     {

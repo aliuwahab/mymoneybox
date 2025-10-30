@@ -3,8 +3,8 @@
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Header -->
             <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-900">Edit Money Box</h1>
-                <p class="mt-2 text-gray-600">Update your money box settings</p>
+                <h1 class="text-3xl font-bold text-gray-900">Edit Piggy Box</h1>
+                <p class="mt-2 text-gray-600">Update your piggy box settings</p>
             </div>
 
             <!-- Form -->
@@ -265,7 +265,7 @@
                             onchange="toggleEndDate()"
                         />
                         <label for="is_ongoing" class="ml-2 text-sm text-gray-700">
-                            This money box is ongoing (no end date)
+                            This piggy box is ongoing (no end date)
                         </label>
                     </div>
 
@@ -383,7 +383,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <button
                         type="button"
-                        onclick="confirmDelete(() => document.getElementById('delete-form').submit(), { title: 'Delete Money Box?', text: 'All contributions and data will be permanently deleted!', confirmText: 'Yes, delete it!' })"
+                        onclick="confirmDelete(() => document.getElementById('delete-form').submit(), { title: 'Delete Piggy Box?', text: 'All contributions and data will be permanently deleted!', confirmText: 'Yes, delete it!' })"
                         class="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base text-red-700 bg-red-50 border border-red-300 rounded-lg hover:bg-red-100 transition"
                     >
                         Delete
@@ -399,7 +399,7 @@
                             type="submit"
                             class="px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition"
                         >
-                            Update Money Box
+                            Update Piggy Box
                         </button>
                     </div>
                 </div>
