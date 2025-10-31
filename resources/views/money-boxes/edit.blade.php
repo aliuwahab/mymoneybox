@@ -299,7 +299,7 @@
                         
                         @if($moneyBox->hasMedia('main'))
                             <div class="mb-3 relative inline-block">
-                                <img src="{{ $moneyBox->getFirstMediaUrl('main') }}" 
+                                <img src="{{ $moneyBox->getMainImageUrl() }}" 
                                      alt="Main image" 
                                      class="w-48 h-48 object-cover rounded-lg border border-gray-300">
                                 <button
@@ -340,7 +340,7 @@
                             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-3">
                                 @foreach($moneyBox->getMedia('gallery') as $media)
                                     <div class="relative">
-                                        <img src="{{ $media->getUrl() }}" 
+                                        <img src="{{ $media->getTemporaryUrl(now()->addHours(24)) }}" 
                                              alt="Gallery image" 
                                              class="w-full h-32 object-cover rounded-lg border border-gray-300">
                                         <button

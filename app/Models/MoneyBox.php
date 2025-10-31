@@ -167,12 +167,27 @@ class MoneyBox extends Model implements HasMedia
         return min(100, ($this->total_contributions / $this->goal_amount) * 100);
     }
 
+    public function getMainImageUrl(): ?string
+    {
+        $media = $this->getFirstMedia('main');
+        return $media ? $media->getTemporaryUrl(now()->addHours(24)) : null;
+    }
+
+    public function getGalleryImageUrls(): array
+    {
+        return $this->getMedia('gallery')->map(function ($media) {
+            return $media->getTemporaryUrl(now()->addHours(24));
+        })->toArray();
+    }
+
     // Media Collections
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('main')
+            ->useDisk('s3')
             ->singleFile(); // Only one main image
 
-        $this->addMediaCollection('gallery');
+        $this->addMediaCollection('gallery')
+            ->useDisk('s3');
     }
 }
