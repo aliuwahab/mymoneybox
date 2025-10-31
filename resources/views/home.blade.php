@@ -110,8 +110,8 @@
                                     </div>
                                     <div class="flex justify-between items-end">
                                         <div>
-                                            <div class="text-base font-bold text-gray-900">$7,500</div>
-                                            <div class="text-xs text-gray-500">of $10,000</div>
+                                            <div class="text-base font-bold text-gray-900">GH₵7,500</div>
+                                            <div class="text-xs text-gray-500">of GH₵10,000</div>
                                         </div>
                                         <div class="text-right">
                                             <div class="text-sm font-bold text-gray-900">42</div>
@@ -163,8 +163,8 @@
                                     </div>
                                     <div class="flex justify-between items-end">
                                         <div>
-                                            <div class="text-base font-bold text-gray-900">$3,250</div>
-                                            <div class="text-xs text-gray-500">of $5,000</div>
+                                            <div class="text-base font-bold text-gray-900">GH₵3,250</div>
+                                            <div class="text-xs text-gray-500">of GH₵5,000</div>
                                         </div>
                                         <div class="text-right">
                                             <div class="text-sm font-bold text-gray-900">28</div>
@@ -218,8 +218,8 @@
                                     </div>
                                     <div class="flex justify-between items-end">
                                         <div>
-                                            <div class="text-base font-bold text-gray-900">$450</div>
-                                            <div class="text-xs text-gray-500">of $1,000</div>
+                                            <div class="text-base font-bold text-gray-900">GH₵450</div>
+                                            <div class="text-xs text-gray-500">of GH₵1,000</div>
                                         </div>
                                         <div class="text-right">
                                             <div class="text-sm font-bold text-gray-900">18</div>
@@ -271,8 +271,8 @@
                                     </div>
                                     <div class="flex justify-between items-end">
                                         <div>
-                                            <div class="text-base font-bold text-gray-900">$16,400</div>
-                                            <div class="text-xs text-gray-500">of $20,000</div>
+                                            <div class="text-base font-bold text-gray-900">GH₵16,400</div>
+                                            <div class="text-xs text-gray-500">of GH₵20,000</div>
                                         </div>
                                         <div class="text-right">
                                             <div class="text-sm font-bold text-gray-900">156</div>
