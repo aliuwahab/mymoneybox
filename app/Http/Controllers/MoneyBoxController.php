@@ -142,6 +142,8 @@ class MoneyBoxController extends Controller
         ]);
 
         // Update only non-media fields
+        $isOngoing = $validated['is_ongoing'] ?? false;
+        
         $moneyBox->update([
             'title' => $validated['title'],
             'description' => $validated['description'] ?? null,
@@ -154,8 +156,8 @@ class MoneyBoxController extends Controller
             'maximum_amount' => $validated['maximum_amount'] ?? null,
             'goal_amount' => $validated['goal_amount'] ?? null,
             'start_date' => $validated['start_date'] ?? null,
-            'end_date' => $validated['end_date'] ?? null,
-            'is_ongoing' => $validated['is_ongoing'] ?? false,
+            'end_date' => $isOngoing ? null : ($validated['end_date'] ?? null),
+            'is_ongoing' => $isOngoing,
             'is_active' => $validated['is_active'] ?? true,
         ]);
 
