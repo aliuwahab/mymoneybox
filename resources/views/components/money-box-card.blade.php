@@ -6,7 +6,7 @@
         <div class="w-full h-48 bg-gray-100 overflow-hidden flex-shrink-0">
             @if($moneyBox->hasMedia('main'))
                 <img
-                    src="{{ $moneyBox->getFirstMediaUrl('main') }}"
+                    src="{{ $moneyBox->getMainImageUrl() }}"
                     alt="{{ $moneyBox->title }}"
                     class="w-full h-full object-cover"
                 />
