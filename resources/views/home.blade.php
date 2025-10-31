@@ -412,12 +412,12 @@
     <!-- Featured Piggy Boxes -->
     <div id="featured" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center mb-12">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-8 sm:mb-12 gap-4">
                 <div>
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Featured Piggy Boxes</h2>
-                    <p class="text-xl text-gray-600">Support these amazing causes</p>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Featured Piggy Boxes</h2>
+                    <p class="text-base sm:text-xl text-gray-600">Support these amazing causes</p>
                 </div>
-                <a href="{{ route('browse') }}" class="text-green-600 hover:text-green-700 font-semibold flex items-center">
+                <a href="{{ route('browse') }}" class="text-green-600 hover:text-green-700 font-semibold flex items-center self-start sm:self-auto">
                     View All
                     <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
