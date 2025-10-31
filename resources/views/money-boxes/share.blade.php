@@ -50,12 +50,12 @@
                     <div class="flex flex-col items-center">
                         @if($moneyBox->qr_code_path)
                             <img
-                                src="{{ asset('storage/' . $moneyBox->qr_code_path) }}"
+                                src="{{ Storage::disk('s3')->temporaryUrl($moneyBox->qr_code_path, now()->addHour()) }}"
                                 alt="QR Code"
                                 class="w-64 h-64 border-2 border-gray-200 rounded-lg"
                             />
                             <a
-                                href="{{ asset('storage/' . $moneyBox->qr_code_path) }}"
+                                href="{{ Storage::disk('s3')->temporaryUrl($moneyBox->qr_code_path, now()->addHour()) }}"
                                 download="moneybox-qr-{{ $moneyBox->slug }}.png"
                                 class="mt-4 px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition"
                             >

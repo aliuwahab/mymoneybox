@@ -36,7 +36,8 @@ class GenerateQRCodeAction
 
         $filename = "qr-codes/{$moneyBox->slug}.png";
 
-        Storage::disk('public')->put($filename, $result->getString());
+        // Store on S3 instead of local public disk
+        Storage::disk('s3')->put($filename, $result->getString(), 'public');
 
         event(new QRCodeGenerated($moneyBox, $filename));
 
