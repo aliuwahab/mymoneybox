@@ -17,6 +17,11 @@ Route::get('/', [PublicBoxController::class, 'home'])->name('home');
 Route::get('/browse', [PublicBoxController::class, 'index'])->name('browse');
 Route::get('/box/{slug}', [PublicBoxController::class, 'show'])->name('box.show');
 
+// Static Pages
+Route::view('/about', 'pages.about')->name('about');
+Route::view('/terms', 'pages.terms')->name('terms');
+Route::view('/privacy', 'pages.privacy')->name('privacy');
+
 // Contribution Routes (Public)
 Route::post('/box/{slug}/contribute', [ContributionController::class, 'store'])->name('box.contribute');
 Route::get('/contributions/callback', [ContributionController::class, 'callback'])->name('contributions.callback');

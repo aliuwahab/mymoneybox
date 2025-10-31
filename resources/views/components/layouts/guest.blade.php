@@ -22,6 +22,9 @@
                 </div>
 
                 <div class="flex items-center space-x-4">
+                    <a href="{{ route('about') }}" class="text-gray-700 hover:text-green-600 font-medium transition">
+                        About
+                    </a>
                     @auth
                         <a href="{{ route('dashboard') }}" class="text-gray-700 hover:text-green-600 font-medium transition">
                             Dashboard
@@ -63,14 +66,15 @@
                     <ul class="space-y-2 text-gray-400">
                         <li><a href="{{ route('browse') }}" class="hover:text-white transition">Browse Piggy Boxes</a></li>
                         <li><a href="{{ route('register') }}" class="hover:text-white transition">Create Account</a></li>
+                        <li><a href="{{ route('about') }}" class="hover:text-white transition">About Us</a></li>
                     </ul>
                 </div>
 
                 <div>
-                    <h3 class="font-semibold mb-4">Support</h3>
+                    <h3 class="font-semibold mb-4">Legal</h3>
                     <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-white transition">Help Center</a></li>
-                        <li><a href="#" class="hover:text-white transition">Contact Us</a></li>
+                        <li><a href="{{ route('terms') }}" class="hover:text-white transition">Terms & Conditions</a></li>
+                        <li><a href="{{ route('privacy') }}" class="hover:text-white transition">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
