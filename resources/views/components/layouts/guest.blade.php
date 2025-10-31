@@ -7,6 +7,11 @@
 
     <title>{{ config('app.name', 'MyPiggyBox') }}</title>
 
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.svg">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="antialiased" x-data="{ mobileMenuOpen: false }">
