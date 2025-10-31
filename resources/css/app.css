@@ -116,6 +116,14 @@
 
 /* Form input styling */
 @layer components {
+    /* Make all buttons show pointer cursor */
+    button,
+    [type="button"],
+    [type="submit"],
+    [type="reset"] {
+        @apply cursor-pointer;
+    }
+
     label {
         @apply text-gray-700 dark:text-gray-300;
     }

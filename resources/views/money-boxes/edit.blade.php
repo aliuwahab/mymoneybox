@@ -305,7 +305,7 @@
                                 <button
                                     type="button"
                                     onclick="confirmDelete(() => { document.getElementById('remove_main_image').value = '1'; this.parentElement.style.display='none'; }, { title: 'Remove Image?', text: 'This image will be removed when you save.', confirmText: 'Yes, remove it!' })"
-                                    class="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 transition"
+                                    class="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 transition cursor-pointer"
                                     title="Remove image"
                                 >
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -346,7 +346,7 @@
                                         <button
                                             type="button"
                                             onclick="confirmDelete(() => { let input = document.getElementById('remove_gallery_images'); input.value = input.value ? input.value + ',' + {{ $media->id }} : {{ $media->id }}; this.parentElement.style.display='none'; }, { title: 'Remove Image?', text: 'This image will be removed when you save.', confirmText: 'Yes, remove it!' })"
-                                            class="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 transition"
+                                            class="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 transition cursor-pointer"
                                             title="Remove image"
                                         >
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -384,7 +384,7 @@
                     <button
                         type="button"
                         onclick="confirmDelete(() => document.getElementById('delete-form').submit(), { title: 'Delete Piggy Box?', text: 'All contributions and data will be permanently deleted!', confirmText: 'Yes, delete it!' })"
-                        class="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base text-red-700 bg-red-50 border border-red-300 rounded-lg hover:bg-red-100 transition"
+                        class="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base text-red-700 bg-red-50 border border-red-300 rounded-lg hover:bg-red-100 transition cursor-pointer"
                     >
                         Delete
                     </button>
@@ -397,7 +397,7 @@
                         </a>
                         <button
                             type="submit"
-                            class="px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition"
+                            class="px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition cursor-pointer"
                         >
                             Update Piggy Box
                         </button>
