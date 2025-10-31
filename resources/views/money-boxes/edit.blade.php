@@ -340,7 +340,7 @@
                             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-3">
                                 @foreach($moneyBox->getMedia('gallery') as $media)
                                     <div class="relative">
-                                        <img src="{{ $media->getUrl() }}" 
+                                        <img src="{{ $media->getTemporaryUrl(now()->addHour()) }}" 
                                              alt="Gallery image" 
                                              class="w-full h-32 object-cover rounded-lg border border-gray-300">
                                         <button

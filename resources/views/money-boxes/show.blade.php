@@ -138,7 +138,7 @@
                                         <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Gallery ({{ $moneyBox->getMedia('gallery')->count() }} images)</h3>
                                         <div class="grid grid-cols-3 gap-2">
                                             @foreach($moneyBox->getMedia('gallery') as $image)
-                                                <img src="{{ $image->getUrl() }}" 
+                                                <img src="{{ $image->getTemporaryUrl(now()->addHour()) }}" 
                                                      alt="Gallery image"
                                                      class="w-full h-24 object-cover rounded">
                                             @endforeach
