@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class MoneyBox extends Model implements HasMedia
 {
@@ -175,7 +176,7 @@ class MoneyBox extends Model implements HasMedia
 
     public function getGalleryImageUrls(): array
     {
-        return $this->getMedia('gallery')->map(function ($media) {
+        return $this->getMedia('gallery')->map(function (Media $media) {
             return $media->getTemporaryUrl(now()->addHour());
         })->toArray();
     }
