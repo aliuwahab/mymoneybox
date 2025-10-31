@@ -111,8 +111,8 @@
                             <h2 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">Gallery</h2>
                             <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
                                 @foreach($moneyBox->getMedia('gallery') as $image)
-                                    <a href="{{ $image->getTemporaryUrl(now()->addHours(24)) }}" target="_blank" class="group">
-                                        <img src="{{ $image->getTemporaryUrl(now()->addHours(24)) }}" 
+                                    <a href="{{ $image->getUrl() }}" target="_blank" class="group">
+                                        <img src="{{ $image->getUrl() }}" 
                                              alt="Gallery image"
                                              class="w-full h-32 sm:h-48 object-cover rounded-lg transition-transform group-hover:scale-105">
                                     </a>
