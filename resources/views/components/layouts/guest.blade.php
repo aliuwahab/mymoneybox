@@ -9,7 +9,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="antialiased">
+<body class="antialiased" x-data="{ mobileMenuOpen: false }">
     <!-- Navigation -->
     <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -21,7 +21,8 @@
                     </a>
                 </div>
 
-                <div class="flex items-center space-x-4">
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-4">
                     <a href="{{ route('about') }}" class="text-gray-700 hover:text-green-600 font-medium transition">
                         About
                     </a>
@@ -38,6 +39,47 @@
                         </a>
                     @endauth
                 </div>
+
+                <!-- Mobile Navigation -->
+                <div class="flex md:hidden items-center space-x-2">
+                    @guest
+                        <a href="{{ route('register') }}" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition text-sm">
+                            Get Started
+                        </a>
+                    @endguest
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                            <path x-show="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div x-show="mobileMenuOpen" 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 transform -translate-y-2"
+             x-transition:enter-end="opacity-100 transform translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 transform translate-y-0"
+             x-transition:leave-end="opacity-0 transform -translate-y-2"
+             class="md:hidden border-t border-gray-200 bg-white"
+             @click.away="mobileMenuOpen = false">
+            <div class="px-4 py-3 space-y-2">
+                <a href="{{ route('about') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-green-600 rounded-lg transition">
+                    About
+                </a>
+                @auth
+                    <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-green-600 rounded-lg transition">
+                        Dashboard
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-green-600 rounded-lg transition">
+                        Sign In
+                    </a>
+                @endauth
             </div>
         </div>
     </nav>
