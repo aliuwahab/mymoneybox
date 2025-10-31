@@ -381,13 +381,29 @@
 
                 <!-- Submit Buttons -->
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <button
-                        type="button"
-                        onclick="confirmDelete(() => document.getElementById('delete-form').submit(), { title: 'Delete Piggy Box?', text: 'All contributions and data will be permanently deleted!', confirmText: 'Yes, delete it!' })"
-                        class="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base text-red-700 bg-red-50 border border-red-300 rounded-lg hover:bg-red-100 transition cursor-pointer"
-                    >
-                        Delete
-                    </button>
+                    @if($moneyBox->contribution_count > 0)
+                        <div class="relative group">
+                            <button
+                                type="button"
+                                disabled
+                                class="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base text-gray-400 bg-gray-100 border border-gray-300 rounded-lg cursor-not-allowed"
+                            >
+                                Delete
+                            </button>
+                            <div class="absolute bottom-full left-0 mb-2 hidden group-hover:block w-64 p-2 bg-gray-900 text-white text-xs rounded shadow-lg z-10">
+                                This piggy box has {{ $moneyBox->contribution_count }} {{ Str::plural('contribution', $moneyBox->contribution_count) }} and cannot be deleted
+                                <div class="absolute top-full left-4 -mt-1 border-4 border-transparent border-t-gray-900"></div>
+                            </div>
+                        </div>
+                    @else
+                        <button
+                            type="button"
+                            onclick="confirmDelete(() => document.getElementById('delete-form').submit(), { title: 'Delete Piggy Box?', text: 'All contributions and data will be permanently deleted!', confirmText: 'Yes, delete it!' })"
+                            class="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base text-red-700 bg-red-50 border border-red-300 rounded-lg hover:bg-red-100 transition cursor-pointer"
+                        >
+                            Delete
+                        </button>
+                    @endif
                     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                         <a
                             href="{{ route('money-boxes.show', $moneyBox) }}"
