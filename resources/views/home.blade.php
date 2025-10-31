@@ -15,11 +15,14 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <!-- Hero Content -->
                 <div class="text-white">
+                    <div class="inline-block mb-4 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-semibold border border-white/20">
+                        ✨ The Modern Way to Collect & Give
+                    </div>
                     <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                        Collect Contributions <span class="text-green-200">Made Easy</span>
+                        Collect Gifts & Contributions <span class="text-green-200">The Easy Way</span>
                     </h1>
-                    <p class="text-xl md:text-2xl mb-8 text-green-100">
-                        Create a piggy box for any occasion. Share with friends and family. Track contributions in real-time.
+                    <p class="text-xl md:text-2xl mb-8 text-green-100 leading-relaxed">
+                        From weddings to charities, birthdays to tithes—everyone contributes with just a link, QR code, or Piggy Number. <strong>Transparent. Accessible. Trusted by thousands.</strong>
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4">
                         <a href="{{ route('piggy.lookup') }}" class="px-8 py-4 bg-yellow-500 text-white font-bold rounded-lg hover:bg-yellow-600 transition text-center shadow-lg">
@@ -293,8 +296,8 @@
     <div class="py-20 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose MyPiggyBox?</h2>
-                <p class="text-xl text-gray-600">Everything you need to collect contributions seamlessly</p>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Thousands Choose MyPiggyBox</h2>
+                <p class="text-xl text-gray-600">Modernize the age-old practice of communal contributions with complete transparency and security</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -305,8 +308,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Quick Setup</h3>
-                    <p class="text-gray-600">Create your piggy box in minutes. No complicated forms or lengthy processes.</p>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Lightning Fast Setup</h3>
+                    <p class="text-gray-600">Create your PiggyBox in under 2 minutes. No complicated forms, no hassle—just simple, intuitive design.</p>
                 </div>
 
                 <!-- Feature 2 -->
@@ -316,8 +319,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Secure Payments</h3>
-                    <p class="text-gray-600">Accept contributions through trusted payment providers with bank-level security.</p>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Bank-Level Security</h3>
+                    <p class="text-gray-600">Accept payments via cards and mobile money with enterprise-grade encryption. Your contributors' data is always protected.</p>
                 </div>
 
                 <!-- Feature 3 -->
@@ -327,8 +330,80 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Easy Sharing</h3>
-                    <p class="text-gray-600">Share via link, QR code, or social media. Reach your contributors effortlessly.</p>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Share Anywhere, Anytime</h3>
+                    <p class="text-gray-600">QR codes for events, unique links for social media, or your personal Piggy Number—reach contributors on any platform instantly.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Use Cases Section -->
+    <div class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Perfect For Every Occasion</h2>
+                <p class="text-xl text-gray-600">From personal milestones to community causes—MyPiggyBox adapts to your needs</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Use Case 1 -->
+                <div class="relative group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-pink-500 to-pink-600 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="relative bg-white border-2 border-gray-100 rounded-2xl p-6 hover:border-pink-200 transition">
+                        <div class="text-4xl mb-4">💍</div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Weddings & Celebrations</h3>
+                        <p class="text-gray-600">Guests scan QR codes at tables to send gifts instantly. Modern, seamless, and memorable.</p>
+                    </div>
+                </div>
+
+                <!-- Use Case 2 -->
+                <div class="relative group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="relative bg-white border-2 border-gray-100 rounded-2xl p-6 hover:border-purple-200 transition">
+                        <div class="text-4xl mb-4">⛪</div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Church & Tithes</h3>
+                        <p class="text-gray-600">A permanent PiggyBox for offerings, tithes, and donations. Transparent and convenient for your congregation.</p>
+                    </div>
+                </div>
+
+                <!-- Use Case 3 -->
+                <div class="relative group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="relative bg-white border-2 border-gray-100 rounded-2xl p-6 hover:border-blue-200 transition">
+                        <div class="text-4xl mb-4">🎓</div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Group Events & Trips</h3>
+                        <p class="text-gray-600">Friends split costs for dinners, trips, or activities. Everyone contributes their share hassle-free.</p>
+                    </div>
+                </div>
+
+                <!-- Use Case 4 -->
+                <div class="relative group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="relative bg-white border-2 border-gray-100 rounded-2xl p-6 hover:border-red-200 transition">
+                        <div class="text-4xl mb-4">🏥</div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Medical Fundraisers</h3>
+                        <p class="text-gray-600">Rally community support for medical needs. Track progress and thank donors in real-time.</p>
+                    </div>
+                </div>
+
+                <!-- Use Case 5 -->
+                <div class="relative group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="relative bg-white border-2 border-gray-100 rounded-2xl p-6 hover:border-green-200 transition">
+                        <div class="text-4xl mb-4">💰</div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Tips & Gratuities</h3>
+                        <p class="text-gray-600">Service workers receive tips via their Piggy Number or QR code. Digital tipping made simple.</p>
+                    </div>
+                </div>
+
+                <!-- Use Case 6 -->
+                <div class="relative group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="relative bg-white border-2 border-gray-100 rounded-2xl p-6 hover:border-yellow-200 transition">
+                        <div class="text-4xl mb-4">🎯</div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Community Projects</h3>
+                        <p class="text-gray-600">Political parties, clubs, and societies raise funds with clarity and accountability.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -373,14 +448,73 @@
         </div>
     </div>
 
+    <!-- How It Works Section -->
+    <div class="py-20 bg-gradient-to-br from-green-50 to-green-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Get Started in 3 Simple Steps</h2>
+                <p class="text-xl text-gray-600">From creation to collection—it takes less than 5 minutes</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <!-- Step 1 -->
+                <div class="text-center">
+                    <div class="relative inline-flex items-center justify-center w-20 h-20 mb-6">
+                        <div class="absolute inset-0 bg-green-200 rounded-full animate-pulse"></div>
+                        <div class="relative bg-green-600 text-white text-3xl font-bold rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
+                            1
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Create Your PiggyBox</h3>
+                    <p class="text-lg text-gray-600">Sign up free and set up your box in under 2 minutes. Add a title, goal, and description.</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="text-center">
+                    <div class="relative inline-flex items-center justify-center w-20 h-20 mb-6">
+                        <div class="absolute inset-0 bg-green-200 rounded-full animate-pulse animation-delay-150"></div>
+                        <div class="relative bg-green-600 text-white text-3xl font-bold rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
+                            2
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Share With Anyone</h3>
+                    <p class="text-lg text-gray-600">Get your unique link, QR code, or Piggy Number. Share on WhatsApp, Facebook, or print for events.</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="text-center">
+                    <div class="relative inline-flex items-center justify-center w-20 h-20 mb-6">
+                        <div class="absolute inset-0 bg-green-200 rounded-full animate-pulse animation-delay-300"></div>
+                        <div class="relative bg-green-600 text-white text-3xl font-bold rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
+                            3
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Track & Collect</h3>
+                    <p class="text-lg text-gray-600">Watch contributions come in real-time. Withdraw anytime. 100% transparent and secure.</p>
+                </div>
+            </div>
+
+            <!-- CTA Button -->
+            <div class="text-center mt-12">
+                <a href="{{ route('register') }}" class="inline-flex items-center px-8 py-4 bg-green-600 hover:bg-green-700 text-white text-lg font-bold rounded-lg shadow-xl transition">
+                    Start Collecting Now - It's Free
+                    <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                    </svg>
+                </a>
+                <p class="mt-4 text-gray-600">No credit card required • Setup in 2 minutes • Free forever</p>
+            </div>
+        </div>
+    </div>
+
     <!-- CTA Section -->
     <div class="bg-gradient-to-r from-green-600 to-green-700 py-16">
         <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
             <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
-                Ready to Get Started?
+                Join the Digital Giving Revolution
             </h2>
             <p class="text-xl text-green-100 mb-8">
-                Join thousands of people collecting contributions for their special moments
+                Whether it's a wedding gift, church offering, or community fundraiser—start collecting contributions the modern way. <strong>Free to create. Easy to share. Secure for everyone.</strong>
             </p>
             <a href="{{ route('register') }}" class="inline-flex items-center px-8 py-4 bg-white text-green-700 font-bold rounded-lg hover:bg-green-50 transition shadow-lg">
                 Create Your Free Account
