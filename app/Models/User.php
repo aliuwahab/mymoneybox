@@ -111,6 +111,36 @@ class User extends Authenticatable
     }
 
     /**
+     * Get all ID verifications for the user
+     */
+    public function idVerifications(): HasMany
+    {
+        return $this->hasMany(IdVerification::class);
+    }
+
+    /**
+     * Get the user's current valid verification
+     */
+    public function currentVerification(): HasOne
+    {
+        return $this->hasOne(IdVerification::class)
+            ->where('status', 'approved')
+            ->where(function($q) {
+                $q->whereNull('expires_at')
+                  ->orWhere('expires_at', '>', now());
+            })
+            ->latestOfMany();
+    }
+
+    /**
+     * Check if user is verified
+     */
+    public function isVerified(): bool
+    {
+        return $this->currentVerification()->exists();
+    }
+
+    /**
      * Generate a unique piggy code for the user
      */
     public static function generateUniquePiggyCode(): string
