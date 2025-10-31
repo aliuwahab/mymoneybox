@@ -10,7 +10,7 @@
                     </div>
                     <a
                         href="{{ route('money-boxes.create') }}"
-                        class="inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 bg-green-600 hover:bg-green-700 text-white text-sm sm:text-base font-semibold rounded-lg transition whitespace-nowrap"
+                        class="mat-button mat-button-primary mat-ripple whitespace-nowrap text-sm sm:text-base"
                     >
                         Create Piggy Box
                     </a>
@@ -21,7 +21,7 @@
         <!-- Stats -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white rounded-lg shadow p-6">
+                <div class="mat-stat-card smooth-transition">
                     <div class="flex items-center">
                         <div class="flex-shrink-0 p-3 bg-primary-100 rounded-lg">
                             <svg class="h-6 w-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,7 +35,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg shadow p-6">
+                <div class="mat-stat-card smooth-transition">
                     <div class="flex items-center">
                         <div class="flex-shrink-0 p-3 bg-secondary-100 rounded-lg">
                             <svg class="h-6 w-6 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,7 +51,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg shadow p-6">
+                <div class="mat-stat-card smooth-transition">
                     <div class="flex items-center">
                         <div class="flex-shrink-0 p-3 bg-primary-100 rounded-lg">
                             <svg class="h-6 w-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,7 +73,7 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($moneyBoxes as $moneyBox)
-                        <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden">
+                        <div class="mat-card elevation-hover smooth-transition overflow-hidden">
                             <!-- Card Header -->
                             <div class="p-6">
                                 <div class="flex items-start justify-between mb-4">
@@ -138,7 +138,7 @@
                                     </a>
                                     <a
                                         href="{{ route('money-boxes.edit', $moneyBox) }}"
-                                        class="flex-1 text-center px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition"
+                                        class="flex-1 text-center px-3 py-2 text-sm font-medium text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 rounded-lg smooth-transition elevation-1"
                                     >
                                         Edit
                                     </a>
