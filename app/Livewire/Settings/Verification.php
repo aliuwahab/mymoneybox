@@ -37,7 +37,7 @@ class Verification extends Component
             'otherNames' => 'nullable|string|max:255',
             'idNumber' => 'nullable|string|max:255',
             'expiresAt' => 'required|date|after:today',
-            'frontImage' => 'required|file|mimes:jpeg,png,jpg,pdf|max:5120',
+            'frontImage' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:5120',
             'backImage' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:5120',
         ];
     }
@@ -49,6 +49,14 @@ class Verification extends Component
 
     public function submit()
     {
+        // Debug: Log what we're receiving
+        \Log::info('Verification submission attempt', [
+            'frontImage_type' => gettype($this->frontImage),
+            'frontImage_class' => is_object($this->frontImage) ? get_class($this->frontImage) : 'not_object',
+            'frontImage_value' => $this->frontImage,
+            'backImage_type' => gettype($this->backImage),
+        ]);
+
         $this->validate();
 
         $verification = IdVerification::create([
@@ -62,14 +70,16 @@ class Verification extends Component
             'status' => 'pending',
         ]);
 
-        // Upload front image
-        $verification->addMedia($this->frontImage->getRealPath())
-            ->usingName($this->frontImage->getClientOriginalName())
-            ->toMediaCollection('front');
+        // Upload front image using Livewire 3 temporary file path
+        if ($this->frontImage) {
+            $verification->addMedia($this->frontImage->path())
+                ->usingName($this->frontImage->getClientOriginalName())
+                ->toMediaCollection('front');
+        }
 
         // Upload back image if provided
         if ($this->backImage) {
-            $verification->addMedia($this->backImage->getRealPath())
+            $verification->addMedia($this->backImage->path())
                 ->usingName($this->backImage->getClientOriginalName())
                 ->toMediaCollection('back');
         }

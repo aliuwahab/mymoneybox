@@ -1,5 +1,9 @@
 <div>
-    <flux:heading size="xl" class="mb-6">{{ __('ID Verification') }}</flux:heading>
+    <section class="w-full">
+        @include('partials.settings-heading')
+
+        <x-settings.layout :heading="__('ID Verification')" :subheading="__('Verify your identity to unlock all features')">
+            <div class="my-6 w-full space-y-6">
 
     @if (session('success'))
         <div class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
@@ -84,7 +88,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Front of ID *</label>
-                        <input type="file" wire:model="frontImage" accept="image/*" class="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer" />
+                        <input type="file" wire:model.live="frontImage" accept="image/*" class="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer" />
+                        <div wire:loading wire:target="frontImage" class="mt-2 text-sm text-green-600">Uploading...</div>
                         @if ($frontImage)
                             <div class="mt-2">
                                 <img src="{{ $frontImage->temporaryUrl() }}" class="w-full h-48 object-cover rounded-lg border border-gray-300">
@@ -95,7 +100,8 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Back of ID</label>
-                        <input type="file" wire:model="backImage" accept="image/*" class="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer" />
+                        <input type="file" wire:model.live="backImage" accept="image/*" class="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer" />
+                        <div wire:loading wire:target="backImage" class="mt-2 text-sm text-green-600">Uploading...</div>
                         @if ($backImage)
                             <div class="mt-2">
                                 <img src="{{ $backImage->temporaryUrl() }}" class="w-full h-48 object-cover rounded-lg border border-gray-300">
@@ -107,8 +113,9 @@
                 </div>
 
                 <div class="flex justify-end">
-                    <flux:button type="submit" variant="primary">
-                        {{ __('Submit for Verification') }}
+                    <flux:button type="submit" variant="primary" wire:loading.attr="disabled" wire:target="submit">
+                        <span wire:loading.remove wire:target="submit">{{ __('Submit for Verification') }}</span>
+                        <span wire:loading wire:target="submit">Submitting...</span>
                     </flux:button>
                 </div>
             </form>
@@ -155,4 +162,7 @@
             </div>
         </div>
     @endif
+            </div>
+        </x-settings.layout>
+    </section>
 </div>
