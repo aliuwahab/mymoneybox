@@ -112,35 +112,35 @@
                 </div>
 
                 <!-- Main Image & Gallery -->
-                @if($moneyBox->hasMedia('main_image') || $moneyBox->hasMedia('gallery'))
+                @if($moneyBox->hasMedia('main') || $moneyBox->hasMedia('gallery'))
                     <div class="lg:col-span-3">
-                        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow p-6">
+                        <div class="bg-white rounded-lg shadow p-6">
                             <div class="flex justify-between items-center mb-4">
-                                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Images</h2>
+                                <h2 class="text-lg font-semibold text-gray-900">Images</h2>
                                 <a href="{{ route('money-boxes.edit', $moneyBox) }}" 
                                    class="text-sm text-green-600 hover:text-green-700">
                                     Manage Images
                                 </a>
                             </div>
                             
-                            <div class="space-y-4">
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 @if($moneyBox->hasMedia('main'))
-                                    <div>
-                                        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Main Image</h3>
+                                    <div class="lg:col-span-2">
+                                        <h3 class="text-sm font-medium text-gray-700 mb-2">Main Image</h3>
                                         <img src="{{ $moneyBox->getMainImageUrl() }}" 
                                              alt="Main image"
-                                             class="w-full max-h-64 object-cover rounded-lg">
+                                             class="w-full h-64 object-cover rounded-lg shadow-sm">
                                     </div>
                                 @endif
                                 
                                 @if($moneyBox->hasMedia('gallery'))
-                                    <div>
-                                        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Gallery ({{ $moneyBox->getMedia('gallery')->count() }} images)</h3>
-                                        <div class="grid grid-cols-3 gap-2">
-                                            @foreach($moneyBox->getMedia('gallery') as $image)
-                                                <img src="{{ $image->getTemporaryUrl(now()->addHour()) }}" 
+                                    <div class="{{ $moneyBox->hasMedia('main') ? 'lg:col-span-1' : 'lg:col-span-3' }}">
+                                        <h3 class="text-sm font-medium text-gray-700 mb-2">Gallery ({{ $moneyBox->getMedia('gallery')->count() }})</h3>
+                                        <div class="grid grid-cols-2 {{ $moneyBox->hasMedia('main') ? 'lg:grid-cols-1' : 'lg:grid-cols-4' }} gap-2">
+                                            @foreach($moneyBox->getGalleryImageUrls() as $imageUrl)
+                                                <img src="{{ $imageUrl }}" 
                                                      alt="Gallery image"
-                                                     class="w-full h-24 object-cover rounded">
+                                                     class="w-full h-32 object-cover rounded-lg shadow-sm hover:shadow-md transition cursor-pointer">
                                             @endforeach
                                         </div>
                                     </div>
