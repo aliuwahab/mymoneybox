@@ -35,7 +35,7 @@
                 </div>
 
                 <!-- Error Message -->
-                <div class="mb-8">
+                <div class="mb-4">
                     <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                         @yield('title')
                     </h2>
@@ -43,6 +43,15 @@
                         @yield('message')
                     </p>
                 </div>
+
+                <!-- Additional Help Text -->
+                @hasSection('help')
+                    <div class="mb-8">
+                        <p class="text-base text-gray-600 dark:text-gray-400">
+                            @yield('help')
+                        </p>
+                    </div>
+                @endif
 
                 <!-- Action Buttons -->
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -59,15 +68,6 @@
                         Go Back
                     </button>
                 </div>
-
-                <!-- Additional Help Text -->
-                @hasSection('help')
-                    <div class="mt-8 p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
-                        <p class="text-sm text-gray-600 dark:text-gray-400">
-                            @yield('help')
-                        </p>
-                    </div>
-                @endif
             </div>
         </div>
     </body>
