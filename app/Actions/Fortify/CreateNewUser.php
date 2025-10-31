@@ -2,6 +2,7 @@
 
 namespace App\Actions\Fortify;
 
+use App\Actions\CreatePiggyBoxForUser;
 use App\Models\Country;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
@@ -34,11 +35,17 @@ class CreateNewUser implements CreatesNewUsers
         // Get Ghana as default country (code 'GH')
         $ghanaCountryId = Country::where('code', 'GH')->value('id');
 
-        return User::create([
+        $user = User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => $input['password'],
             'country_id' => $ghanaCountryId,
+            'piggy_code' => User::generateUniquePiggyCode(),
         ]);
+
+        // Auto-create personal piggy box for the new user
+        app(CreatePiggyBoxForUser::class)->execute($user);
+
+        return $user;
     }
 }

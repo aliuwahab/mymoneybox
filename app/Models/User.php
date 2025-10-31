@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -26,6 +27,7 @@ class User extends Authenticatable
         'email',
         'password',
         'country_id',
+        'piggy_code',
     ];
 
     /**
@@ -74,10 +76,30 @@ class User extends Authenticatable
     }
 
     /**
-     * Get all piggy boxes created by the user
+     * Get all money boxes (for causes) created by the user
      */
     public function moneyBoxes(): HasMany
     {
         return $this->hasMany(MoneyBox::class);
+    }
+
+    /**
+     * Get the user's personal piggy box
+     */
+    public function piggyBox(): HasOne
+    {
+        return $this->hasOne(PiggyBox::class);
+    }
+
+    /**
+     * Generate a unique piggy code for the user
+     */
+    public static function generateUniquePiggyCode(): string
+    {
+        do {
+            $code = strtoupper(Str::random(4) . rand(0, 9));
+        } while (self::where('piggy_code', $code)->exists());
+
+        return $code;
     }
 }

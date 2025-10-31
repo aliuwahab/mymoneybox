@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ContributionController;
 use App\Http\Controllers\MoneyBoxController;
+use App\Http\Controllers\PiggyBoxController;
 use App\Http\Controllers\PublicBoxController;
 use App\Http\Controllers\TrendiPayWebhookController;
 use App\Livewire\Settings\Appearance;
@@ -19,6 +20,13 @@ Route::get('/box/{slug}', [PublicBoxController::class, 'show'])->name('box.show'
 // Contribution Routes (Public)
 Route::post('/box/{slug}/contribute', [ContributionController::class, 'store'])->name('box.contribute');
 Route::get('/contributions/callback', [ContributionController::class, 'callback'])->name('contributions.callback');
+
+// Piggy Box Routes (Public)
+Route::get('/piggy-someone', [PiggyBoxController::class, 'lookup'])->name('piggy.lookup');
+Route::post('/piggy-someone/find', [PiggyBoxController::class, 'findByCode'])->name('piggy.find');
+Route::get('/piggy/{code}', [PiggyBoxController::class, 'showByCode'])->name('piggy.show');
+Route::post('/piggy/{user}/donate', [PiggyBoxController::class, 'donate'])->name('piggy.donate');
+Route::get('/piggy/callback', [PiggyBoxController::class, 'callback'])->name('piggy.callback');
 
 // Webhook Routes (Provider-Specific)
 Route::put('/webhooks/trendipay', [TrendiPayWebhookController::class, 'handle'])->name('webhooks.trendipay');
@@ -42,6 +50,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('money-boxes.generate-qr');
     Route::post('/money-boxes/{moneyBox}/upload-media', [MoneyBoxController::class, 'uploadMedia'])
         ->name('money-boxes.upload-media');
+
+    // Piggy Box Routes (Authenticated)
+    Route::get('/my-piggy-box', [PiggyBoxController::class, 'myPiggyBox'])
+        ->name('piggy.my-piggy-box');
 
     // Settings Routes
     Route::redirect('settings', 'settings/profile');

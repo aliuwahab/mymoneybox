@@ -25,6 +25,9 @@
                         <a href="{{ route('register') }}" class="px-8 py-4 bg-white text-green-700 font-bold rounded-lg hover:bg-green-50 transition text-center shadow-lg">
                             Create Your Piggy Box
                         </a>
+                        <a href="{{ route('piggy.lookup') }}" class="px-8 py-4 bg-yellow-500 text-white font-bold rounded-lg hover:bg-yellow-600 transition text-center shadow-lg">
+                            🎁 Piggy Someone
+                        </a>
                         <a href="{{ route('browse') }}" class="px-8 py-4 bg-green-500/20 backdrop-blur-sm text-white font-bold rounded-lg hover:bg-green-500/30 transition text-center border-2 border-white/30">
                             Browse Piggy Boxes
                         </a>
