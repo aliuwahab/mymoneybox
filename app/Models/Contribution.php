@@ -31,6 +31,7 @@ class Contribution extends Model
         'amount' => 'decimal:2',
         'is_anonymous' => 'boolean',
         'payment_status' => PaymentStatus::class,
+        'payment_metadata' => 'array',
     ];
 
     public function moneyBox(): BelongsTo
