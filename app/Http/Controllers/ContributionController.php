@@ -22,7 +22,7 @@ class ContributionController extends Controller
      */
     public function store(Request $request, string $slug)
     {
-        $moneyBox = MoneyBox::where('slug', $slug)->firstOrFail();
+        $moneyBox = MoneyBox::query()->where('slug', $slug)->firstOrFail();
 
         if (!$moneyBox->canAcceptContributions()) {
             return back()->with('error', 'This piggy box is not accepting contributions.');
@@ -48,7 +48,7 @@ class ContributionController extends Controller
             'amount' => $validated['amount'],
             'currency' => $moneyBox->currency_code,
             'reference' => 'contrib_' . uniqid(),
-            'return_url' => route('box.show', $moneyBox->slug),
+            'return_url' => route('trendipay.return'),
             'webhook_url' => route('trendipay.webhook'),
             'description' => "Contribution to {$moneyBox->title}",
             'metadata' => [
