@@ -25,7 +25,10 @@ Route::view('/privacy', 'pages.privacy')->name('privacy');
 
 // Contribution Routes (Public)
 Route::post('/box/{slug}/contribute', [ContributionController::class, 'store'])->name('box.contribute');
-Route::get('/contributions/callback', [ContributionController::class, 'callback'])->name('contributions.callback');
+
+// TrendiPay-specific routes
+Route::get('/contributions/trendipay/callback', [TrendiPayWebhookController::class, 'callback'])->name('contributions.callback');
+Route::put('/webhooks/trendipay', [TrendiPayWebhookController::class, 'handle'])->name('webhooks.trendipay');
 
 // Piggy Box Routes (Public)
 Route::get('/piggy-someone', [PiggyBoxController::class, 'lookup'])->name('piggy.lookup');
@@ -35,9 +38,6 @@ Route::post('/piggy/{user}/donate', [PiggyBoxController::class, 'donate'])->name
 Route::get('/piggy/callback', [PiggyBoxController::class, 'callback'])->name('piggy.callback');
 
 // Webhook Routes (Provider-Specific)
-Route::put('/webhooks/trendipay', [TrendiPayWebhookController::class, 'handle'])->name('webhooks.trendipay');
-// Legacy webhook route (kept for backward compatibility)
-Route::post('/contributions/webhook', [ContributionController::class, 'webhook'])->name('contributions.webhook');
 
 // Authenticated Routes
 Route::middleware(['auth', 'verified'])->group(function () {

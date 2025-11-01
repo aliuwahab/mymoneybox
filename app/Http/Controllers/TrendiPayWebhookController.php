@@ -2,19 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\UpdateMoneyBoxStatsAction;
+use App\Enums\PaymentStatus;
 use App\Models\Contribution;
-use App\Payment\PaymentManager;
+use App\Payment\Providers\TrendiPayProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class TrendiPayWebhookController extends Controller
 {
     public function __construct(
-        protected PaymentManager $paymentManager
+        protected TrendiPayProvider $trendiPayProvider,
+        protected UpdateMoneyBoxStatsAction $updateStatsAction
     ) {}
 
     /**
-     * Handle TrendiPay webhook callback
+     * Handle TrendiPay webhook notification (server-to-server)
+     *
+     * This receives payment status updates from TrendiPay after payment
      */
     public function handle(Request $request)
     {
@@ -24,15 +29,28 @@ class TrendiPayWebhookController extends Controller
                 'headers' => $request->headers->all()
             ]);
 
-            // Process the webhook through the provider
-            $webhookData = $this->paymentManager->provider('trendipay')->handleWebhook($request->all());
+            // Process the webhook payload through TrendiPay provider
+            $webhookData = $this->trendiPayProvider->handleWebhook($request->all());
+
+            if (!$webhookData['success']) {
+                Log::warning('TrendiPay webhook: Payment failed', [
+                    'data' => $webhookData
+                ]);
+
+                return response()->json([
+                    'status' => 'received',
+                    'message' => 'Payment failed notification received'
+                ], 200);
+            }
 
             // Find the contribution by reference
-            $contribution = Contribution::where('payment_reference', $webhookData['reference'])->first();
+            $reference = $webhookData['reference'];
+            $contribution = Contribution::query()->where('payment_reference', $reference)->first();
 
             if (!$contribution) {
-                Log::warning('TrendiPay webhook: Contribution not found', [
-                    'reference' => $webhookData['reference']
+                Log::error('TrendiPay webhook: Contribution not found', [
+                    'reference' => $reference,
+                    'webhook_data' => $webhookData
                 ]);
 
                 return response()->json([
@@ -41,47 +59,120 @@ class TrendiPayWebhookController extends Controller
                 ], 404);
             }
 
-            // Update contribution if status is success
-            if ($webhookData['success']) {
-                $contribution->update([
-                    'payment_status' => \App\Enums\PaymentStatus::Completed,
+            // Check if already processed
+            if ($contribution->payment_status === PaymentStatus::Completed) {
+                Log::info('TrendiPay webhook: Already processed', [
+                    'reference' => $reference,
+                    'contribution_id' => $contribution->id
                 ]);
 
-                // Update piggy box stats
-                $moneyBox = $contribution->moneyBox;
-                $moneyBox->increment('total_contributions', $contribution->amount);
-                $moneyBox->increment('contribution_count');
-
-                Log::info('TrendiPay webhook: Payment completed', [
-                    'contribution_id' => $contribution->id,
-                    'amount' => $contribution->amount
-                ]);
-            } else {
-                $contribution->update([
-                    'payment_status' => \App\Enums\PaymentStatus::Failed,
-                ]);
-
-                Log::warning('TrendiPay webhook: Payment failed', [
-                    'contribution_id' => $contribution->id,
-                    'reason' => $webhookData['reason'] ?? 'Unknown'
-                ]);
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Payment already processed'
+                ], 200);
             }
+
+            // Update contribution status to completed
+            $contribution->update([
+                'payment_status' => PaymentStatus::Completed,
+                'transaction_rrn' => $webhookData['transaction_rrn'] ?? null,
+                'payment_metadata' => $webhookData['raw_data'] ?? null,
+            ]);
+
+            Log::info('TrendiPay webhook: Contribution marked as completed', [
+                'contribution_id' => $contribution->id,
+                'reference' => $reference,
+                'amount' => $contribution->amount
+            ]);
+
+            // Update piggy box statistics
+            $this->updateStatsAction->execute($contribution->moneyBox, $contribution);
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Webhook processed successfully'
-            ]);
+                'message' => 'Payment processed successfully'
+            ], 200);
 
         } catch (\Exception $e) {
-            Log::error('TrendiPay webhook error', [
+            Log::error('TrendiPay webhook: Processing error', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
+                'payload' => $request->all()
             ]);
 
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage()
+                'message' => 'Webhook processing failed'
             ], 500);
         }
+    }
+
+    /**
+     * Handle return URL callback (when user is redirected back after payment)
+     *
+     * This is the user-facing redirect after they complete/cancel payment
+     */
+    public function callback(Request $request)
+    {
+        $reference = $request->query('reference');
+
+        Log::info('TrendiPay callback: User returned', [
+            'reference' => $reference,
+            'query_params' => $request->query()
+        ]);
+
+        if (!$reference) {
+            return redirect()->route('home')
+                ->with('error', 'Invalid payment reference.');
+        }
+
+        // Find the contribution
+        $contribution = Contribution::query()->where('payment_reference', $reference)->first();
+
+        if (!$contribution) {
+            Log::error('TrendiPay callback: Contribution not found', [
+                'reference' => $reference
+            ]);
+
+            return redirect()->route('home')
+                ->with('error', 'Contribution not found.');
+        }
+
+        // Check if already completed (webhook might have already processed it)
+        if ($contribution->payment_status === PaymentStatus::Completed) {
+            Log::info('TrendiPay callback: Already completed by webhook', [
+                'reference' => $reference,
+                'contribution_id' => $contribution->id
+            ]);
+
+            return redirect()->route('box.show', $contribution->moneyBox->slug)
+                ->with('success', 'Thank you for your contribution!');
+        }
+
+        // Verify payment status with TrendiPay API
+        $verification = $this->trendiPayProvider->verifyPayment($reference);
+
+        Log::info('TrendiPay callback: Verification result', [
+            'reference' => $reference,
+            'verification' => $verification
+        ]);
+
+        if (!$verification['success']) {
+            return redirect()->route('box.show', $contribution->moneyBox->slug)
+                ->with('error', 'Payment verification failed. Please contact support if you were charged.');
+        }
+
+        // Update contribution if verification is successful
+        $contribution->update([
+            'payment_status' => PaymentStatus::Completed,
+            'transaction_rrn' => $verification['transaction_rrn'] ?? null,
+            'payment_metadata' => $verification['raw_data'] ?? null,
+        ]);
+
+        // Update piggy box stats
+        $this->updateStatsAction->execute($contribution->moneyBox, $contribution);
+
+        return redirect()->route('box.show', $contribution->moneyBox->slug)
+            ->with('success', 'Thank you for your contribution!');
     }
 }

@@ -42,15 +42,17 @@ class ContributionController extends Controller
             return back()->with('error', 'Invalid contribution amount based on the piggy box rules.');
         }
 
-        // Initialize payment
+        // Initialize payment with Trendipay Checkout
         $paymentData = [
             'email' => $validated['contributor_email'],
             'amount' => $validated['amount'],
             'currency' => $moneyBox->currency_code,
             'reference' => 'contrib_' . uniqid(),
             'callback_url' => route('contributions.callback'),
+            'description' => "Contribution to {$moneyBox->title}",
             'metadata' => [
                 'money_box_id' => $moneyBox->id,
+                'money_box_title' => $moneyBox->title, // For itemized display
                 'contributor_name' => $validated['contributor_name'] ?? 'Anonymous',
                 'is_anonymous' => $validated['is_anonymous'] ?? false,
                 'message' => $validated['message'] ?? null,
@@ -58,8 +60,6 @@ class ContributionController extends Controller
         ];
 
         $payment = $this->paymentManager->initializePayment($paymentData);
-
-        dd($payment);
 
         if (!$payment['success']) {
             return back()->with('error', $payment['message'] ?? 'Payment initialization failed.');
@@ -75,8 +75,14 @@ class ContributionController extends Controller
 
         $this->processContributionAction->execute($moneyBox, $contributionData);
 
-        // Redirect to payment page
-        return redirect($payment['payment_url']);
+        // Option 1: Show checkout page with embedded iframe (keeps user in your app)
+        return view('checkout.trendipay', [
+            'paymentUrl' => $payment['payment_url'],
+            'moneyBox' => $moneyBox,
+        ]);
+
+        // Option 2: Direct redirect to TrendiPay (uncomment if iframe doesn't work)
+        // return redirect($payment['payment_url']);
     }
 
     /**
@@ -119,19 +125,6 @@ class ContributionController extends Controller
 
         return redirect()->route('box.show', $contribution->moneyBox->slug)
             ->with('success', 'Thank you for your contribution!');
-    }
-
-    /**
-     * Handle payment webhook
-     */
-    public function webhook(Request $request)
-    {
-        try {
-            $this->paymentManager->handleWebhook($request->all());
-            return response()->json(['status' => 'success']);
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 400);
-        }
     }
 }
 

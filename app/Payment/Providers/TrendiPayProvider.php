@@ -8,13 +8,14 @@ use Illuminate\Support\Facades\Log;
 
 class TrendiPayProvider implements PaymentProviderInterface
 {
-    protected string $apiKey;
-    protected string $terminalExternalId;
+    protected string $merchantExternalId; // Used as Bearer token
+    protected string $terminalExternalId; // Used in payload
     protected string $baseUrl;
 
     public function __construct()
     {
-        $this->apiKey = config('payment.trendipay.api_key');
+        // According to docs: Use Merchant External ID as Bearer token, NOT the API key
+        $this->merchantExternalId = config('payment.trendipay.merchant_external_id');
         $this->terminalExternalId = config('payment.trendipay.terminal_external_id');
         $this->baseUrl = config('payment.trendipay.base_url', 'https://test-api.bsl.com.gh');
     }
@@ -22,58 +23,72 @@ class TrendiPayProvider implements PaymentProviderInterface
     public function initializePayment(array $data): array
     {
         try {
-            // Amount should be in minor units (pesewas for GHS)
+            // Convert amount to minor units (pesewas for GHS)
+            // Example: GHS 10.50 becomes 1050 pesewas
             $amountInMinorUnits = (int) ($data['amount'] * 100);
 
+            // Build the payload according to Trendipay Checkout API specs
             $payload = [
+                // REQUIRED: Your terminal/merchant identifier
                 'terminalExternalId' => $this->terminalExternalId,
+
+                // REQUIRED: Amount in minor units (pesewas)
                 'amount' => $amountInMinorUnits,
-                'description' => $data['description'] ?? 'Piggy Box Contribution',
-                'reference' => $data['reference'] ?? 'trendipay_' . uniqid(),
+
+                // REQUIRED: Transaction description (shown to customer)
+                'description' => $data['description'] ?? 'MyPiggyBox Contribution',
+
+                // REQUIRED: Your unique transaction reference (for tracking)
+                'reference' => $data['reference'] ?? 'contrib_' . uniqid(),
+
+                // REQUIRED: URL to redirect customer after payment (success or fail)
                 'returnUrl' => $data['callback_url'] ?? route('contributions.callback'),
+
+                // REQUIRED: Webhook URL for server-to-server notifications
                 'callbackUrl' => route('webhooks.trendipay'),
+
+                // OPTIONAL: Limit available payment methods
                 'paymentMethods' => ['cards', 'mobile money', 'bank'],
             ];
 
-            // Add metadata as items if provided
-            if (isset($data['metadata'])) {
+            // OPTIONAL: Add itemized breakdown (helps with accounting/reconciliation)
+            // Note: TrendiPay only accepts 'name' and 'price' in items array
+            if (isset($data['metadata']['money_box_title'])) {
                 $payload['items'] = [[
-                    'name' => $data['metadata']['money_box_title'] ?? 'Contribution',
+                    'name' => $data['metadata']['money_box_title'],
                     'price' => (string) $amountInMinorUnits,
-                    'currency' => 'GHS'
                 ]];
             }
 
+            $url = "{$this->baseUrl}/v1/payment-links";
+
+            // Send request to Trendipay Checkout API (using required headers from docs)
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Authorization' => 'Bearer ' . $this->merchantExternalId,
+                'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
-            ])->post("{$this->baseUrl}/v1/payment-links", $payload);
+            ])->post($url, $payload);
 
             $result = $response->json();
 
-            dd($result);
-
-            Log::info('TrendiPay initialization response', [
-                'status' => $response->status(),
-                'response' => $result
-            ]);
-
-            if ($response->successful() && isset($result['data']['paymentLink'])) {
+            // Check if payment link was created successfully
+            // TrendiPay returns the URL directly in 'data' as a string, not nested
+            if ($response->successful() && isset($result['success']) && $result['success'] === true && isset($result['data'])) {
                 return [
                     'success' => true,
-                    'payment_url' => $result['data']['paymentLink'],
-                    'reference' => $payload['reference'],
-                    'transaction_rrn' => $result['data']['transactionRRN'] ?? null,
+                    'payment_url' => $result['data'], // URL is returned directly as string
+                    'reference' => $payload['reference'], // Our reference for tracking
                     'provider' => 'trendipay',
                 ];
             }
 
+            // Payment link creation failed
             return [
                 'success' => false,
-                'message' => $result['message'] ?? 'Payment initialization failed',
+                'message' => $result['message'] ?? 'Unable to create payment link. Please try again.',
             ];
         } catch (\Exception $e) {
-            Log::error('TrendiPay initialization error', [
+            Log::error('TrendiPay: Payment initialization failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'data' => $data
@@ -91,15 +106,11 @@ class TrendiPayProvider implements PaymentProviderInterface
         try {
             // The reference is actually the transaction RRN
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Authorization' => 'Bearer ' . $this->merchantExternalId,
+                'Accept' => 'application/json',
             ])->get("{$this->baseUrl}/v1/transactions/{$reference}/status");
 
             $result = $response->json();
-
-            Log::info('TrendiPay verification response', [
-                'status' => $response->status(),
-                'response' => $result
-            ]);
 
             if ($response->successful() && isset($result['data'])) {
                 $data = $result['data'];
@@ -140,10 +151,6 @@ class TrendiPayProvider implements PaymentProviderInterface
     public function handleWebhook(array $payload): array
     {
         try {
-            Log::info('TrendiPay webhook received', [
-                'payload' => $payload,
-                'headers' => request()->headers->all()
-            ]);
 
             // Extract data from webhook
             if (!isset($payload['data'])) {
