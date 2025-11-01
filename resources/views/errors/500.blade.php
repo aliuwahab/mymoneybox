@@ -6,3 +6,4 @@
 
 @section('help')
     We're experiencing technical difficulties. Our team has been notified and is working to resolve the issue. Please try again later.
+@endsection

@@ -171,13 +171,27 @@ class MoneyBox extends Model implements HasMedia
     public function getMainImageUrl(): ?string
     {
         $media = $this->getFirstMedia('main');
-        return $media ? $media->getTemporaryUrl(now()->addHours(24)) : null;
+        if (!$media) {
+            return null;
+        }
+        
+        // Try temporary URL (S3), fall back to regular URL (local)
+        try {
+            return $media->getTemporaryUrl(now()->addHours(24));
+        } catch (\RuntimeException $e) {
+            return $media->getUrl();
+        }
     }
 
     public function getGalleryImageUrls(): array
     {
         return $this->getMedia('gallery')->map(function (Media $media) {
-            return $media->getTemporaryUrl(now()->addHours(24));
+            // Try temporary URL (S3), fall back to regular URL (local)
+            try {
+                return $media->getTemporaryUrl(now()->addHours(24));
+            } catch (\RuntimeException $e) {
+                return $media->getUrl();
+            }
         })->toArray();
     }
 
