@@ -48,7 +48,7 @@ class ContributionController extends Controller
             'amount' => $validated['amount'],
             'currency' => $moneyBox->currency_code,
             'reference' => 'contrib_' . uniqid(),
-            'return_url' => route('trendipay.return'),
+            'return_url' => route('box.show', $moneyBox->slug),
             'webhook_url' => route('trendipay.webhook'),
             'description' => "Contribution to {$moneyBox->title}",
             'metadata' => [

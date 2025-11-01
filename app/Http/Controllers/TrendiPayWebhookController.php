@@ -6,7 +6,6 @@ use App\Actions\UpdateMoneyBoxStatsAction;
 use App\Enums\PaymentStatus;
 use App\Models\Contribution;
 use App\Payment\Providers\TrendiPayProvider;
-use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -111,43 +110,6 @@ class TrendiPayWebhookController extends Controller
         }
     }
 
-    /**
-     * Handle return URL callback (when user is redirected back after payment)
-     *
-     * This redirects the user back to the fundraiser/money box page
-     */
-    public function callback(Request $request)
-    {
-        $reference = $request->query('reference');
-
-        Log::info('TrendiPay callback: User returned', [
-            'reference' => $reference,
-            'query_params' => $request->query()
-        ]);
-
-        if (! $reference) {
-            return
-                redirect()
-                ->route('home')
-                ->with('info', 'Thank you for your interest!');
-        }
-
-        // Find the contribution to get the money box
-        $contribution = Contribution::query()->where('payment_reference', $reference)->first();
-
-        if (! $contribution) {
-            Log::error('TrendiPay callback: Contribution not found', ['reference' => $reference]);
-
-            return redirect()->route('home')->with('info', 'Thank you for your interest!');
-        }
-
-        // Redirect back to the money box page
-        // The webhook will handle updating the status in the background
-        return
-            redirect()
-            ->route('box.show', $contribution->moneyBox->slug)
-            ->with('success', 'Thank you! Your contribution is being processed.');
-    }
 
     /**
      * Validate webhook payload structure
