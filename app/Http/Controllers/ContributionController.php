@@ -77,13 +77,13 @@ class ContributionController extends Controller
         $this->processContributionAction->execute($moneyBox, $contributionData);
 
         // Option 1: Show checkout page with embedded iframe (keeps user in your app)
-        return view('checkout.trendipay', [
-            'paymentUrl' => $payment['payment_url'],
-            'moneyBox' => $moneyBox,
-        ]);
+//        return view('checkout.trendipay', [
+//            'paymentUrl' => $payment['payment_url'],
+//            'moneyBox' => $moneyBox,
+//        ]);
 
         // Option 2: Direct redirect to TrendiPay (uncomment if iframe doesn't work)
-        // return redirect($payment['payment_url']);
+         return redirect($payment['payment_url']);
     }
 
     /**
