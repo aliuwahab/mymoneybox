@@ -50,7 +50,7 @@ class ProcessContributionAction
             }
 
             // Dispatch event for notifications (emails, etc)
-            event(new ContributionProcessed($contribution, $moneyBox));
+//            event(new ContributionProcessed($contribution, $moneyBox));
 
             return $contribution;
         });
