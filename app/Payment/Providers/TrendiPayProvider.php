@@ -151,18 +151,27 @@ class TrendiPayProvider implements PaymentProviderInterface
     public function handleWebhook(array $payload): array
     {
         try {
-
             // Extract data from webhook
             if (!isset($payload['data'])) {
                 throw new \Exception('Invalid webhook payload: missing data');
             }
 
             $data = $payload['data'];
-            $isSuccessful = strtolower($data['status']) === 'success';
+            $status = strtolower($data['status'] ?? 'unknown');
+
+            // Map TrendiPay status to our internal status
+            // TrendiPay statuses: success, pending, failed, cancelled, expired
+            $isSuccessful = $status === 'success';
+            $internalStatus = match($status) {
+                'success' => 'completed',
+                'failed', 'cancelled', 'expired' => 'failed',
+                default => 'pending'
+            };
 
             return [
                 'success' => $isSuccessful,
-                'status' => $isSuccessful ? 'completed' : 'failed',
+                'status' => $internalStatus,
+                'payment_status' => $status, // Original TrendiPay status
                 'amount' => ($data['amount'] ?? 0) / 100, // Convert from minor units
                 'reference' => $data['reference'] ?? null,
                 'transaction_rrn' => $data['rrn'] ?? null,

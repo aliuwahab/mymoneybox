@@ -23,6 +23,8 @@ class Contribution extends Model
         'payment_status',
         'ip_address',
         'user_agent',
+        'transaction_rrn',
+        'payment_metadata',
     ];
 
     protected $casts = [

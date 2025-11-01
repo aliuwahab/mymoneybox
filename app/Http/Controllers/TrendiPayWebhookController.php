@@ -6,6 +6,7 @@ use App\Actions\UpdateMoneyBoxStatsAction;
 use App\Enums\PaymentStatus;
 use App\Models\Contribution;
 use App\Payment\Providers\TrendiPayProvider;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -31,79 +32,64 @@ class TrendiPayWebhookController extends Controller
 
             // Process the webhook payload through TrendiPay provider
             $webhookData = $this->trendiPayProvider->handleWebhook($request->all());
-
-            if (!$webhookData['success']) {
-                Log::warning('TrendiPay webhook: Payment failed', [
-                    'data' => $webhookData
-                ]);
-
-                return response()->json([
-                    'status' => 'received',
-                    'message' => 'Payment failed notification received'
-                ], 200);
-            }
-
-            // Find the contribution by reference
             $reference = $webhookData['reference'];
+
+            // Find the contribution
             $contribution = Contribution::query()->where('payment_reference', $reference)->first();
 
-            if (!$contribution) {
-                Log::error('TrendiPay webhook: Contribution not found', [
-                    'reference' => $reference,
-                    'webhook_data' => $webhookData
-                ]);
+            if (! $contribution) {
+                Log::error('TrendiPay webhook: Contribution not found', ['reference' => $reference, 'webhook_data' => $webhookData]);
 
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Contribution not found'
-                ], 404);
+                return response()->json(['status' => 'error', 'message' => 'Contribution not found'], 404);
             }
 
-            // Check if already processed
-            if ($contribution->payment_status === PaymentStatus::Completed) {
-                Log::info('TrendiPay webhook: Already processed', [
-                    'reference' => $reference,
-                    'contribution_id' => $contribution->id
-                ]);
+            // Map TrendiPay status to our local PaymentStatus enum
+            $paymentStatus = match($webhookData['status']) {
+                'completed' => PaymentStatus::Completed,
+                'failed' => PaymentStatus::Failed,
+                default => PaymentStatus::Pending,
+            };
 
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Payment already processed'
-                ], 200);
-            }
-
-            // Update contribution status to completed
+            // Update contribution with new status and metadata
             $contribution->update([
-                'payment_status' => PaymentStatus::Completed,
+                'payment_status' => $paymentStatus,
                 'transaction_rrn' => $webhookData['transaction_rrn'] ?? null,
                 'payment_metadata' => $webhookData['raw_data'] ?? null,
             ]);
 
-            Log::info('TrendiPay webhook: Contribution marked as completed', [
+            Log::info('TrendiPay webhook: Status updated', [
                 'contribution_id' => $contribution->id,
                 'reference' => $reference,
-                'amount' => $contribution->amount
+                'status' => $paymentStatus->value,
+                'reason' => $webhookData['reason'] ?? null,
             ]);
 
-            // Update piggy box statistics
-            $this->updateStatsAction->execute($contribution->moneyBox, $contribution);
+            // Take action based on status
+            if ($paymentStatus === PaymentStatus::Completed) {
+                // Update piggy box statistics
+                $this->updateStatsAction->execute($contribution->moneyBox, $contribution);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Payment processed successfully'
-            ], 200);
+                // TODO: Fire event for payment confirmed notifications
+                // event(new PaymentConfirmed($contribution, $contribution->moneyBox));
+            }
 
-        } catch (\Exception $e) {
+
+            // Take action based on status
+            if ($paymentStatus === PaymentStatus::Failed) {
+                // TODO: Fire event for payment Failed notifications
+                // event(new PaymentFailed($contribution, $contribution->moneyBox));
+            }
+
+            return response()->json(['status' => 'success', 'message' => 'Payment processed successfully'], 200);
+
+        } catch (Exception $e) {
             Log::error('TrendiPay webhook: Processing error', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'payload' => $request->all()
             ]);
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Webhook processing failed'
-            ], 500);
+            return response()->json(['status' => 'error', 'message' => 'Webhook processing failed'], 500);
         }
     }
 
