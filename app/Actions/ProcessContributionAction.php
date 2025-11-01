@@ -49,7 +49,8 @@ class ProcessContributionAction
                 $this->updateStatsAction->execute($moneyBox, $contribution);
             }
 
-            event(new ContributionProcessed($contribution, $moneyBox));
+            // TODO: Enable when queue is configured
+            // event(new ContributionProcessed($contribution, $moneyBox));
 
             return $contribution;
         });
