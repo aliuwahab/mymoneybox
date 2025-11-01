@@ -42,7 +42,7 @@ class TrendiPayProvider implements PaymentProviderInterface
                 'reference' => $data['reference'] ?? 'contrib_' . uniqid(),
 
                 // REQUIRED: URL to redirect customer after payment (success or fail)
-                'returnUrl' => $data['return_url'] ?? route('trendipay.return'),
+                'returnUrl' => $data['return_url'],
 
                 // REQUIRED: Webhook URL for server-to-server notifications
                 'callbackUrl' => $data['webhook_url'] ?? route('trendipay.webhook'),

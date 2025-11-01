@@ -48,7 +48,7 @@ class ContributionController extends Controller
             'amount' => $validated['amount'],
             'currency' => $moneyBox->currency_code,
             'reference' => 'contrib_' . uniqid(),
-            'return_url' => route('trendipay.return'),
+            'return_url' => route('box.show', $moneyBox->slug),
             'webhook_url' => route('trendipay.webhook'),
             'description' => "Contribution to {$moneyBox->title}",
             'metadata' => [
@@ -84,48 +84,6 @@ class ContributionController extends Controller
 
         // Option 2: Direct redirect to TrendiPay (uncomment if iframe doesn't work)
          return redirect($payment['payment_url']);
-    }
-
-    /**
-     * Handle payment callback
-     */
-    public function callback(Request $request)
-    {
-        $reference = $request->query('reference');
-
-        if (!$reference) {
-            return redirect()->route('home')->with('error', 'Invalid payment reference.');
-        }
-
-        // Verify payment
-        $verification = $this->paymentManager->verifyPayment($reference);
-
-        if (!$verification['success']) {
-            return redirect()->route('home')->with('error', 'Payment verification failed.');
-        }
-
-        // Find and update contribution
-        $contribution = \App\Models\Contribution::where('payment_reference', $reference)->first();
-
-        if (!$contribution) {
-            return redirect()->route('home')->with('error', 'Contribution not found.');
-        }
-
-        if ($contribution->payment_status === PaymentStatus::Completed) {
-            return redirect()->route('box.show', $contribution->moneyBox->slug)
-                ->with('success', 'Thank you for your contribution!');
-        }
-
-        // Update contribution status
-        $contribution->update([
-            'payment_status' => PaymentStatus::Completed,
-        ]);
-
-        // Update piggy box stats
-        $this->updateStatsAction->execute($contribution->moneyBox, $contribution);
-
-        return redirect()->route('box.show', $contribution->moneyBox->slug)
-            ->with('success', 'Thank you for your contribution!');
     }
 }
 
