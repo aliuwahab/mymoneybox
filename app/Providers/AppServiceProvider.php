@@ -47,7 +47,7 @@ class AppServiceProvider extends ServiceProvider
 
         Event::listen(
             ContributionProcessed::class,
-            [SendContributionThankYouEmail::class, NotifyMoneyBoxOwner::class]
+//            [SendContributionThankYouEmail::class, NotifyMoneyBoxOwner::class]
         );
     }
 }

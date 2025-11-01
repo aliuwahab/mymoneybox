@@ -23,7 +23,7 @@ class ProcessContributionAction
             }
 
             if (!$moneyBox->canAcceptContributions()) {
-                throw new \InvalidArgumentException('Money box is not accepting contributions');
+                throw new \InvalidArgumentException('Piggy box is not accepting contributions');
             }
 
             // Create contribution
