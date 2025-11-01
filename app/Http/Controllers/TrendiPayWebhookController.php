@@ -7,6 +7,7 @@ use App\Enums\PaymentStatus;
 use App\Models\Contribution;
 use App\Payment\Providers\TrendiPayProvider;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -24,23 +25,37 @@ class TrendiPayWebhookController extends Controller
      */
     public function handle(Request $request)
     {
-        try {
-            Log::info('TrendiPay webhook received', [
-                'payload' => $request->all(),
-                'headers' => $request->headers->all()
-            ]);
+        Log::info('TrendiPay webhook received', [
+            'payload' => $request->all(),
+            'headers' => $request->headers->all()
+        ]);
 
+        $payload = $request->all();
+
+        // Validate webhook payload structure
+        $validationFailedResponse = $this->validateWebhookPayload($payload);
+        if ($validationFailedResponse) {
+            return $validationFailedResponse;
+        }
+
+        try {
             // Process the webhook payload through TrendiPay provider
-            $webhookData = $this->trendiPayProvider->handleWebhook($request->all());
+            $webhookData = $this->trendiPayProvider->handleWebhook($payload);
             $reference = $webhookData['reference'];
 
             // Find the contribution
             $contribution = Contribution::query()->where('payment_reference', $reference)->first();
 
-            if (! $contribution) {
-                Log::error('TrendiPay webhook: Contribution not found', ['reference' => $reference, 'webhook_data' => $webhookData]);
+            if (!$contribution) {
+                Log::warning('TrendiPay webhook: Contribution not found', [
+                    'reference' => $reference,
+                    'webhook_data' => $webhookData
+                ]);
 
-                return response()->json(['status' => 'error', 'message' => 'Contribution not found'], 404);
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Contribution not found'
+                ], 404);
             }
 
             // Map TrendiPay status to our local PaymentStatus enum
@@ -82,14 +97,17 @@ class TrendiPayWebhookController extends Controller
 
             return response()->json(['status' => 'success', 'message' => 'Payment processed successfully'], 200);
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('TrendiPay webhook: Processing error', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'payload' => $request->all()
             ]);
 
-            return response()->json(['status' => 'error', 'message' => 'Webhook processing failed'], 500);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Internal error processing webhook'
+            ], 500);
         }
     }
 
@@ -129,5 +147,51 @@ class TrendiPayWebhookController extends Controller
             redirect()
             ->route('box.show', $contribution->moneyBox->slug)
             ->with('success', 'Thank you! Your contribution is being processed.');
+    }
+
+    /**
+     * Validate webhook payload structure
+     *
+     * @return JsonResponse|null Returns error response if invalid, null if valid
+     */
+    protected function validateWebhookPayload(array $payload): ?JsonResponse
+    {
+        if (!isset($payload['data'])) {
+            Log::warning('TrendiPay webhook: Invalid payload - missing data field', [
+                'payload' => $payload
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid webhook payload: missing data field'
+            ], 400);
+        }
+
+        $data = $payload['data'];
+
+        // Check for required fields
+        if (!isset($data['reference'])) {
+            Log::warning('TrendiPay webhook: Invalid payload - missing reference', [
+                'payload' => $payload
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid webhook payload: missing reference'
+            ], 400);
+        }
+
+        if (!isset($data['status'])) {
+            Log::warning('TrendiPay webhook: Invalid payload - missing status', [
+                'payload' => $payload
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid webhook payload: missing status'
+            ], 400);
+        }
+
+        return null; // Validation passed
     }
 }
