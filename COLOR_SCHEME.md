@@ -1,37 +1,37 @@
 # MyPiggyBox Color Scheme
 
-## Primary Color - Deeper Green
-The primary color is a deeper green (emerald/green scale), used for main branding, CTAs, and important UI elements.
+## Primary Color - Facebook Blue
+The primary color is Facebook blue (#1877F2), used for main branding, CTAs, and important UI elements.
 
 | Shade | Hex Code | Usage |
 |-------|----------|-------|
-| primary-50 | #f0fdf4 | Very light backgrounds, hover states |
-| primary-100 | #dcfce7 | Light backgrounds |
-| primary-200 | #bbf7d0 | Subtle highlights |
-| primary-300 | #86efac | Muted accents |
-| primary-400 | #4ade80 | Light accents |
-| primary-500 | #22c55e | Medium green |
-| **primary-600** | **#16a34a** | **Main primary color** ⭐ |
-| primary-700 | #15803d | Deeper primary for contrast |
-| primary-800 | #166534 | Dark primary |
-| primary-900 | #14532d | Very dark primary |
-| primary-950 | #052e16 | Almost black green |
+| primary-50 | #e8f2fe | Very light backgrounds, hover states |
+| primary-100 | #d1e5fd | Light backgrounds |
+| primary-200 | #a3cbfb | Subtle highlights |
+| primary-300 | #75b1f9 | Muted accents |
+| primary-400 | #4697f7 | Light accents |
+| primary-500 | #1877f2 | Medium blue |
+| **primary-600** | **#1877f2** | **Main primary color (Facebook Blue)** ⭐ |
+| primary-700 | #155fcb | Deeper primary for contrast |
+| primary-800 | #1147a4 | Dark primary |
+| primary-900 | #0d2f7d | Very dark primary |
+| primary-950 | #091856 | Almost black blue |
 
-## Secondary Color - Lighter Green
-The secondary color is a lighter green, used for secondary actions, accents, and complementary elements.
+## Secondary Color - Amber/Orange
+The secondary color is a warm amber/orange, used for secondary actions, accents, and complementary elements.
 
 | Shade | Hex Code | Usage |
 |-------|----------|-------|
-| secondary-50 | #f0fdf4 | Very light backgrounds |
-| secondary-100 | #dcfce7 | Light backgrounds |
-| secondary-200 | #bbf7d0 | Subtle highlights |
-| secondary-300 | #86efac | Muted accents |
-| **secondary-400** | **#4ade80** | **Main secondary color** ⭐ |
-| secondary-500 | #22c55e | Medium secondary |
-| secondary-600 | #16a34a | Deeper secondary |
-| secondary-700 | #15803d | Dark secondary |
-| secondary-800 | #166534 | Darker secondary |
-| secondary-900 | #14532d | Very dark secondary |
+| secondary-50 | #fffbeb | Very light backgrounds |
+| secondary-100 | #fef3c7 | Light backgrounds |
+| secondary-200 | #fde68a | Subtle highlights |
+| secondary-300 | #fcd34d | Muted accents |
+| secondary-400 | #fbbf24 | Light accents |
+| **secondary-500** | **#f59e0b** | **Main secondary color** ⭐ |
+| secondary-600 | #d97706 | Deeper secondary |
+| secondary-700 | #b45309 | Dark secondary |
+| secondary-800 | #92400e | Darker secondary |
+| secondary-900 | #78350f | Very dark secondary |
 
 ## Usage Examples
 
@@ -68,13 +68,13 @@ The colors are defined in `/resources/css/app.css` using Tailwind CSS 4's `@them
 
 ```css
 @theme {
-  /* Primary Colors - Deeper Green */
-  --color-primary-600: #16a34a;  /* Main primary */
-  --color-primary-700: #15803d;  /* Hover/Active states */
+  /* Primary Colors - Facebook Blue */
+  --color-primary-600: #1877f2;  /* Main primary (Facebook Blue) */
+  --color-primary-700: #155fcb;  /* Hover/Active states */
 
-  /* Secondary Colors - Lighter Green */
-  --color-secondary-400: #4ade80;  /* Main secondary */
-  --color-secondary-500: #22c55e;  /* Hover states */
+  /* Secondary Colors - Amber/Orange */
+  --color-secondary-500: #f59e0b;  /* Main secondary */
+  --color-secondary-600: #d97706;  /* Hover states */
 }
 ```
 

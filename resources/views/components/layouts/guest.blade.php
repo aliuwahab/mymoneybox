@@ -21,25 +21,25 @@
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     <a href="{{ route('home') }}" class="flex items-center space-x-2">
-                        <x-app-logo-icon class="w-8 h-8 text-green-600" />
+                        <x-app-logo-icon class="w-8 h-8 text-blue-600" />
                         <span class="text-xl font-bold text-gray-900">{{ config('app.name', 'MyPiggyBox') }}</span>
                     </a>
                 </div>
 
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center space-x-4">
-                    <a href="{{ route('about') }}" class="text-gray-700 hover:text-green-600 font-medium transition">
+                    <a href="{{ route('about') }}" class="text-gray-700 hover:text-blue-600 font-medium transition">
                         About
                     </a>
                     @auth
-                        <a href="{{ route('dashboard') }}" class="text-gray-700 hover:text-green-600 font-medium transition">
+                        <a href="{{ route('dashboard') }}" class="text-gray-700 hover:text-blue-600 font-medium transition">
                             Dashboard
                         </a>
                     @else
-                        <a href="{{ route('login') }}" class="text-gray-700 hover:text-green-600 font-medium transition">
+                        <a href="{{ route('login') }}" class="text-gray-700 hover:text-blue-600 font-medium transition">
                             Sign In
                         </a>
-                        <a href="{{ route('register') }}" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition">
+                        <a href="{{ route('register') }}" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm transition">
                             Get Started
                         </a>
                     @endauth
@@ -48,7 +48,7 @@
                 <!-- Mobile Navigation -->
                 <div class="flex md:hidden items-center space-x-2">
                     @guest
-                        <a href="{{ route('register') }}" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition text-sm">
+                        <a href="{{ route('register') }}" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm transition text-sm">
                             Get Started
                         </a>
                     @endguest
@@ -73,15 +73,15 @@
              class="md:hidden border-t border-gray-200 bg-white"
              @click.away="mobileMenuOpen = false">
             <div class="px-4 py-3 space-y-2">
-                <a href="{{ route('about') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-green-600 rounded-lg transition">
+                <a href="{{ route('about') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition">
                     About
                 </a>
                 @auth
-                    <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-green-600 rounded-lg transition">
+                    <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition">
                         Dashboard
                     </a>
                 @else
-                    <a href="{{ route('login') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-green-600 rounded-lg transition">
+                    <a href="{{ route('login') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition">
                         Sign In
                     </a>
                 @endauth
@@ -100,7 +100,7 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div class="col-span-1 md:col-span-2">
                     <div class="flex items-center space-x-2 mb-4">
-                        <x-app-logo-icon class="w-8 h-8 text-green-400" />
+                        <x-app-logo-icon class="w-8 h-8 text-blue-400" />
                         <span class="text-xl font-bold">{{ config('app.name') }}</span>
                     </div>
                     <p class="text-gray-400 mb-4">

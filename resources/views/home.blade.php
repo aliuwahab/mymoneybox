@@ -1,6 +1,6 @@
 <x-layouts.guest>
     <!-- Hero Section -->
-    <div class="relative bg-gradient-to-br from-green-600 via-green-700 to-green-900 overflow-hidden">
+    <div class="relative bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 overflow-hidden">
         <!-- Background Pattern -->
         <div class="absolute inset-0 opacity-10">
             <svg class="absolute w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -19,19 +19,19 @@
                         ✨ The Modern Way to Collect & Give
                     </div>
                     <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                        Collect Gifts & Contributions <span class="text-green-200">The Easy Way</span>
+                        Collect Gifts & Contributions <span class="text-blue-200">The Easy Way</span>
                     </h1>
-                    <p class="text-xl md:text-2xl mb-8 text-green-100 leading-relaxed">
+                    <p class="text-xl md:text-2xl mb-8 text-blue-100 leading-relaxed">
                         From weddings to charities, birthdays to tithes—everyone contributes with just a link, QR code, or Piggy Number. <strong>Transparent. Accessible. Trusted by thousands.</strong>
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4">
                         <a href="{{ route('piggy.lookup') }}" class="px-8 py-4 bg-yellow-500 text-white font-bold rounded-lg hover:bg-yellow-600 transition text-center shadow-lg">
                             🎁 Piggy Someone
                         </a>
-                        <a href="{{ route('register') }}" class="px-8 py-4 bg-white text-green-700 font-bold rounded-lg hover:bg-green-50 transition text-center shadow-lg">
+                        <a href="{{ route('register') }}" class="px-8 py-4 bg-white text-blue-700 font-bold rounded-lg hover:bg-blue-50 transition text-center shadow-lg">
                             Create Your Piggy Box
                         </a>
-                        <a href="{{ route('browse') }}" class="px-8 py-4 bg-green-500/20 backdrop-blur-sm text-white font-bold rounded-lg hover:bg-green-500/30 transition text-center border-2 border-white/30">
+                        <a href="{{ route('browse') }}" class="px-8 py-4 bg-blue-500/20 backdrop-blur-sm text-white font-bold rounded-lg hover:bg-blue-500/30 transition text-center border-2 border-white/30">
                             Browse Piggy Boxes
                         </a>
                     </div>
@@ -40,15 +40,15 @@
                     <div class="mt-12 grid grid-cols-3 gap-8">
                         <div>
                             <div class="text-3xl font-bold text-white">{{ \App\Models\MoneyBox::count() }}+</div>
-                            <div class="text-green-200">Piggy Boxes</div>
+                            <div class="text-blue-200">Piggy Boxes</div>
                         </div>
                         <div>
                             <div class="text-3xl font-bold text-white">{{ \App\Models\Contribution::count() }}+</div>
-                            <div class="text-green-200">Contributions</div>
+                            <div class="text-blue-200">Contributions</div>
                         </div>
                         <div>
                             <div class="text-3xl font-bold text-white">{{ \App\Models\User::count() }}+</div>
-                            <div class="text-green-200">Users</div>
+                            <div class="text-blue-200">Users</div>
                         </div>
                     </div>
                 </div>
@@ -79,7 +79,7 @@
                                             alt="Happy bride"
                                             class="w-16 h-16 rounded-full object-cover border-3 border-white shadow-lg"
                                         />
-                                        <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center border-2 border-white shadow-lg">
+                                        <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center border-2 border-white shadow-lg">
                                             <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
                                             </svg>
@@ -285,7 +285,7 @@
                     </div>
 
                     <!-- Decorative Elements -->
-                    <div class="absolute -top-4 -right-4 w-24 h-24 bg-green-400 rounded-full blur-3xl opacity-50"></div>
+                    <div class="absolute -top-4 -right-4 w-24 h-24 bg-blue-400 rounded-full blur-3xl opacity-50"></div>
                     <div class="absolute -bottom-4 -left-4 w-32 h-32 bg-purple-300 rounded-full blur-3xl opacity-50"></div>
                 </div>
             </div>
@@ -303,8 +303,8 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Feature 1 -->
                 <div class="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition">
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
                     </div>
@@ -314,8 +314,8 @@
 
                 <!-- Feature 2 -->
                 <div class="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition">
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
                     </div>
@@ -348,8 +348,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Use Case 1 -->
                 <div class="relative group">
-                    <div class="absolute inset-0 bg-gradient-to-r from-pink-500 to-pink-600 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    <div class="relative bg-white border-2 border-gray-100 rounded-2xl p-6 hover:border-pink-200 transition">
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-500 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="relative bg-white border-2 border-gray-100 rounded-2xl p-6 hover:border-blue-200 transition">
                         <div class="text-4xl mb-4">💍</div>
                         <h3 class="text-xl font-bold text-gray-900 mb-2">Weddings & Celebrations</h3>
                         <p class="text-gray-600">Guests scan QR codes at tables to send gifts instantly. Modern, seamless, and memorable.</p>
@@ -358,8 +358,8 @@
 
                 <!-- Use Case 2 -->
                 <div class="relative group">
-                    <div class="absolute inset-0 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    <div class="relative bg-white border-2 border-gray-100 rounded-2xl p-6 hover:border-purple-200 transition">
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-500 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="relative bg-white border-2 border-gray-100 rounded-2xl p-6 hover:border-blue-200 transition">
                         <div class="text-4xl mb-4">⛪</div>
                         <h3 class="text-xl font-bold text-gray-900 mb-2">Church & Tithes</h3>
                         <p class="text-gray-600">A permanent PiggyBox for offerings, tithes, and donations. Transparent and convenient for your congregation.</p>
@@ -368,7 +368,7 @@
 
                 <!-- Use Case 3 -->
                 <div class="relative group">
-                    <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-500 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
                     <div class="relative bg-white border-2 border-gray-100 rounded-2xl p-6 hover:border-blue-200 transition">
                         <div class="text-4xl mb-4">🎓</div>
                         <h3 class="text-xl font-bold text-gray-900 mb-2">Group Events & Trips</h3>
@@ -378,8 +378,8 @@
 
                 <!-- Use Case 4 -->
                 <div class="relative group">
-                    <div class="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    <div class="relative bg-white border-2 border-gray-100 rounded-2xl p-6 hover:border-red-200 transition">
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-500 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="relative bg-white border-2 border-gray-100 rounded-2xl p-6 hover:border-blue-200 transition">
                         <div class="text-4xl mb-4">🏥</div>
                         <h3 class="text-xl font-bold text-gray-900 mb-2">Medical Fundraisers</h3>
                         <p class="text-gray-600">Rally community support for medical needs. Track progress and thank donors in real-time.</p>
@@ -388,8 +388,8 @@
 
                 <!-- Use Case 5 -->
                 <div class="relative group">
-                    <div class="absolute inset-0 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    <div class="relative bg-white border-2 border-gray-100 rounded-2xl p-6 hover:border-green-200 transition">
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-500 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="relative bg-white border-2 border-gray-100 rounded-2xl p-6 hover:border-blue-200 transition">
                         <div class="text-4xl mb-4">💰</div>
                         <h3 class="text-xl font-bold text-gray-900 mb-2">Tips & Gratuities</h3>
                         <p class="text-gray-600">Service workers receive tips via their Piggy Number or QR code. Digital tipping made simple.</p>
@@ -398,8 +398,8 @@
 
                 <!-- Use Case 6 -->
                 <div class="relative group">
-                    <div class="absolute inset-0 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    <div class="relative bg-white border-2 border-gray-100 rounded-2xl p-6 hover:border-yellow-200 transition">
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-500 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="relative bg-white border-2 border-gray-100 rounded-2xl p-6 hover:border-blue-200 transition">
                         <div class="text-4xl mb-4">🎯</div>
                         <h3 class="text-xl font-bold text-gray-900 mb-2">Community Projects</h3>
                         <p class="text-gray-600">Political parties, clubs, and societies raise funds with clarity and accountability.</p>
@@ -417,7 +417,7 @@
                     <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Featured Piggy Boxes</h2>
                     <p class="text-base sm:text-xl text-gray-600">Support these amazing causes</p>
                 </div>
-                <a href="{{ route('browse') }}" class="text-green-600 hover:text-green-700 font-semibold flex items-center self-start sm:self-auto">
+                <a href="{{ route('browse') }}" class="text-blue-600 hover:text-blue-700 font-semibold flex items-center self-start sm:self-auto">
                     View All
                     <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -439,7 +439,7 @@
                     <h3 class="mt-2 text-sm font-medium text-gray-900">No piggy boxes yet</h3>
                     <p class="mt-1 text-sm text-gray-500">Be the first to create one!</p>
                     <div class="mt-6">
-                        <a href="{{ route('register') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+                        <a href="{{ route('register') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
                             Create Piggy Box
                         </a>
                     </div>
@@ -449,7 +449,7 @@
     </div>
 
     <!-- How It Works Section -->
-    <div class="py-20 bg-gradient-to-br from-green-50 to-green-100">
+    <div class="py-20 bg-gradient-to-br from-blue-50 to-blue-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Get Started in 3 Simple Steps</h2>
@@ -460,8 +460,8 @@
                 <!-- Step 1 -->
                 <div class="text-center">
                     <div class="relative inline-flex items-center justify-center w-20 h-20 mb-6">
-                        <div class="absolute inset-0 bg-green-200 rounded-full animate-pulse"></div>
-                        <div class="relative bg-green-600 text-white text-3xl font-bold rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
+                        <div class="absolute inset-0 bg-blue-200 rounded-full animate-pulse"></div>
+                        <div class="relative bg-blue-600 text-white text-3xl font-bold rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
                             1
                         </div>
                     </div>
@@ -472,8 +472,8 @@
                 <!-- Step 2 -->
                 <div class="text-center">
                     <div class="relative inline-flex items-center justify-center w-20 h-20 mb-6">
-                        <div class="absolute inset-0 bg-green-200 rounded-full animate-pulse animation-delay-150"></div>
-                        <div class="relative bg-green-600 text-white text-3xl font-bold rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
+                        <div class="absolute inset-0 bg-blue-200 rounded-full animate-pulse animation-delay-150"></div>
+                        <div class="relative bg-blue-600 text-white text-3xl font-bold rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
                             2
                         </div>
                     </div>
@@ -484,8 +484,8 @@
                 <!-- Step 3 -->
                 <div class="text-center">
                     <div class="relative inline-flex items-center justify-center w-20 h-20 mb-6">
-                        <div class="absolute inset-0 bg-green-200 rounded-full animate-pulse animation-delay-300"></div>
-                        <div class="relative bg-green-600 text-white text-3xl font-bold rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
+                        <div class="absolute inset-0 bg-blue-200 rounded-full animate-pulse animation-delay-300"></div>
+                        <div class="relative bg-blue-600 text-white text-3xl font-bold rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
                             3
                         </div>
                     </div>
@@ -496,7 +496,7 @@
 
             <!-- CTA Button -->
             <div class="text-center mt-12">
-                <a href="{{ route('register') }}" class="inline-flex items-center px-8 py-4 bg-green-600 hover:bg-green-700 text-white text-lg font-bold rounded-lg shadow-xl transition">
+                <a href="{{ route('register') }}" class="inline-flex items-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold rounded-lg shadow-xl transition">
                     Start Collecting Now - It's Free
                     <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
@@ -508,15 +508,15 @@
     </div>
 
     <!-- CTA Section -->
-    <div class="bg-gradient-to-r from-green-600 to-green-700 py-16">
+    <div class="bg-gradient-to-r from-blue-600 to-blue-700 py-16">
         <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
             <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
                 Join the Digital Giving Revolution
             </h2>
-            <p class="text-xl text-green-100 mb-8">
+            <p class="text-xl text-blue-100 mb-8">
                 Whether it's a wedding gift, church offering, or community fundraiser—start collecting contributions the modern way. <strong>Free to create. Easy to share. Secure for everyone.</strong>
             </p>
-            <a href="{{ route('register') }}" class="inline-flex items-center px-8 py-4 bg-white text-green-700 font-bold rounded-lg hover:bg-green-50 transition shadow-lg">
+            <a href="{{ route('register') }}" class="inline-flex items-center px-8 py-4 bg-white text-blue-700 font-bold rounded-lg hover:bg-blue-50 transition shadow-lg">
                 Create Your Free Account
                 <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />

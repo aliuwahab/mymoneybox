@@ -9,7 +9,7 @@
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
-            class="fixed top-4 left-4 right-4 sm:left-auto sm:right-4 z-50 bg-green-600 text-white px-4 sm:px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2"
+            class="fixed top-4 left-4 right-4 sm:left-auto sm:right-4 z-50 bg-blue-600 text-white px-4 sm:px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2"
             style="display: none;"
         >
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,7 +35,7 @@
                         <!-- Category -->
                         @if($moneyBox->category)
                             <div class="mb-3 sm:mb-4">
-                                <span class="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-green-100 text-green-800">
+                                <span class="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-blue-100 text-blue-800">
                                     <span class="mr-1">{{ $moneyBox->category->icon }}</span>
                                     <span>{{ $moneyBox->category->name }}</span>
                                 </span>
@@ -67,7 +67,7 @@
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2.5 sm:h-3">
                                     <div
-                                        class="bg-green-600 h-2.5 sm:h-3 rounded-full transition-all"
+                                        class="bg-blue-600 h-2.5 sm:h-3 rounded-full transition-all"
                                         style="width: {{ min(100, $moneyBox->getProgressPercentage()) }}%"
                                     ></div>
                                 </div>
@@ -132,8 +132,8 @@
                                 @foreach($moneyBox->contributions as $contribution)
                                     <div class="flex items-start space-x-2 sm:space-x-3 pb-3 sm:pb-4 border-b border-gray-200 last:border-0">
                                         <div class="flex-shrink-0">
-                                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-100 flex items-center justify-center">
-                                                <span class="text-sm sm:text-base text-green-700 font-semibold">
+                                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                                <span class="text-sm sm:text-base text-blue-700 font-semibold">
                                                     {{ substr($contribution->getDisplayName(), 0, 1) }}
                                                 </span>
                                             </div>
@@ -255,7 +255,7 @@
                                 <!-- Submit -->
                                 <button
                                     type="submit"
-                                    class="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition"
+                                    class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm transition"
                                 >
                                     Proceed to Payment
                                 </button>
