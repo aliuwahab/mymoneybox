@@ -9,7 +9,7 @@
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
-            class="fixed top-4 right-4 z-50 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2"
+            class="fixed top-4 right-4 z-50 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2"
             style="display: none;"
         >
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -24,10 +24,10 @@
                     <div>
                         <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3">{{ $moneyBox->title }}</h1>
                         <div class="flex flex-wrap items-center gap-2">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium {{ $moneyBox->visibility->value === 'public' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium {{ $moneyBox->visibility->value === 'public' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' }}">
                                 {{ $moneyBox->visibility->value === 'public' ? 'Public' : 'Private' }}
                             </span>
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium {{ $moneyBox->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium {{ $moneyBox->is_active ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800' }}">
                                 {{ $moneyBox->is_active ? 'Active' : 'Inactive' }}
                             </span>
                             @if($moneyBox->category)
@@ -53,7 +53,7 @@
                         </a>
                         <a
                             href="{{ route('money-boxes.edit', $moneyBox) }}"
-                            class="flex-1 sm:flex-none text-center px-4 py-2 text-xs sm:text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition"
+                            class="flex-1 sm:flex-none text-center px-4 py-2 text-xs sm:text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition"
                         >
                             Edit
                         </a>
@@ -101,7 +101,7 @@
 
                         <div class="bg-white rounded-lg shadow p-6">
                             <div class="text-sm font-medium text-gray-600 mb-1">Status</div>
-                            <div class="text-xl font-bold {{ $moneyBox->canAcceptContributions() ? 'text-green-600' : 'text-red-600' }}">
+                            <div class="text-xl font-bold {{ $moneyBox->canAcceptContributions() ? 'text-blue-600' : 'text-red-600' }}">
                                 {{ $moneyBox->canAcceptContributions() ? 'Accepting' : 'Not Accepting' }}
                             </div>
                             <div class="text-sm text-gray-500 mt-1">
@@ -118,7 +118,7 @@
                             <div class="flex justify-between items-center mb-4">
                                 <h2 class="text-lg font-semibold text-gray-900">Images</h2>
                                 <a href="{{ route('money-boxes.edit', $moneyBox) }}" 
-                                   class="text-sm text-green-600 hover:text-green-700">
+                                   class="text-sm text-blue-600 hover:text-blue-700">
                                     Manage Images
                                 </a>
                             </div>
@@ -157,7 +157,7 @@
                             <h2 class="text-lg font-semibold text-gray-900">Recent Contributions</h2>
                             <a
                                 href="{{ route('money-boxes.statistics', $moneyBox) }}"
-                                class="text-sm text-green-600 hover:text-green-700"
+                                class="text-sm text-blue-600 hover:text-blue-700"
                             >
                                 View All
                             </a>
@@ -168,8 +168,8 @@
                                     @foreach($moneyBox->contributions as $contribution)
                                         <div class="flex items-start space-x-3 pb-4 border-b border-gray-200 last:border-0">
                                             <div class="flex-shrink-0">
-                                                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                                                    <span class="text-green-700 font-semibold">
+                                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                                    <span class="text-blue-700 font-semibold">
                                                         {{ substr($contribution->getDisplayName(), 0, 1) }}
                                                     </span>
                                                 </div>
@@ -190,7 +190,7 @@
                                                     <p class="text-xs text-gray-500">
                                                         {{ $contribution->created_at->diffForHumans() }}
                                                     </p>
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $contribution->payment_status->value === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $contribution->payment_status->value === 'completed' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800' }}">
                                                         {{ ucfirst($contribution->payment_status->value) }}
                                                     </span>
                                                 </div>
@@ -226,7 +226,7 @@
                             </button>
                             <a
                                 href="{{ route('money-boxes.share', $moneyBox) }}"
-                                class="block w-full px-4 py-2 text-center text-sm font-medium text-green-700 bg-green-50 rounded-lg hover:bg-green-100 transition"
+                                class="block w-full px-4 py-2 text-center text-sm font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition"
                             >
                                 Share Options
                             </a>

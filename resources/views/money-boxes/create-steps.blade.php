@@ -18,8 +18,8 @@
                             <div class="relative">
                                 <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center font-semibold transition-all"
                                      :class="{
-                                         'bg-green-600 text-white': currentStep > index + 1,
-                                         'bg-green-600 text-white ring-4 ring-green-100': currentStep === index + 1,
+                                         'bg-blue-600 text-white': currentStep > index + 1,
+                                         'bg-blue-600 text-white ring-4 ring-blue-100': currentStep === index + 1,
                                          'bg-gray-200 dark:bg-zinc-700 text-gray-500 dark:text-gray-400': currentStep < index + 1
                                      }">
                                     <span x-show="currentStep > index + 1">✓</span>
@@ -28,7 +28,7 @@
                                 <div class="hidden sm:block absolute top-full mt-2 left-1/2 -translate-x-1/2 w-32 text-center">
                                     <span class="text-xs font-medium" 
                                           :class="{
-                                              'text-green-600 dark:text-green-400': currentStep >= index + 1,
+                                              'text-blue-600 dark:text-blue-400': currentStep >= index + 1,
                                               'text-gray-500 dark:text-gray-400': currentStep < index + 1
                                           }"
                                           x-text="stepInfo.name"></span>
@@ -38,7 +38,7 @@
                             <div x-show="index < steps.length - 1" 
                                  class="flex-1 h-1 mx-2 rounded transition-all"
                                  :class="{
-                                     'bg-green-600': currentStep > index + 1,
+                                     'bg-blue-600': currentStep > index + 1,
                                      'bg-gray-200 dark:bg-zinc-700': currentStep <= index + 1
                                  }"></div>
                         </div>
@@ -199,8 +199,8 @@
                             </div>
                         </div>
 
-                        <div class="mt-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                            <p class="text-sm text-green-800 dark:text-green-200">
+                        <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                            <p class="text-sm text-blue-800 dark:text-blue-200">
                                 <strong>Next step:</strong> After creating your piggy box, you'll be able to upload images to make it more appealing to contributors.
                             </p>
                         </div>
@@ -212,7 +212,7 @@
                         
                         <div class="space-y-6">
                             <div class="text-center py-4">
-                                <svg class="mx-auto h-12 w-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="mx-auto h-12 w-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                                 <h3 class="mt-2 text-lg font-medium text-gray-900 dark:text-white">Piggy Box Created!</h3>
@@ -235,7 +235,7 @@
                                         </div>
                                         <div x-show="mainImagePreview">
                                             <img :src="mainImagePreview" class="mx-auto max-h-48 rounded">
-                                            <p class="mt-2 text-sm text-green-600">Main image selected</p>
+                                            <p class="mt-2 text-sm text-blue-600">Main image selected</p>
                                         </div>
                                     </label>
                                 </div>
@@ -282,14 +282,14 @@
 
                             <button type="button" @click="nextStep" 
                                     x-show="currentStep < 3"
-                                    class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition">
+                                    class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm transition">
                                 Next
                             </button>
 
                             <button type="submit" 
                                     x-show="currentStep === 3"
                                     :disabled="isSubmitting"
-                                    class="px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold rounded-lg shadow-sm transition">
+                                    class="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold rounded-lg shadow-sm transition">
                                 <span x-show="!isSubmitting">Create Piggy Box</span>
                                 <span x-show="isSubmitting">Creating...</span>
                             </button>
@@ -297,7 +297,7 @@
                             <button type="button" @click="uploadMedia" 
                                     x-show="currentStep === 4"
                                     :disabled="isUploading"
-                                    class="px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold rounded-lg shadow-sm transition">
+                                    class="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold rounded-lg shadow-sm transition">
                                 <span x-show="!isUploading">Save & Continue</span>
                                 <span x-show="isUploading">Uploading...</span>
                             </button>

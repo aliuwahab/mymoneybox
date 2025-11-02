@@ -413,7 +413,7 @@
                         </a>
                         <button
                             type="submit"
-                            class="px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition cursor-pointer"
+                            class="px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition cursor-pointer"
                         >
                             Update Piggy Box
                         </button>
@@ -475,7 +475,7 @@
                     preview.innerHTML = `
                         <div class="mt-3">
                             <p class="text-sm font-medium text-gray-700 mb-2">Preview (New Main Image):</p>
-                            <img src="${e.target.result}" class="w-48 h-48 object-cover rounded-lg border-2 border-green-300 shadow-sm" alt="Preview">
+                            <img src="${e.target.result}" class="w-48 h-48 object-cover rounded-lg border-2 border-blue-300 shadow-sm" alt="Preview">
                         </div>
                     `;
                 };
@@ -512,7 +512,7 @@
                 div.className = 'relative';
                 div.id = `gallery_preview_${fileId}`;
                 div.innerHTML = `
-                    <img src="${e.target.result}" class="w-full h-32 object-cover rounded-lg border-2 border-green-300 shadow-sm" alt="Preview">
+                    <img src="${e.target.result}" class="w-full h-32 object-cover rounded-lg border-2 border-blue-300 shadow-sm" alt="Preview">
                     <button
                         type="button"
                         onclick="removeGalleryFile(${fileId})"
@@ -523,7 +523,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
-                    <span class="absolute bottom-1 left-1 bg-green-600 text-white text-xs px-2 py-0.5 rounded">${galleryFiles.length}</span>
+                    <span class="absolute bottom-1 left-1 bg-blue-600 text-white text-xs px-2 py-0.5 rounded">${galleryFiles.length}</span>
                 `;
                 preview.appendChild(div);
             };
