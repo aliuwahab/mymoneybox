@@ -81,7 +81,7 @@
                                         {{ $moneyBox->title }}
                                     </h3>
                                     @if($moneyBox->visibility->value === 'public')
-                                        <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                             Public
                                         </span>
                                     @else
@@ -104,7 +104,7 @@
                                         <div>
                                             <div class="w-full bg-gray-200 rounded-full h-2.5">
                                                 <div
-                                                    class="bg-green-600 h-2.5 rounded-full transition-all"
+                                                    class="bg-blue-600 h-2.5 rounded-full transition-all"
                                                     style="width: {{ min(100, $moneyBox->getProgressPercentage()) }}%"
                                                 ></div>
                                             </div>
@@ -126,19 +126,19 @@
                                 <div class="flex items-center justify-between space-x-2">
                                     <a
                                         href="{{ route('money-boxes.show', $moneyBox) }}"
-                                        class="flex-1 text-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                                        class="flex-1 text-center px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition"
                                     >
                                         View
                                     </a>
                                     <a
                                         href="{{ route('money-boxes.statistics', $moneyBox) }}"
-                                        class="flex-1 text-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                                        class="flex-1 text-center px-3 py-2 text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition"
                                     >
                                         Stats
                                     </a>
                                     <a
                                         href="{{ route('money-boxes.edit', $moneyBox) }}"
-                                        class="flex-1 text-center px-3 py-2 text-sm font-medium text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 rounded-lg smooth-transition elevation-1"
+                                        class="flex-1 text-center px-3 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-lg smooth-transition elevation-1"
                                     >
                                         Edit
                                     </a>
