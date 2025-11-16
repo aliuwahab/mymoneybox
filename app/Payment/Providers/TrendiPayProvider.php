@@ -82,6 +82,8 @@ class TrendiPayProvider implements PaymentProviderInterface
                 ];
             }
 
+            Log::warning("TrendiPay Payment Link Error", ["response" => $result, 'requestUrl' => $url]);
+
             // Payment link creation failed
             return [
                 'success' => false,
