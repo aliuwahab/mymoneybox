@@ -8,6 +8,7 @@ use App\Enums\PaymentStatus;
 use App\Models\MoneyBox;
 use App\Payment\PaymentManager;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ContributionController extends Controller
 {
@@ -25,6 +26,8 @@ class ContributionController extends Controller
         $moneyBox = MoneyBox::query()->where('slug', $slug)->firstOrFail();
 
         if (!$moneyBox->canAcceptContributions()) {
+            Log::warning("Can accept contribution failed: ".$moneyBox->start_date." end date".$moneyBox->start_date);
+
             return back()->with('error', 'This piggy box is not accepting contributions.');
         }
 
@@ -39,6 +42,8 @@ class ContributionController extends Controller
 
         // Validate contribution amount based on piggy box rules
         if (!$moneyBox->validateContributionAmount($validated['amount'])) {
+            Log::warning("Invalid contribution amount of: ".$validated['amount']);
+
             return back()->with('error', 'Invalid contribution amount based on the piggy box rules.');
         }
 
@@ -63,6 +68,8 @@ class ContributionController extends Controller
         $payment = $this->paymentManager->initializePayment($paymentData);
 
         if (!$payment['success']) {
+            Log::warning("Payment link failed", ["payment" => $payment]);
+
             return back()->with('error', $payment['message'] ?? 'Payment initialization failed.');
         }
 
