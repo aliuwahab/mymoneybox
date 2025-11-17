@@ -24,8 +24,8 @@ return [
     */
 
     'trendipay' => [
-        'merchant_external_id' => env('TRENDIPAY_MERCHANT_EXTERNAL_ID'),
-        'terminal_external_id' => env('TRENDIPAY_TERMINAL_EXTERNAL_ID'),
+        'api_key' => env('TRENDIPAY_API_KEY'),
+        'terminal_id' => env('TRENDIPAY_TERMINAL_ID'),
         'base_url' => env('TRENDIPAY_BASE_URL', 'https://test-api.bsl.com.gh'),
     ],
 
