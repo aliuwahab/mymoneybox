@@ -71,6 +71,8 @@ class TrendiPayProvider implements PaymentProviderInterface
 
             $result = $response->json();
 
+            Log::warning("TrendiPay Payment Generation Response", ["response" => $result, 'requestUrl' => $url]);
+
             // Check if payment link was created successfully
             // TrendiPay returns the URL directly in 'data' as a string, not nested
             if ($response->successful() && isset($result['success']) && $result['success'] === true && isset($result['data'])) {
