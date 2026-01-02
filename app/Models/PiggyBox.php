@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -61,7 +62,23 @@ class PiggyBox extends Model implements HasMedia
     public function getQrCodeUrl(): ?string
     {
         $media = $this->getFirstMedia('qr_code');
-        return $media ? $media->getUrl() : null;
+
+        if (!$media) {
+            return null;
+        }
+
+        // If using S3, get temporary URL (valid for 24 hours)
+        // Otherwise, get regular URL for local/public disk
+        try {
+            if ($media->getDiskDriverName() === 's3') {
+                return $media->getTemporaryUrl(now()->addHours(24));
+            }
+        } catch (Exception $e) {
+            // Fallback to regular URL if temporary URL fails
+            report($e);
+        }
+
+        return $media->getUrl();
     }
 
     /**

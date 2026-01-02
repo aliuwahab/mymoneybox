@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\AmountType;
 use App\Enums\ContributorIdentity;
 use App\Enums\Visibility;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -174,7 +175,7 @@ class MoneyBox extends Model implements HasMedia
         if (!$media) {
             return null;
         }
-        
+
         // Try temporary URL (S3), fall back to regular URL (local)
         try {
             return $media->getTemporaryUrl(now()->addHours(24));
@@ -201,7 +202,23 @@ class MoneyBox extends Model implements HasMedia
     public function getQrCodeUrl(): ?string
     {
         $media = $this->getFirstMedia('qr_code');
-        return $media ? $media->getUrl() : null;
+
+        if (!$media) {
+            return null;
+        }
+
+        // If using S3, get temporary URL (valid for 24 hours)
+        // Otherwise, get regular URL for local/public disk
+        try {
+            if ($media->getDiskDriverName() === 's3') {
+                return $media->getTemporaryUrl(now()->addHours(24));
+            }
+        } catch (Exception $e) {
+            report($e);
+            // Fallback to regular URL if temporary URL fails
+        }
+
+        return $media->getUrl();
     }
 
     /**
