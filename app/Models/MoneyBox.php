@@ -207,11 +207,11 @@ class MoneyBox extends Model implements HasMedia
             return null;
         }
 
-        // If using S3, get temporary URL (valid for 24 hours)
+        // If using S3, get temporary URL (valid for 7 days)
         // Otherwise, get regular URL for local/public disk
         try {
             if ($media->getDiskDriverName() === 's3') {
-                return $media->getTemporaryUrl(now()->addHours(24));
+                return $media->getTemporaryUrl(now()->addDays(7));
             }
         } catch (Exception $e) {
             report($e);
