@@ -17,7 +17,7 @@ class TrendiPayProvider implements PaymentProviderInterface
         // According to docs: Use Merchant External ID as Bearer token, NOT the API key
         $this->merchantExternalId = config('payment.trendipay.merchant_external_id');
         $this->checkoutTerminalId = config('payment.trendipay.checkout_terminal_id');
-        $this->checkoutBaseUrl = config('payment.trendipay.base_url', 'https://test-api.bsl.com.gh');
+        $this->checkoutBaseUrl = config('payment.trendipay.checkout_base_url', 'https://test-api.bsl.com.gh');
     }
 
     public function initializePayment(array $data): array
