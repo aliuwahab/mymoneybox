@@ -9,15 +9,15 @@ use Illuminate\Support\Facades\Log;
 class TrendiPayProvider implements PaymentProviderInterface
 {
     protected string $merchantExternalId; // Used as Bearer token
-    protected string $terminalExternalId; // Used in payload
-    protected string $baseUrl;
+    protected string $checkoutTerminalId; // Used in payload
+    protected string $checkoutBaseUrl;
 
     public function __construct()
     {
         // According to docs: Use Merchant External ID as Bearer token, NOT the API key
-        $this->merchantExternalId = config('payment.trendipay.api_key'); // their docs cals this merchant_external_id
-        $this->terminalExternalId = config('payment.trendipay.terminal_id'); //and thi terminal external id
-        $this->baseUrl = config('payment.trendipay.base_url', 'https://test-api.bsl.com.gh');
+        $this->merchantExternalId = config('payment.trendipay.merchant_external_id');
+        $this->checkoutTerminalId = config('payment.trendipay.checkout_terminal_id');
+        $this->checkoutBaseUrl = config('payment.trendipay.base_url', 'https://test-api.bsl.com.gh');
     }
 
     public function initializePayment(array $data): array
@@ -30,7 +30,7 @@ class TrendiPayProvider implements PaymentProviderInterface
             // Build the payload according to Trendipay Checkout API specs
             $payload = [
                 // REQUIRED: Your terminal/merchant identifier
-                'terminalExternalId' => $this->terminalExternalId,
+                'terminalExternalId' => $this->checkoutTerminalId,
 
                 // REQUIRED: Amount in minor units (pesewas)
                 'amount' => $amountInMinorUnits,
@@ -60,7 +60,7 @@ class TrendiPayProvider implements PaymentProviderInterface
                 ]];
             }
 
-            $url = "{$this->baseUrl}/v1/payment-links";
+            $url = "{$this->checkoutBaseUrl}/v1/payment-links";
 
             // Send request to Trendipay Checkout API (using required headers from docs)
             $response = Http::withHeaders([
@@ -112,7 +112,7 @@ class TrendiPayProvider implements PaymentProviderInterface
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->merchantExternalId,
                 'Accept' => 'application/json',
-            ])->get("{$this->baseUrl}/v1/transactions/{$reference}/status");
+            ])->get("{$this->checkoutBaseUrl}/v1/transactions/{$reference}/status");
 
             $result = $response->json();
 
