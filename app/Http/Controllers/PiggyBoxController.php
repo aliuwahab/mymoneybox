@@ -262,6 +262,17 @@ class PiggyBoxController extends Controller
             return redirect()->back()->with('error', 'QR Code not found.');
         }
 
-        return response()->download($media->getPath(), "piggybox-{$user->piggy_code}-qr.png");
+        $filename = "piggybox-{$user->piggy_code}-qr.png";
+
+        // For S3/remote files, stream the content
+        if ($media->getDiskDriverName() === 's3') {
+            $contents = \Storage::disk($media->disk)->get($media->getPath());
+            return response($contents, 200)
+                ->header('Content-Type', 'image/png')
+                ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+        }
+
+        // For local files, use regular download
+        return response()->download($media->getPath(), $filename);
     }
 }

@@ -273,7 +273,18 @@ class MoneyBoxController extends Controller
             return redirect()->back()->with('error', 'QR Code not found.');
         }
 
-        return response()->download($media->getPath(), "moneybox-{$moneyBox->slug}-qr.png");
+        $filename = "moneybox-{$moneyBox->slug}-qr.png";
+
+        // For S3/remote files, stream the content
+        if ($media->getDiskDriverName() === 's3') {
+            $contents = \Storage::disk($media->disk)->get($media->getPath());
+            return response($contents, 200)
+                ->header('Content-Type', 'image/png')
+                ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+        }
+
+        // For local files, use regular download
+        return response()->download($media->getPath(), $filename);
     }
 
     /**
