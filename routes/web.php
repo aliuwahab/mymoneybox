@@ -3,6 +3,7 @@
 use App\Http\Controllers\ContributionController;
 use App\Http\Controllers\MoneyBoxController;
 use App\Http\Controllers\PiggyBoxController;
+use App\Http\Controllers\PiggyWebhookController;
 use App\Http\Controllers\PublicBoxController;
 use App\Http\Controllers\TrendiPayWebhookController;
 use App\Livewire\Settings\Appearance;
@@ -26,8 +27,11 @@ Route::view('/privacy', 'pages.privacy')->name('privacy');
 // Contribution Routes (Public)
 Route::post('/box/{slug}/contribute', [ContributionController::class, 'store'])->name('box.contribute');
 
-// TrendiPay webhook route (server-to-server notification)
+// Campaigns/Boxes webhook route (server-to-server notification)
 Route::put('/webhooks/trendipay', [TrendiPayWebhookController::class, 'handle'])->name('trendipay.webhook');
+
+// Personal Piggies gifts webhook route (server-to-server notification)
+Route::put('/webhooks/piggy', [PiggyWebhookController::class, 'handle'])->name('piggy.webhook');
 
 // Piggy Box Routes (Public)
 Route::get('/piggy-someone', [PiggyBoxController::class, 'lookup'])->name('piggy.lookup');
