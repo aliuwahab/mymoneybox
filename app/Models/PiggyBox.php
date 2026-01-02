@@ -84,7 +84,6 @@ class PiggyBox extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('qr_code')
-            ->useDisk('public') // Public disk for QR codes (not secrets)
             ->singleFile(); // Only one QR code
     }
 }

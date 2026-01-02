@@ -223,7 +223,6 @@ class MoneyBox extends Model implements HasMedia
             ->useDisk('s3');
 
         $this->addMediaCollection('qr_code')
-            ->useDisk('public') // Public disk for QR codes (not secrets)
             ->singleFile(); // Only one QR code
     }
 }
