@@ -4,6 +4,7 @@
         toastMessage: '',
         shareUrl: '{{ $shareUrl }}',
         piggyCode: '{{ auth()->user()->piggy_code }}',
+        userName: '{{ auth()->user()->name }}',
         copyLink() {
             navigator.clipboard.writeText(this.shareUrl).then(() => {
                 this.showToastMessage('✅ Link copied to clipboard!');
@@ -12,12 +13,12 @@
             });
         },
         shareViaWhatsApp() {
-            const text = `🎁 Send me a gift!\n\nMy Piggy Code: ${this.piggyCode}\n\nOr use this link: ${this.shareUrl}`;
+            const text = `🎁 ${this.userName} is collecting gifts!\n\nMy Piggy Code: ${this.piggyCode}\n\nOr use this link: ${this.shareUrl}`;
             const encodedText = encodeURIComponent(text);
             window.open(`https://wa.me/?text=${encodedText}`, '_blank');
         },
         copyPiggyCode() {
-            const text = `🎁 Send me a gift!\n\nMy Piggy Code: ${this.piggyCode}\n\nOr use this link: ${this.shareUrl}`;
+            const text = `🎁 ${this.userName} is collecting gifts!\n\nMy Piggy Code: ${this.piggyCode}\n\nOr use this link: ${this.shareUrl}`;
             navigator.clipboard.writeText(text).then(() => {
                 this.showToastMessage('✅ Piggy message copied to clipboard!');
             }).catch(() => {
