@@ -17,9 +17,9 @@
             window.open(`https://wa.me/?text=${encodedText}`, '_blank');
         },
         copyPiggyCode() {
-            const text = `My Piggy Code: ${this.piggyCode}`;
+            const text = `🎁 Send me a gift!\n\nMy Piggy Code: ${this.piggyCode}\n\nOr use this link: ${this.shareUrl}`;
             navigator.clipboard.writeText(text).then(() => {
-                this.showToastMessage('✅ Piggy code copied to clipboard!');
+                this.showToastMessage('✅ Piggy message copied to clipboard!');
             }).catch(() => {
                 this.showToastMessage('❌ Failed to copy');
             });
