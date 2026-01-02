@@ -84,7 +84,8 @@ class PiggyBoxController extends Controller
             'amount' => $validated['amount'],
             'currency' => $piggyBox->currency_code,
             'reference' => 'piggy_' . uniqid(),
-            'callback_url' => route('piggy.callback'),
+            'return_url' => route('piggy.callback'),
+            'webhook_url' => route('trendipay.webhook'),
             'metadata' => [
                 'piggy_box_id' => $piggyBox->id,
                 'user_id' => $user->id,
