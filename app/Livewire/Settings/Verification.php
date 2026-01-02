@@ -70,18 +70,34 @@ class Verification extends Component
             'status' => 'pending',
         ]);
 
-        // Upload front image using Livewire 3 temporary file path
+        // Upload front image using Livewire temporary file
         if ($this->frontImage) {
-            $verification->addMedia($this->frontImage->path())
-                ->usingName($this->frontImage->getClientOriginalName())
-                ->toMediaCollection('front');
+            try {
+                // For Livewire 3, getRealPath() works for both local and S3
+                $verification->addMedia($this->frontImage->getRealPath())
+                    ->usingName($this->frontImage->getClientOriginalName())
+                    ->toMediaCollection('front');
+            } catch (\Exception $e) {
+                \Log::error('Failed to upload front image', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                throw $e;
+            }
         }
 
         // Upload back image if provided
         if ($this->backImage) {
-            $verification->addMedia($this->backImage->path())
-                ->usingName($this->backImage->getClientOriginalName())
-                ->toMediaCollection('back');
+            try {
+                $verification->addMedia($this->backImage->getRealPath())
+                    ->usingName($this->backImage->getClientOriginalName())
+                    ->toMediaCollection('back');
+            } catch (\Exception $e) {
+                \Log::error('Failed to upload back image', [
+                    'error' => $e->getMessage(),
+                ]);
+                throw $e;
+            }
         }
 
         session()->flash('success', 'ID verification submitted successfully! We will review it shortly.');
