@@ -14,8 +14,13 @@ use Illuminate\Support\Facades\Storage;
 
 class GenerateQRCodeAction
 {
-    public function execute(MoneyBox $moneyBox): string
+    public function execute(MoneyBox $moneyBox): void
     {
+        // Check if QR code already exists, reuse it
+        if ($moneyBox->hasQrCode()) {
+            return;
+        }
+
         $url = route('box.show', $moneyBox->slug);
 
         // Create QR code
@@ -23,7 +28,7 @@ class GenerateQRCodeAction
             data: $url,
             encoding: new Encoding('UTF-8'),
             errorCorrectionLevel: ErrorCorrectionLevel::High,
-            size: 300,
+            size: 400,
             margin: 10,
             roundBlockSizeMode: RoundBlockSizeMode::Margin,
             foregroundColor: new Color(0, 0, 0),
@@ -34,13 +39,19 @@ class GenerateQRCodeAction
         $writer = new PngWriter();
         $result = $writer->write($qrCode);
 
-        $filename = "qr-codes/{$moneyBox->slug}.png";
+        // Create temporary file
+        $tempPath = tempnam(sys_get_temp_dir(), 'qr_');
+        file_put_contents($tempPath, $result->getString());
 
-        // Store on S3 instead of local public disk
-        Storage::disk('s3')->put($filename, $result->getString(), 'public');
+        // Add to media collection using Spatie Media Library
+        $moneyBox->addMedia($tempPath)
+            ->usingFileName("qr-code-{$moneyBox->slug}.png")
+            ->usingName("QR Code for {$moneyBox->title}")
+            ->toMediaCollection('qr_code');
 
-        event(new QRCodeGenerated($moneyBox, $filename));
+        // Clean up temp file
+        @unlink($tempPath);
 
-        return $filename;
+        event(new QRCodeGenerated($moneyBox));
     }
 }

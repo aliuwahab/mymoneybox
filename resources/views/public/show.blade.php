@@ -287,10 +287,11 @@
                                 </button>
 
                                 <!-- QR Code Download -->
-                                @if($moneyBox->qr_code_path)
+                                @if($moneyBox->hasQrCode())
                                     <a
-                                        href="{{ asset('storage/' . $moneyBox->qr_code_path) }}"
+                                        href="{{ $moneyBox->getQrCodeUrl() }}"
                                         download
+                                        target="_blank"
                                         class="w-full flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition text-sm sm:text-base"
                                     >
                                         <svg class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

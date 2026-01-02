@@ -195,6 +195,23 @@ class MoneyBox extends Model implements HasMedia
         })->toArray();
     }
 
+    /**
+     * Get QR code URL
+     */
+    public function getQrCodeUrl(): ?string
+    {
+        $media = $this->getFirstMedia('qr_code');
+        return $media ? $media->getUrl() : null;
+    }
+
+    /**
+     * Check if QR code exists
+     */
+    public function hasQrCode(): bool
+    {
+        return $this->hasMedia('qr_code');
+    }
+
     // Media Collections
     public function registerMediaCollections(): void
     {
@@ -204,5 +221,9 @@ class MoneyBox extends Model implements HasMedia
 
         $this->addMediaCollection('gallery')
             ->useDisk('s3');
+
+        $this->addMediaCollection('qr_code')
+            ->useDisk('public') // Public disk for QR codes (not secrets)
+            ->singleFile(); // Only one QR code
     }
 }

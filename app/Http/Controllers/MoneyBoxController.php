@@ -248,12 +248,32 @@ class MoneyBoxController extends Controller
         $this->authorize('update', $moneyBox);
 
         $generateQRCodeAction = app(\App\Actions\GenerateQRCodeAction::class);
-        $qrCodePath = $generateQRCodeAction->execute($moneyBox);
-
-        $moneyBox->update(['qr_code_path' => $qrCodePath]);
+        $generateQRCodeAction->execute($moneyBox);
 
         return redirect()->route('money-boxes.share', $moneyBox)
             ->with('success', 'QR Code generated successfully!');
+    }
+
+    /**
+     * Download QR code for a piggy box
+     */
+    public function downloadQrCode(MoneyBox $moneyBox)
+    {
+        $this->authorize('view', $moneyBox);
+
+        // Generate QR code if it doesn't exist
+        if (!$moneyBox->hasQrCode()) {
+            $generateQRCodeAction = app(\App\Actions\GenerateQRCodeAction::class);
+            $generateQRCodeAction->execute($moneyBox);
+        }
+
+        $media = $moneyBox->getFirstMedia('qr_code');
+        
+        if (!$media) {
+            return redirect()->back()->with('error', 'QR Code not found.');
+        }
+
+        return response()->download($media->getPath(), "moneybox-{$moneyBox->slug}-qr.png");
     }
 
     /**

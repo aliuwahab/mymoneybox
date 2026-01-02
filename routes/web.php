@@ -57,6 +57,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('money-boxes.share');
     Route::post('/money-boxes/{moneyBox}/generate-qr', [MoneyBoxController::class, 'generateQrCode'])
         ->name('money-boxes.generate-qr');
+    Route::get('/money-boxes/{moneyBox}/download-qr', [MoneyBoxController::class, 'downloadQrCode'])
+        ->name('money-boxes.download-qr');
     Route::post('/money-boxes/{moneyBox}/upload-media', [MoneyBoxController::class, 'uploadMedia'])
         ->name('money-boxes.upload-media');
 

@@ -22,9 +22,8 @@ class CreateMoneyBoxAction
             'slug' => $slug,
         ]);
 
-        // Generate QR Code
-        $qrCodePath = $this->generateQRCodeAction->execute($moneyBox);
-        $moneyBox->update(['qr_code_path' => $qrCodePath]);
+        // Generate QR Code (stored via Spatie Media)
+        $this->generateQRCodeAction->execute($moneyBox);
 
         event(new MoneyBoxCreated($moneyBox));
 

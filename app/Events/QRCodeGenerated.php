@@ -12,6 +12,6 @@ class QRCodeGenerated
 
     public function __construct(
         public MoneyBox $moneyBox,
-        public string $qrCodePath
+        public ?string $qrCodePath = null
     ) {}
 }
