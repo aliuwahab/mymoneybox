@@ -23,6 +23,11 @@
                 <flux:navlist.item icon="gift" :href="route('piggy.my-piggy-box')" wire:navigate>
                     {{ __('My Piggy') }}
                 </flux:navlist.item>
+                @if(auth()->user()->isAdmin())
+                    <flux:navlist.item icon="shield-check" href="/admin" wire:navigate>
+                        {{ __('Admin Management') }}
+                    </flux:navlist.item>
+                @endif
             </flux:navlist>
 
             <!-- Desktop User Menu -->
