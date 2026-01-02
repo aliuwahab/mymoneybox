@@ -9,6 +9,12 @@ return [
     'disk_name' => env('MEDIA_DISK', 's3'),
 
     /*
+     * The disk on which to store private/sensitive files (like KYC documents).
+     * These files require temporary URLs for access (not public).
+     */
+    'private_disk' => env('MEDIA_PRIVATE_DISK', 's3'),
+
+    /*
      * The maximum file size of an item in bytes.
      * Adding a larger file will result in an exception.
      */

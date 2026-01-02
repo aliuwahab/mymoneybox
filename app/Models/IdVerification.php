@@ -92,12 +92,15 @@ class IdVerification extends Model implements HasMedia
     // Media Collections
     public function registerMediaCollections(): void
     {
+        // Use S3 for sensitive KYC documents (requires private access with temporary URLs)
+        $privateDisk = config('media-library.private_disk', 's3');
+        
         $this->addMediaCollection('front')
-            ->useDisk('s3')
+            ->useDisk($privateDisk)
             ->singleFile();
 
         $this->addMediaCollection('back')
-            ->useDisk('s3')
+            ->useDisk($privateDisk)
             ->singleFile();
     }
 
