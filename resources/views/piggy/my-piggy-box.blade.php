@@ -11,25 +11,15 @@
                 this.showToastMessage('❌ Failed to copy');
             });
         },
-        copyCode() {
+        shareViaWhatsApp() {
             const text = `🎁 Send me a gift!\n\nMy Piggy Code: ${this.piggyCode}\n\nOr use this link: ${this.shareUrl}`;
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: 'My Piggy Box',
-                    text: text
-                }).catch((err) => {
-                    if (err.name !== 'AbortError') {
-                        this.fallbackCopy(text);
-                    }
-                });
-            } else {
-                this.fallbackCopy(text);
-            }
+            const encodedText = encodeURIComponent(text);
+            window.open(`https://wa.me/?text=${encodedText}`, '_blank');
         },
-        fallbackCopy(text) {
+        copyPiggyCode() {
+            const text = `My Piggy Code: ${this.piggyCode}`;
             navigator.clipboard.writeText(text).then(() => {
-                this.showToastMessage('✅ Copied to clipboard!');
+                this.showToastMessage('✅ Piggy code copied to clipboard!');
             }).catch(() => {
                 this.showToastMessage('❌ Failed to copy');
             });
@@ -87,16 +77,17 @@
                             🔗 View Donation Page
                         </a>
                         <button
-                            @click="copyLink()"
-                            class="flex-1 sm:flex-none text-center px-4 py-2 text-sm font-medium text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 hover:shadow-md transition-all cursor-pointer transform hover:scale-105"
+                            @click="shareViaWhatsApp()"
+                            class="flex-1 sm:flex-none text-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 hover:shadow-md transition-all cursor-pointer transform hover:scale-105 flex items-center justify-center gap-2"
                         >
-                            📋 Copy Share Link
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-4.946 1.196c-1.54.92-2.846 2.454-3.297 4.12 1.357-2.119 3.2-3.913 5.408-5.028 1.265-.72 2.88-1.288 2.835 0 0 0 0 0zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z"/></svg>
+                            Share via WhatsApp
                         </button>
                         <button
-                            @click="copyCode()"
-                            class="flex-1 sm:flex-none text-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 hover:shadow-md transition-all cursor-pointer transform hover:scale-105"
+                            @click="copyPiggyCode()"
+                            class="flex-1 sm:flex-none text-center px-4 py-2 text-sm font-medium text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 hover:shadow-md transition-all cursor-pointer transform hover:scale-105"
                         >
-                            📤 Share My Code
+                            📋 Copy Piggy Code
                         </button>
                     </div>
                 </div>
@@ -217,12 +208,21 @@
                                     <div class="text-6xl mb-4">🎁</div>
                                     <h3 class="text-lg font-medium text-gray-900 mb-2">No gifts yet</h3>
                                     <p class="text-gray-600 mb-4">Share your piggy code with friends to start receiving gifts!</p>
-                                    <button
-                                        @click="copyCode()"
-                                        class="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 hover:shadow-md transition-all cursor-pointer transform hover:scale-105"
-                                    >
-                                        Share My Code
-                                    </button>
+                                    <div class="flex flex-col sm:flex-row gap-2 justify-center">
+                                        <button
+                                            @click="shareViaWhatsApp()"
+                                            class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 hover:shadow-md transition-all cursor-pointer transform hover:scale-105 flex items-center justify-center gap-2"
+                                        >
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-4.946 1.196c-1.54.92-2.846 2.454-3.297 4.12 1.357-2.119 3.2-3.913 5.408-5.028 1.265-.72 2.88-1.288 2.835 0 0 0 0 0zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z"/></svg>
+                                            Share via WhatsApp
+                                        </button>
+                                        <button
+                                            @click="copyPiggyCode()"
+                                            class="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 hover:shadow-md transition-all cursor-pointer transform hover:scale-105"
+                                        >
+                                            📋 Copy Piggy Code
+                                        </button>
+                                    </div>
                                 </div>
                             @endif
                         </div>
