@@ -65,6 +65,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Piggy Box Routes (Authenticated)
     Route::get('/my-piggy-box', [PiggyBoxController::class, 'myPiggyBox'])
         ->name('piggy.my-piggy-box');
+    Route::post('/my-piggy-box/generate-qr', [PiggyBoxController::class, 'generateQrCode'])
+        ->name('piggy.generate-qr');
+    Route::get('/my-piggy-box/download-qr', [PiggyBoxController::class, 'downloadQrCode'])
+        ->name('piggy.download-qr');
 
     // Settings Routes
     Route::redirect('settings', 'settings/profile');

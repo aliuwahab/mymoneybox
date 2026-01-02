@@ -218,4 +218,50 @@ class PiggyBoxController extends Controller
             'piggyBox' => $user->piggyBox,
         ]);
     }
+
+    /**
+     * Generate QR code for user's piggy box
+     */
+    public function generateQrCode()
+    {
+        $user = auth()->user();
+        $piggyBox = $user->piggyBox;
+
+        if (!$piggyBox) {
+            return redirect()->back()->with('error', 'Piggy box not found.');
+        }
+
+        $generateQRCodeAction = app(\App\Actions\GeneratePiggyQRCodeAction::class);
+        $generateQRCodeAction->execute($piggyBox);
+
+        return redirect()->route('piggy.my-piggy-box')
+            ->with('success', 'QR Code generated successfully!');
+    }
+
+    /**
+     * Download QR code for user's piggy box
+     */
+    public function downloadQrCode()
+    {
+        $user = auth()->user();
+        $piggyBox = $user->piggyBox;
+
+        if (!$piggyBox) {
+            return redirect()->back()->with('error', 'Piggy box not found.');
+        }
+
+        // Generate QR code if it doesn't exist
+        if (!$piggyBox->hasQrCode()) {
+            $generateQRCodeAction = app(\App\Actions\GeneratePiggyQRCodeAction::class);
+            $generateQRCodeAction->execute($piggyBox);
+        }
+
+        $media = $piggyBox->getFirstMedia('qr_code');
+        
+        if (!$media) {
+            return redirect()->back()->with('error', 'QR Code not found.');
+        }
+
+        return response()->download($media->getPath(), "piggybox-{$user->piggy_code}-qr.png");
+    }
 }
