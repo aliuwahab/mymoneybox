@@ -73,8 +73,12 @@ class Verification extends Component
         // Upload front image using Livewire temporary file
         if ($this->frontImage) {
             try {
-                // For Livewire 3, getRealPath() works for both local and S3
-                $verification->addMedia($this->frontImage->getRealPath())
+                // Store the file directly using Livewire's store method
+                // This works for both local and S3 temporary files
+                $storedPath = $this->frontImage->store('id-verifications', config('media-library.private_disk', 's3'));
+                
+                // Add the stored file to media collection
+                $verification->addMediaFromDisk($storedPath, config('media-library.private_disk', 's3'))
                     ->usingName($this->frontImage->getClientOriginalName())
                     ->toMediaCollection('front');
             } catch (\Exception $e) {
@@ -89,7 +93,11 @@ class Verification extends Component
         // Upload back image if provided
         if ($this->backImage) {
             try {
-                $verification->addMedia($this->backImage->getRealPath())
+                // Store the file directly using Livewire's store method
+                $storedPath = $this->backImage->store('id-verifications', config('media-library.private_disk', 's3'));
+                
+                // Add the stored file to media collection
+                $verification->addMediaFromDisk($storedPath, config('media-library.private_disk', 's3'))
                     ->usingName($this->backImage->getClientOriginalName())
                     ->toMediaCollection('back');
             } catch (\Exception $e) {
