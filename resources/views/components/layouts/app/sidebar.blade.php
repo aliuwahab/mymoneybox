@@ -135,7 +135,7 @@
         {{ $slot }}
 
         @fluxScripts
-        
+
         <!-- SweetAlert2 Theme Configuration -->
         <script>
             // Configure SweetAlert2 with our theme colors (green primary)

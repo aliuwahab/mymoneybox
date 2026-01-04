@@ -11,6 +11,7 @@ use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\TwoFactor;
 use App\Livewire\Settings\Verification;
+use App\Livewire\Settings\WithdrawalAccounts;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -62,6 +63,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/money-boxes/{moneyBox}/upload-media', [MoneyBoxController::class, 'uploadMedia'])
         ->name('money-boxes.upload-media');
 
+    // Money Box Withdrawal Routes
+    Route::get('/money-boxes/{moneyBox}/withdraw', [App\Http\Controllers\MoneyBoxWithdrawalController::class, 'create'])
+        ->name('money-boxes.withdraw.create');
+    Route::post('/money-boxes/{moneyBox}/withdraw', [App\Http\Controllers\MoneyBoxWithdrawalController::class, 'store'])
+        ->name('money-boxes.withdraw.store');
+
     // Piggy Box Routes (Authenticated)
     Route::get('/my-piggy-box', [PiggyBoxController::class, 'myPiggyBox'])
         ->name('piggy.my-piggy-box');
@@ -70,11 +77,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/my-piggy-box/download-qr', [PiggyBoxController::class, 'downloadQrCode'])
         ->name('piggy.download-qr');
 
+    // Piggy Box Withdrawal Routes
+    Route::get('/my-piggy-box/withdraw', [App\Http\Controllers\PiggyBoxWithdrawalController::class, 'create'])
+        ->name('piggy.withdraw.create');
+    Route::post('/my-piggy-box/withdraw', [App\Http\Controllers\PiggyBoxWithdrawalController::class, 'store'])
+        ->name('piggy.withdraw.store');
+
     // Settings Routes
     Route::redirect('settings', 'settings/profile');
     Route::get('settings/profile', Profile::class)->name('profile.edit');
     Route::get('settings/password', Password::class)->name('user-password.edit');
     Route::get('settings/verification', Verification::class)->name('settings.verification');
+    Route::get('settings/withdrawal-accounts', WithdrawalAccounts::class)->name('settings.withdrawal-accounts');
     Route::get('settings/appearance', Appearance::class)->name('appearance.edit');
 
     Route::get('settings/two-factor', TwoFactor::class)

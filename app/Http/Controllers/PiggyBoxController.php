@@ -172,7 +172,7 @@ class PiggyBoxController extends Controller
     public function myPiggyBox()
     {
         $user = auth()->user();
-        
+
         // Auto-create piggy box if user doesn't have one
         $piggyBox = app(CreatePiggyBoxForUser::class)->execute($user);
 
@@ -182,12 +182,20 @@ class PiggyBoxController extends Controller
             ->limit(20)
             ->get();
 
+        // Load withdrawal requests
+        $withdrawals = $piggyBox->withdrawals()
+            ->with(['withdrawalAccount', 'processedBy'])
+            ->latest()
+            ->limit(10)
+            ->get();
+
         // Generate shareable URL
         $shareUrl = route('piggy.show', $user->piggy_code);
 
         return view('piggy.my-piggy-box', [
             'piggyBox' => $piggyBox,
             'recentDonations' => $recentDonations,
+            'withdrawals' => $withdrawals,
             'shareUrl' => $shareUrl,
         ]);
     }

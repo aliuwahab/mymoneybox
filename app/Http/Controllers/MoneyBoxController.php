@@ -94,9 +94,17 @@ class MoneyBoxController extends Controller
     {
         $this->authorize('view', $moneyBox);
 
-        $moneyBox->load(['category', 'contributions' => function ($query) {
-            $query->completed()->recent()->limit(10);
-        }]);
+        $moneyBox->load([
+            'category',
+            'contributions' => function ($query) {
+                $query->completed()->recent()->limit(10);
+            },
+            'withdrawals' => function ($query) {
+                $query->with(['withdrawalAccount', 'processedBy'])
+                    ->latest()
+                    ->limit(10);
+            }
+        ]);
 
         return view('money-boxes.show', compact('moneyBox'));
     }

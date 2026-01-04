@@ -17,6 +17,7 @@
                     @endif
                 </div>
             </flux:navlist.item>
+            <flux:navlist.item :href="route('settings.withdrawal-accounts')" wire:navigate>{{ __('Withdrawal Accounts') }}</flux:navlist.item>
             @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
                 <flux:navlist.item :href="route('two-factor.show')" wire:navigate>{{ __('Two-Factor Auth') }}</flux:navlist.item>
             @endif

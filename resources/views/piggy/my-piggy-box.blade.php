@@ -30,7 +30,11 @@
             this.showToast = true;
             setTimeout(() => { this.showToast = false; }, 3000);
         }
-    }">
+    }" x-init="
+        @if(session('success'))
+            showToastMessage('{{ session('success') }}');
+        @endif
+    ">
         <!-- Toast Notification -->
         <div
             x-show="showToast"
@@ -77,6 +81,36 @@
                         >
                             🔗 View Donation Page
                         </a>
+                        @if(auth()->user()->isVerified() && $piggyBox->getAvailableBalance() >= config('withdrawal.min_amount', 10) && auth()->user()->withdrawalAccounts()->active()->count() > 0)
+                            <a
+                                href="{{ route('piggy.withdraw.create') }}"
+                                class="flex-1 sm:flex-none text-center px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 hover:shadow-md transition-all cursor-pointer transform hover:scale-105"
+                            >
+                                💰 Withdraw Funds
+                            </a>
+                        @elseif(!auth()->user()->isVerified())
+                            <a
+                                href="{{ route('settings.verification') }}"
+                                class="flex-1 sm:flex-none text-center px-4 py-2 text-sm font-medium text-yellow-700 bg-yellow-100 border border-yellow-300 rounded-lg hover:bg-yellow-200 transition"
+                            >
+                                🔒 Verify ID to Withdraw
+                            </a>
+                        @elseif(auth()->user()->withdrawalAccounts()->active()->count() === 0)
+                            <a
+                                href="{{ route('settings.withdrawal-accounts') }}"
+                                class="flex-1 sm:flex-none text-center px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 border border-blue-300 rounded-lg hover:bg-blue-200 transition"
+                            >
+                                🏦 Add Account to Withdraw
+                            </a>
+                        @elseif($piggyBox->getAvailableBalance() < config('withdrawal.min_amount', 10))
+                            <button
+                                type="button"
+                                disabled
+                                class="flex-1 sm:flex-none text-center px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-200 rounded-lg cursor-not-allowed"
+                            >
+                                💰 Insufficient Balance
+                            </button>
+                        @endif
                         <button
                             @click="shareViaWhatsApp()"
                             class="flex-1 sm:flex-none text-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 hover:shadow-md transition-all cursor-pointer transform hover:scale-105 flex items-center justify-center gap-2"
@@ -97,7 +131,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Stats Overview -->
                 <div class="lg:col-span-3">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <div class="bg-white rounded-lg shadow p-6">
                             <div class="text-sm font-medium text-gray-600 mb-1">Total Received</div>
                             <div class="text-3xl font-bold text-gray-900">
@@ -105,6 +139,16 @@
                             </div>
                             <div class="text-sm text-gray-500 mt-1">
                                 all time
+                            </div>
+                        </div>
+
+                        <div class="bg-green-50 border-2 border-green-200 rounded-lg shadow p-6">
+                            <div class="text-sm font-medium text-green-700 mb-1">Available Balance</div>
+                            <div class="text-3xl font-bold text-green-600">
+                                {{ $piggyBox->formatAmount($piggyBox->getAvailableBalance()) }}
+                            </div>
+                            <div class="text-sm text-green-600 mt-1">
+                                ready to withdraw
                             </div>
                         </div>
 
@@ -322,6 +366,116 @@
                                             📋 Copy Piggy Code
                                         </button>
                                     </div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Withdrawal Requests -->
+                <div class="lg:col-span-3">
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                            <h2 class="text-lg font-semibold text-gray-900">Withdrawal Requests</h2>
+                            @if($withdrawals->count() > 0)
+                                <span class="text-sm text-gray-600">
+                                    Total: {{ $withdrawals->count() }}
+                                </span>
+                            @endif
+                        </div>
+                        <div class="p-6">
+                            @if($withdrawals->count() > 0)
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead>
+                                            <tr>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference</th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fee</th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Net Amount</th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Account</th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200">
+                                            @foreach($withdrawals as $withdrawal)
+                                                <tr class="hover:bg-gray-50">
+                                                    <td class="px-4 py-4 whitespace-nowrap">
+                                                        <div class="text-sm font-medium text-gray-900">
+                                                            {{ $withdrawal->reference }}
+                                                        </div>
+                                                        @if($withdrawal->user_note)
+                                                            <div class="text-xs text-gray-500 mt-1">
+                                                                {{ Str::limit($withdrawal->user_note, 30) }}
+                                                            </div>
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                        {{ $piggyBox->formatAmount($withdrawal->amount) }}
+                                                    </td>
+                                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                        - {{ $piggyBox->formatAmount($withdrawal->fee) }}
+                                                    </td>
+                                                    <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
+                                                        {{ $piggyBox->formatAmount($withdrawal->net_amount) }}
+                                                    </td>
+                                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                        @if($withdrawal->withdrawalAccount)
+                                                            <div class="text-sm">{{ $withdrawal->withdrawalAccount->getDisplayName() }}</div>
+                                                        @else
+                                                            <span class="text-gray-400">N/A</span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-4 py-4 whitespace-nowrap">
+                                                        @php
+                                                            $statusClasses = match($withdrawal->status->value) {
+                                                                'pending' => 'bg-yellow-100 text-yellow-800',
+                                                                'in_review' => 'bg-blue-100 text-blue-800',
+                                                                'approved' => 'bg-green-100 text-green-800',
+                                                                'disbursed' => 'bg-emerald-100 text-emerald-800',
+                                                                'rejected' => 'bg-red-100 text-red-800',
+                                                                'failed' => 'bg-orange-100 text-orange-800',
+                                                                default => 'bg-gray-100 text-gray-800',
+                                                            };
+                                                        @endphp
+                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusClasses }}">
+                                                            {{ $withdrawal->status->label() }}
+                                                        </span>
+                                                        @if($withdrawal->rejection_reason)
+                                                            <div class="text-xs text-red-600 mt-1">
+                                                                {{ Str::limit($withdrawal->rejection_reason, 20) }}
+                                                            </div>
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        <div>{{ $withdrawal->created_at->format('M d, Y') }}</div>
+                                                        <div class="text-xs text-gray-400">{{ $withdrawal->created_at->format('h:i A') }}</div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <div class="text-center py-8">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <h3 class="mt-2 text-sm font-medium text-gray-900">No withdrawal requests yet</h3>
+                                    <p class="mt-1 text-sm text-gray-500">
+                                        When you request withdrawals, they will appear here.
+                                    </p>
+                                    @if($piggyBox->getAvailableBalance() >= config('withdrawal.min_amount', 10))
+                                        <div class="mt-4">
+                                            <a
+                                                href="{{ route('piggy.withdraw.create') }}"
+                                                class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition"
+                                            >
+                                                Request Withdrawal
+                                            </a>
+                                        </div>
+                                    @endif
                                 </div>
                             @endif
                         </div>

@@ -73,6 +73,11 @@ class MoneyBox extends Model implements HasMedia
         return $this->hasMany(Contribution::class);
     }
 
+    public function withdrawals(): HasMany
+    {
+        return $this->hasMany(MoneyBoxWithdrawal::class);
+    }
+
     // Scopes
     public function scopePublic($query)
     {
@@ -167,6 +172,39 @@ class MoneyBox extends Model implements HasMedia
         }
 
         return min(100, ($this->total_contributions / $this->goal_amount) * 100);
+    }
+
+    /**
+     * Calculate available balance (total contributions - successful/pending withdrawals)
+     */
+    public function getAvailableBalance(): float
+    {
+        $totalWithdrawn = $this->withdrawals()
+            ->whereIn('status', ['pending', 'in_review', 'approved', 'disbursed'])
+            ->sum('amount');
+
+        return max(0, $this->total_contributions - $totalWithdrawn);
+    }
+
+    /**
+     * Calculate total withdrawn amount (only disbursed withdrawals)
+     */
+    public function getTotalWithdrawn(): float
+    {
+        return $this->withdrawals()
+            ->where('status', 'disbursed')
+            ->sum('amount');
+    }
+
+    /**
+     * Check if user can withdraw from this money box
+     */
+    public function canWithdraw(float $amount): bool
+    {
+        $minWithdrawal = config('withdrawal.min_amount', 10);
+        $availableBalance = $this->getAvailableBalance();
+
+        return $amount >= $minWithdrawal && $amount <= $availableBalance;
     }
 
     public function getMainImageUrl(): ?string

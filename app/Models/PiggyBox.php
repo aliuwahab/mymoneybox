@@ -39,6 +39,11 @@ class PiggyBox extends Model implements HasMedia
         return $this->hasMany(PiggyDonation::class);
     }
 
+    public function withdrawals(): HasMany
+    {
+        return $this->hasMany(PiggyBoxWithdrawal::class);
+    }
+
     // Helper Methods
     public function getCurrencySymbol(): string
     {
@@ -54,6 +59,39 @@ class PiggyBox extends Model implements HasMedia
     public function canReceiveDonations(): bool
     {
         return $this->is_active;
+    }
+
+    /**
+     * Calculate available balance (total received - successful/pending withdrawals)
+     */
+    public function getAvailableBalance(): float
+    {
+        $totalWithdrawn = $this->withdrawals()
+            ->whereIn('status', ['pending', 'in_review', 'approved', 'disbursed'])
+            ->sum('amount');
+
+        return max(0, $this->total_received - $totalWithdrawn);
+    }
+
+    /**
+     * Calculate total withdrawn amount (only disbursed withdrawals)
+     */
+    public function getTotalWithdrawn(): float
+    {
+        return $this->withdrawals()
+            ->where('status', 'disbursed')
+            ->sum('amount');
+    }
+
+    /**
+     * Check if user can withdraw from this piggy box
+     */
+    public function canWithdraw(float $amount): bool
+    {
+        $minWithdrawal = config('withdrawal.min_amount', 10);
+        $availableBalance = $this->getAvailableBalance();
+
+        return $amount >= $minWithdrawal && $amount <= $availableBalance;
     }
 
     /**

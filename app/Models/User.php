@@ -134,6 +134,30 @@ class User extends Authenticatable
     }
 
     /**
+     * Get all withdrawal accounts for the user
+     */
+    public function withdrawalAccounts(): HasMany
+    {
+        return $this->hasMany(WithdrawalAccount::class);
+    }
+
+    /**
+     * Get money box withdrawals
+     */
+    public function moneyBoxWithdrawals(): HasMany
+    {
+        return $this->hasMany(MoneyBoxWithdrawal::class);
+    }
+
+    /**
+     * Get piggy box withdrawals
+     */
+    public function piggyBoxWithdrawals(): HasMany
+    {
+        return $this->hasMany(PiggyBoxWithdrawal::class);
+    }
+
+    /**
      * Check if user is verified
      */
     public function isVerified(): bool
