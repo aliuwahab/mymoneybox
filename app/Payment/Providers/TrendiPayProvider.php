@@ -200,6 +200,76 @@ class TrendiPayProvider implements PaymentProviderInterface
         }
     }
 
+    public function transferAmount(array $data): array
+    {
+        try {
+            // Convert amount to minor units (pesewas for GHS)
+            $amountInMinorUnits = (int) ($data['amount'] * 100);
+
+            // Build disbursement payload according to TrendiPay docs
+            $payload = [
+                'reference' => $data['reference'],
+                'accountNumber' => $data['account_number'],
+                'rSwitch' => $data['network'] ?? 'mtn', // mtn, vodafone, airteltigo
+                'description' => $data['description'] ?? 'Withdrawal',
+                'amount' => $amountInMinorUnits,
+                'accountName' => $data['account_name'] ?? '',
+                'senderName' => $data['sender_name'] ?? config('app.name'),
+                'callbackUrl' => $data['callback_url'] ?? route('trendipay.webhook'),
+            ];
+
+            // Use the API base URL (not checkout) for disbursements
+            // Endpoint: /v1/terminals/{terminalExternalId}/disbursements
+            $apiBaseUrl = config('payment.trendipay.api_base_url', $this->checkoutBaseUrl);
+            $url = "{$apiBaseUrl}/v1/terminals/{$this->checkoutTerminalId}/disbursements";
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->merchantExternalId,
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ])->post($url, $payload);
+
+            $result = $response->json();
+
+            Log::info("TrendiPay Disbursement Response", [
+                "response" => $result,
+                'requestUrl' => $url,
+                'payload' => $payload
+            ]);
+
+            // Check if disbursement was successful
+            if ($response->successful() && isset($result['success']) && $result['success'] === true) {
+                return [
+                    'success' => true,
+                    'transaction_reference' => $result['data']['transactionId'] ?? $result['data']['reference'] ?? $data['reference'],
+                    'status' => 'processing',
+                    'provider' => 'trendipay',
+                    'raw_data' => $result,
+                ];
+            }
+
+            Log::warning("TrendiPay Disbursement Error", ["response" => $result, 'requestUrl' => $url]);
+
+            return [
+                'success' => false,
+                'message' => $result['message'] ?? 'Disbursement failed. Please try again.',
+                'error_code' => $result['code'] ?? null,
+            ];
+        } catch (\Exception $e) {
+            Log::error('TrendiPay: Disbursement failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => $data
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Disbursement service unavailable. Please try again later.',
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
     public function getName(): string
     {
         return 'trendipay';

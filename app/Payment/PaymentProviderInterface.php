@@ -18,10 +18,18 @@ interface PaymentProviderInterface
 
     /**
      * Handle webhook callback
-     * 
+     *
      * @return array Processed webhook data with payment status
      */
     public function handleWebhook(array $payload): array;
+
+    /**
+     * Transfer money to a recipient
+     *
+     * @param array $data Transfer data including amount, recipient details, reference
+     * @return array Transfer result with success status and transaction details
+     */
+    public function transferAmount(array $data): array;
 
     /**
      * Get provider name

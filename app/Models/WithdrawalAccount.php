@@ -108,4 +108,29 @@ class WithdrawalAccount extends Model
 
         $this->update(['is_default' => true]);
     }
+
+    /**
+     * Check if this account has ever received a disbursement
+     * Once an account has been used for disbursements, it cannot be edited or deleted
+     */
+    public function hasDisbursements(): bool
+    {
+        $moneyBoxDisbursements = $this->moneyBoxWithdrawals()
+            ->where('status', 'disbursed')
+            ->exists();
+
+        $piggyBoxDisbursements = $this->piggyBoxWithdrawals()
+            ->where('status', 'disbursed')
+            ->exists();
+
+        return $moneyBoxDisbursements || $piggyBoxDisbursements;
+    }
+
+    /**
+     * Check if account can be modified (edited or deleted)
+     */
+    public function canBeModified(): bool
+    {
+        return !$this->hasDisbursements();
+    }
 }

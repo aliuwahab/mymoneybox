@@ -102,79 +102,132 @@
 
                     {{-- Accounts List --}}
                     @if($accounts->count() > 0)
-                        <div class="bg-white rounded-lg shadow">
-                            <div class="p-6 border-b border-gray-200">
-                                <flux:heading size="lg">Your Withdrawal Accounts</flux:heading>
-                                <p class="text-sm text-gray-600 mt-1">You have {{ $accounts->count() }} withdrawal {{ Str::plural('account', $accounts->count()) }}</p>
+                        <div class="mb-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <flux:heading size="lg">Your Withdrawal Accounts</flux:heading>
+                                    <p class="text-sm text-gray-600 mt-1">{{ $accounts->count() }} {{ Str::plural('account', $accounts->count()) }} added</p>
+                                </div>
                             </div>
-                            
-                            <div class="divide-y divide-gray-200">
-                                @foreach($accounts as $account)
-                                    <div class="p-6 hover:bg-gray-50 transition-colors">
-                                        <div class="flex items-start justify-between">
-                                            <div class="flex-1">
-                                                <div class="flex items-center space-x-3 mb-2">
-                                                    <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center {{ $account->account_type->value === 'mobile_money' ? 'bg-blue-100' : 'bg-green-100' }}">
-                                                        @if($account->account_type->value === 'mobile_money')
-                                                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                                            </svg>
-                                                        @else
-                                                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                                            </svg>
-                                                        @endif
-                                                    </div>
 
-                                                    <div>
-                                                        <div class="flex items-center space-x-2">
-                                                            <h4 class="text-base font-semibold text-gray-900">
-                                                                @if($account->account_type->value === 'mobile_money')
-                                                                    {{ $account->mobile_network->label() }}
-                                                                @else
-                                                                    {{ $account->bank_name }}
-                                                                @endif
-                                                            </h4>
-                                                            @if($account->is_default)
-                                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-                                                                    Default
-                                                                </span>
-                                                            @endif
-                                                        </div>
-                                                        <p class="text-sm text-gray-600">{{ $account->maskAccountNumber() }}</p>
-                                                        <p class="text-sm text-gray-500">{{ $account->account_name }}</p>
-                                                    </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                @foreach($accounts as $account)
+                                    <div class="relative bg-gradient-to-br {{ $account->account_type->value === 'mobile_money' ? 'from-blue-50 to-indigo-50' : 'from-green-50 to-emerald-50' }} rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border-2 {{ $account->is_default ? 'border-green-500' : 'border-transparent' }} {{ !$account->canBeModified() ? 'opacity-95' : '' }}">
+                                        {{-- Badges --}}
+                                        <div class="absolute top-0 right-0 flex flex-col items-end gap-1">
+                                            @if($account->is_default)
+                                                <div class="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+                                                    ★ DEFAULT
+                                                </div>
+                                            @endif
+                                            @if(!$account->canBeModified())
+                                                <div class="bg-gray-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg flex items-center space-x-1">
+                                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                    <span>LOCKED</span>
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <div class="p-6">
+                                            {{-- Icon and Type --}}
+                                            <div class="flex items-center space-x-4 mb-4">
+                                                <div class="flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center {{ $account->account_type->value === 'mobile_money' ? 'bg-blue-100' : 'bg-green-100' }} shadow-sm">
+                                                    @if($account->account_type->value === 'mobile_money')
+                                                        <svg class="w-7 h-7 {{ $account->account_type->value === 'mobile_money' ? 'text-blue-600' : 'text-green-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                        </svg>
+                                                    @else
+                                                        <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                                        </svg>
+                                                    @endif
+                                                </div>
+
+                                                <div class="flex-1 min-w-0">
+                                                    <h3 class="text-lg font-bold text-gray-900 truncate">
+                                                        @if($account->account_type->value === 'mobile_money')
+                                                            {{ $account->mobile_network->label() }}
+                                                        @else
+                                                            {{ $account->bank_name }}
+                                                        @endif
+                                                    </h3>
+                                                    <p class="text-xs text-gray-600 font-medium uppercase tracking-wide">
+                                                        {{ $account->account_type->label() }}
+                                                    </p>
                                                 </div>
                                             </div>
 
-                                            <div class="flex items-center space-x-2">
+                                            {{-- Account Details --}}
+                                            <div class="space-y-2 mb-4">
+                                                <div class="flex items-center space-x-2">
+                                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                                                    </svg>
+                                                    <span class="text-base font-mono font-semibold text-gray-700">{{ $account->maskAccountNumber() }}</span>
+                                                </div>
+                                                <div class="flex items-center space-x-2">
+                                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                    </svg>
+                                                    <span class="text-sm text-gray-600 truncate">{{ $account->account_name }}</span>
+                                                </div>
+                                            </div>
+
+                                            {{-- Action Buttons --}}
+                                            <div class="flex flex-wrap gap-2 pt-4 border-t border-gray-200">
                                                 @if(!$account->is_default)
-                                                    <flux:button 
-                                                        size="sm" 
-                                                        variant="ghost"
+                                                    <button
                                                         wire:click="setAsDefault({{ $account->id }})"
                                                         wire:confirm="Set this as your default withdrawal account?"
+                                                        class="flex-1 min-w-[100px] px-3 py-2 text-xs font-medium text-green-700 bg-white border border-green-300 rounded-lg hover:bg-green-50 transition-colors"
                                                     >
-                                                        Set Default
-                                                    </flux:button>
+                                                        <span class="flex items-center justify-center space-x-1">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                            <span>Set Default</span>
+                                                        </span>
+                                                    </button>
                                                 @endif
-                                                
-                                                <flux:button 
-                                                    size="sm" 
-                                                    variant="ghost"
-                                                    wire:click="edit({{ $account->id }})"
-                                                >
-                                                    Edit
-                                                </flux:button>
-                                                
-                                                <flux:button 
-                                                    size="sm" 
-                                                    variant="danger"
-                                                    wire:click="delete({{ $account->id }})"
-                                                    wire:confirm="Are you sure you want to delete this account?"
-                                                >
-                                                    Delete
-                                                </flux:button>
+
+                                                @if($account->canBeModified())
+                                                    <button
+                                                        wire:click="edit({{ $account->id }})"
+                                                        class="flex-1 min-w-[80px] px-3 py-2 text-xs font-medium text-blue-700 bg-white border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors"
+                                                    >
+                                                        <span class="flex items-center justify-center space-x-1">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                            </svg>
+                                                            <span>Edit</span>
+                                                        </span>
+                                                    </button>
+
+                                                    <button
+                                                        wire:click="delete({{ $account->id }})"
+                                                        wire:confirm="Are you sure you want to delete this account?"
+                                                        class="flex-1 min-w-[80px] px-3 py-2 text-xs font-medium text-red-700 bg-white border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
+                                                    >
+                                                        <span class="flex items-center justify-center space-x-1">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                            </svg>
+                                                            <span>Delete</span>
+                                                        </span>
+                                                    </button>
+                                                @else
+                                                    <div class="flex-1 px-3 py-2 text-xs font-medium text-gray-500 bg-gray-100 border border-gray-200 rounded-lg text-center">
+                                                        <span class="flex items-center justify-center space-x-1">
+                                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                                                            </svg>
+                                                            <span>Account Locked</span>
+                                                        </span>
+                                                        <p class="text-[10px] mt-1 text-gray-400">Has disbursement history</p>
+                                                    </div>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>

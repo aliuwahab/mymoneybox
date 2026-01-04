@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -15,6 +16,18 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'webhooks/*',
         ]);
+    })
+    ->withSchedule(function (Schedule $schedule) {
+        // Disburse approved withdrawals twice daily
+        $schedule->command('withdrawals:disburse')
+            ->dailyAt('08:00')
+            ->withoutOverlapping()
+            ->runInBackground();
+
+        $schedule->command('withdrawals:disburse')
+            ->dailyAt('19:00')
+            ->withoutOverlapping()
+            ->runInBackground();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -61,6 +61,12 @@ class WithdrawalAccounts extends Component
         $account = WithdrawalAccount::findOrFail($accountId);
         $this->authorize('update', $account);
 
+        // Check if account can be modified (no disbursements)
+        if (!$account->canBeModified()) {
+            session()->flash('error', 'This account cannot be edited because it has received disbursements. Please contact support if you need to make changes.');
+            return;
+        }
+
         $this->editingId = $account->id;
         $this->accountType = $account->account_type->value;
         $this->accountName = $account->account_name;
@@ -129,6 +135,12 @@ class WithdrawalAccounts extends Component
     {
         $account = WithdrawalAccount::findOrFail($accountId);
         $this->authorize('delete', $account);
+
+        // Check if account can be modified (no disbursements)
+        if (!$account->canBeModified()) {
+            session()->flash('error', 'This account cannot be deleted because it has received disbursements. Accounts with disbursement history must be kept for audit purposes.');
+            return;
+        }
 
         $account->delete();
         session()->flash('success', 'Withdrawal account deleted successfully!');
