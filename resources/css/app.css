@@ -209,7 +209,7 @@
                p-4 relative;
     }
     .stat-label { @apply text-[12px] text-[#6B6862]; }
-    .stat-value { @apply text-[26px] font-semibold tracking-tight leading-tight tnum mt-1.5; }
+    .stat-value { @apply text-[26px] font-semibold tracking-tight leading-tight mt-1.5; font-variant-numeric: tabular-nums; }
     .stat-delta { @apply flex items-center gap-1.5 text-[11.5px] text-[#6B6862] mt-2; }
 
     /* Pills / badges */
