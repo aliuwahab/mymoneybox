@@ -172,12 +172,18 @@
     .btn:active { @apply translate-y-px; }
 
     .btn-primary {
-        @apply btn bg-primary-600 text-white border-primary-600;
+        @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] text-[13px] font-medium
+               border bg-primary-600 text-white border-primary-600
+               shadow-[0_1px_0_rgba(20,18,12,.04),0_1px_2px_rgba(20,18,12,.04)]
+               transition-all duration-100;
     }
-    .btn-primary:hover { @apply bg-primary-700 border-primary-700; }
+    .btn-primary:hover  { @apply bg-primary-700 border-primary-700; }
+    .btn-primary:active { @apply translate-y-px; }
 
     .btn-ghost {
-        @apply btn bg-transparent border-transparent shadow-none;
+        @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] text-[13px] font-medium
+               border border-transparent bg-transparent text-[#15140F]
+               transition-all duration-100;
     }
     .btn-ghost:hover { @apply bg-black/5; }
 
@@ -198,7 +204,9 @@
 
     /* Stat card */
     .stat-card {
-        @apply card p-4 relative;
+        @apply bg-white border border-[#E6E3DC] rounded-[10px]
+               shadow-[0_1px_0_rgba(20,18,12,.04),0_1px_2px_rgba(20,18,12,.04)]
+               p-4 relative;
     }
     .stat-label { @apply text-[12px] text-[#6B6862]; }
     .stat-value { @apply text-[26px] font-semibold tracking-tight leading-tight tnum mt-1.5; }
