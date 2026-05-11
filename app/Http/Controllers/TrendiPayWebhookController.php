@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Actions\UpdateMoneyBoxStatsAction;
 use App\Enums\PaymentStatus;
+use App\Enums\WithdrawalStatus;
 use App\Models\Contribution;
+use App\Models\MoneyBoxWithdrawal;
+use App\Models\PiggyBoxWithdrawal;
 use App\Models\PiggyDonation;
 use App\Payment\Providers\TrendiPayProvider;
 use Illuminate\Http\JsonResponse;
@@ -42,6 +45,11 @@ class TrendiPayWebhookController extends Controller
             // Process the webhook payload through TrendiPay provider
             $webhookData = $this->trendiPayProvider->handleWebhook($payload);
             $reference = $webhookData['reference'];
+
+            // Disbursement callbacks have the suffix -DISBURSE-{timestamp}
+            if (str_contains($reference, '-DISBURSE-')) {
+                return $this->handleDisbursementCallback($webhookData, $reference);
+            }
 
             // Find the contribution
             $contribution = Contribution::query()->where('payment_reference', $reference)->first();
@@ -111,6 +119,66 @@ class TrendiPayWebhookController extends Controller
         }
     }
 
+
+    /**
+     * Handle a disbursement callback from TrendiPay.
+     * The disbursement reference is {withdrawal_reference}-DISBURSE-{timestamp}.
+     */
+    protected function handleDisbursementCallback(array $webhookData, string $disbursementReference): JsonResponse
+    {
+        // Strip the -DISBURSE-{timestamp} suffix to recover the original withdrawal reference
+        $withdrawalReference = preg_replace('/-DISBURSE-\d+$/', '', $disbursementReference);
+
+        Log::info('TrendiPay disbursement webhook received', [
+            'disbursement_reference' => $disbursementReference,
+            'withdrawal_reference'   => $withdrawalReference,
+            'status'                 => $webhookData['status'],
+        ]);
+
+        // Try MoneyBox withdrawal first, then PiggyBox
+        $withdrawal = MoneyBoxWithdrawal::where('reference', $withdrawalReference)->first()
+            ?? PiggyBoxWithdrawal::where('reference', $withdrawalReference)->first();
+
+        if (!$withdrawal) {
+            Log::warning('TrendiPay disbursement webhook: withdrawal not found', [
+                'withdrawal_reference' => $withdrawalReference,
+            ]);
+
+            return response()->json(['status' => 'error', 'message' => 'Withdrawal not found'], 404);
+        }
+
+        $isSuccess = $webhookData['status'] === 'completed';
+
+        if ($isSuccess) {
+            // Already marked disbursed by the command — just enrich the metadata
+            $withdrawal->update([
+                'payment_metadata' => array_merge($withdrawal->payment_metadata ?? [], [
+                    'disbursement_confirmed' => true,
+                    'disbursement_callback'  => $webhookData['raw_data'] ?? [],
+                    'confirmed_at'           => now()->toDateTimeString(),
+                ]),
+            ]);
+
+            Log::info('TrendiPay disbursement confirmed', ['reference' => $withdrawalReference]);
+        } else {
+            // Transfer ultimately failed — mark accordingly
+            $withdrawal->update([
+                'status'         => WithdrawalStatus::Failed,
+                'failure_reason' => $webhookData['reason'] ?? 'Disbursement failed via TrendiPay callback',
+                'payment_metadata' => array_merge($withdrawal->payment_metadata ?? [], [
+                    'disbursement_failed_callback' => $webhookData['raw_data'] ?? [],
+                    'failed_at'                    => now()->toDateTimeString(),
+                ]),
+            ]);
+
+            Log::warning('TrendiPay disbursement failed via callback', [
+                'reference' => $withdrawalReference,
+                'reason'    => $webhookData['reason'] ?? null,
+            ]);
+        }
+
+        return response()->json(['status' => 'success', 'message' => 'Disbursement callback processed'], 200);
+    }
 
     /**
      * Validate webhook payload structure

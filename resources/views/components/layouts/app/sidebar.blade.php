@@ -18,7 +18,7 @@
                     <div>
                         <div class="text-[14.5px] font-semibold tracking-tight text-[#15140F] leading-none">MyMoneyBox</div>
                         <div class="text-[11px] text-[#9C998F] mt-0.5">
-                            {{ auth()->user()->country ?? 'Ghana' }} · {{ auth()->user()->currency_code ?? 'GHS' }}
+                            {{ auth()->user()->country?->name ?? 'Ghana' }} · {{ auth()->user()->country?->currency_code ?? 'GHS' }}
                         </div>
                     </div>
                 </a>
