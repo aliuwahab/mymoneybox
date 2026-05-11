@@ -1,22 +1,23 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-neutral-100 antialiased dark:bg-linear-to-b dark:from-neutral-950 dark:to-neutral-900">
-        <div class="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+    <body class="min-h-screen bg-[#F3F1EB] antialiased">
+        <div class="flex min-h-screen flex-col items-center justify-center gap-6 p-6 md:p-10">
             <div class="flex w-full max-w-md flex-col gap-6">
-                <a href="{{ route('home') }}" class="flex flex-col items-center gap-2 font-medium" wire:navigate>
-                    <span class="flex h-9 w-9 items-center justify-center rounded-md">
-                        <x-app-logo-icon class="size-9 fill-current text-black dark:text-white" />
-                    </span>
-
-                    <span class="sr-only">{{ config('app.name', 'MyPiggyBox') }}</span>
+                {{-- Brand mark --}}
+                <a href="{{ route('home') }}" class="flex flex-col items-center gap-2 no-underline" wire:navigate>
+                    <div class="w-9 h-9 rounded-[9px] bg-[#15140F] text-[#FAFAF7] grid place-items-center text-[16px] font-bold tracking-tight">
+                        M
+                    </div>
+                    <span class="text-[13px] font-medium text-[#6B6862]">{{ config('app.name', 'MyMoneyBox') }}</span>
                 </a>
 
-                <div class="flex flex-col gap-6">
-                    <div class="rounded-xl border bg-white dark:bg-stone-950 dark:border-stone-800 text-stone-800 shadow-xs">
-                        <div class="px-10 py-8">{{ $slot }}</div>
+                {{-- Card --}}
+                <div class="card">
+                    <div class="px-8 py-8">
+                        {{ $slot }}
                     </div>
                 </div>
             </div>

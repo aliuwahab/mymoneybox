@@ -1,6 +1,7 @@
 <x-layouts.guest>
-    <div class="min-h-screen bg-gray-50 py-4 sm:py-8" x-data="{ showToast: false, toastMessage: '' }">
-        <!-- Toast Notification -->
+    <div class="min-h-screen bg-[#FAFAF7] py-6 sm:py-10" x-data="{ showToast: false, toastMessage: '' }">
+
+        {{-- Toast --}}
         <div
             x-show="showToast"
             x-transition:enter="transition ease-out duration-300"
@@ -9,301 +10,261 @@
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
-            class="fixed top-4 left-4 right-4 sm:left-auto sm:right-4 z-50 bg-blue-600 text-white px-4 sm:px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2"
+            class="fixed top-4 right-4 z-50 flex items-center gap-2.5 px-4 py-3 bg-[#15140F] text-white text-[13px] rounded-[8px] shadow-xl"
             style="display: none;"
-        >
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            x-cloak>
+            <svg viewBox="0 0 24 24" class="w-4 h-4 text-primary-400 flex-none" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m5 12 5 5L20 7"/>
             </svg>
-            <span x-text="toastMessage" class="text-sm sm:text-base"></span>
+            <span x-text="toastMessage"></span>
         </div>
-        <div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-                <!-- Main Content -->
-                <div class="lg:col-span-2 space-y-4 sm:space-y-6">
-                    <!-- Main Image -->
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+
+                {{-- Main content --}}
+                <div class="lg:col-span-2 space-y-5">
+
+                    {{-- Main image --}}
                     @if($moneyBox->hasMedia('main'))
-                        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-md overflow-hidden">
-                            <img src="{{ $moneyBox->getMainImageUrl() }}" 
+                        <div class="card overflow-hidden">
+                            <img src="{{ $moneyBox->getMainImageUrl() }}"
                                  alt="{{ $moneyBox->title }}"
-                                 class="w-full h-64 sm:h-96 object-cover">
+                                 class="w-full h-64 sm:h-80 object-cover">
                         </div>
                     @endif
 
-                    <!-- Piggy Box Details -->
-                    <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-md p-4 sm:p-6">
-                        <!-- Category -->
-                        @if($moneyBox->category)
-                            <div class="mb-3 sm:mb-4">
-                                <span class="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-blue-100 text-blue-800">
-                                    <span class="mr-1">{{ $moneyBox->category->icon }}</span>
-                                    <span>{{ $moneyBox->category->name }}</span>
-                                </span>
-                            </div>
-                        @endif
+                    {{-- Box details --}}
+                    <div class="card">
+                        <div class="card-body">
+                            {{-- Category --}}
+                            @if($moneyBox->category)
+                                <div class="mb-3">
+                                    <span class="pill pill-info">
+                                        {{ $moneyBox->category->icon }} {{ $moneyBox->category->name }}
+                                    </span>
+                                </div>
+                            @endif
 
-                        <!-- Title -->
-                        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4 leading-tight">
-                            {{ $moneyBox->title }}
-                        </h1>
+                            {{-- Title --}}
+                            <h1 class="text-[22px] sm:text-[26px] font-semibold text-[#15140F] tracking-tight leading-snug mb-3">
+                                {{ $moneyBox->title }}
+                            </h1>
 
-                        <!-- Creator -->
-                        <div class="flex items-center mb-4 sm:mb-6 text-gray-600 text-sm sm:text-base">
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                            <span class="truncate flex items-center gap-1">
-                                Created by {{ $moneyBox->user->name }}
+                            {{-- Creator --}}
+                            <div class="flex items-center gap-2 mb-5 text-[13px] text-[#6B6862]">
+                                <svg viewBox="0 0 24 24" class="w-4 h-4 flex-none" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                                </svg>
+                                <span>Created by <span class="font-medium text-[#15140F]">{{ $moneyBox->user->name }}</span></span>
                                 <x-verification-badge :user="$moneyBox->user" />
-                            </span>
-                        </div>
+                            </div>
 
-                        <!-- Progress -->
-                        @if($moneyBox->goal_amount)
-                            <div class="mb-4 sm:mb-6">
-                                <div class="flex justify-between mb-2">
-                                    <span class="text-xs sm:text-sm font-medium text-gray-700">Progress</span>
-                                    <span class="text-xs sm:text-sm font-medium text-gray-900">{{ number_format($moneyBox->getProgressPercentage(), 1) }}%</span>
+                            {{-- Progress --}}
+                            @if($moneyBox->goal_amount)
+                                @php $pct = min(100, $moneyBox->getProgressPercentage()); @endphp
+                                <div class="mb-5">
+                                    <div class="flex items-baseline justify-between mb-2">
+                                        <span class="text-[13px] font-semibold text-[#15140F] tnum">
+                                            {{ $moneyBox->formatAmount($moneyBox->total_contributions) }}
+                                            <span class="muted font-normal text-[12px]">of {{ $moneyBox->formatAmount($moneyBox->goal_amount) }}</span>
+                                        </span>
+                                        <span class="tiny tnum">{{ number_format($pct, 1) }}%</span>
+                                    </div>
+                                    <div class="progress-track">
+                                        <div class="progress-fill" style="width: {{ $pct }}%"></div>
+                                    </div>
                                 </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2.5 sm:h-3">
-                                    <div
-                                        class="bg-blue-600 h-2.5 sm:h-3 rounded-full transition-all"
-                                        style="width: {{ min(100, $moneyBox->getProgressPercentage()) }}%"
-                                    ></div>
+                            @endif
+
+                            {{-- Stats --}}
+                            <div class="grid grid-cols-2 gap-4 p-4 bg-[#F3F1EB] rounded-[8px] mb-5">
+                                <div>
+                                    <div class="text-[22px] font-semibold text-[#15140F] tnum tracking-tight">
+                                        {{ $moneyBox->formatAmount($moneyBox->total_contributions) }}
+                                    </div>
+                                    <div class="tiny mt-0.5">
+                                        @if($moneyBox->goal_amount) of {{ $moneyBox->formatAmount($moneyBox->goal_amount) }} goal
+                                        @else raised @endif
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-[22px] font-semibold text-[#15140F] tnum tracking-tight">
+                                        {{ $moneyBox->contribution_count }}
+                                    </div>
+                                    <div class="tiny mt-0.5">{{ Str::plural('contribution', $moneyBox->contribution_count) }}</div>
                                 </div>
                             </div>
-                        @endif
 
-                        <!-- Stats -->
-                        <div class="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6 p-3 sm:p-4 bg-gray-50 rounded-lg">
-                            <div>
-                                <div class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 break-words">
-                                    {{ $moneyBox->formatAmount($moneyBox->total_contributions) }}
+                            {{-- Description --}}
+                            @if($moneyBox->description)
+                                <div>
+                                    <h2 class="text-[14px] font-semibold text-[#15140F] mb-2">About</h2>
+                                    <p class="text-[13.5px] text-[#6B6862] whitespace-pre-line leading-relaxed">{{ $moneyBox->description }}</p>
                                 </div>
-                                <div class="text-xs sm:text-sm text-gray-600 mt-1">
-                                    @if($moneyBox->goal_amount)
-                                        <span class="hidden sm:inline">of {{ $moneyBox->formatAmount($moneyBox->goal_amount) }} goal</span>
-                                        <span class="sm:hidden">of {{ $moneyBox->formatAmount($moneyBox->goal_amount) }}</span>
-                                    @else
-                                        raised
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Gallery --}}
+                    @if($moneyBox->hasMedia('gallery'))
+                        <div class="card">
+                            <div class="card-head">
+                                <span class="card-title">Gallery</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                    @foreach($moneyBox->getMedia('gallery') as $image)
+                                        <a href="{{ $image->getTemporaryUrl(now()->addHour()) }}" target="_blank" class="group">
+                                            <img src="{{ $image->getTemporaryUrl(now()->addHour()) }}"
+                                                 alt="Gallery image"
+                                                 class="w-full h-32 sm:h-44 object-cover rounded-[6px] transition-transform group-hover:scale-[1.02]">
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Recent contributions --}}
+                    @if($moneyBox->contributions->count() > 0)
+                        <div class="card">
+                            <div class="card-head">
+                                <span class="card-title">Recent contributions</span>
+                            </div>
+                            <table class="data-table">
+                                <tbody>
+                                    @foreach($moneyBox->contributions as $contribution)
+                                        <tr>
+                                            <td>
+                                                <div class="flex items-center gap-2.5">
+                                                    <div class="w-7 h-7 rounded-full bg-primary-50 text-primary-600 grid place-items-center text-[11px] font-semibold flex-none">
+                                                        {{ substr($contribution->getDisplayName(), 0, 1) }}
+                                                    </div>
+                                                    <div>
+                                                        <div class="text-[13px] font-medium text-[#15140F]">{{ $contribution->getDisplayName() }}</div>
+                                                        @if($contribution->message)
+                                                            <div class="tiny line-clamp-1">{{ $contribution->message }}</div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="tiny text-right">{{ $contribution->created_at->diffForHumans() }}</td>
+                                            <td class="num font-semibold text-[#15140F] tnum">{{ $moneyBox->formatAmount($contribution->amount) }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </div>
+
+                {{-- Sidebar --}}
+                <div class="lg:col-span-1">
+                    <div class="card lg:sticky lg:top-[72px]">
+                        <div class="card-body">
+                            @if($moneyBox->canAcceptContributions())
+                                <h2 class="text-[15px] font-semibold text-[#15140F] mb-4">Make a contribution</h2>
+
+                                <form method="POST" action="{{ route('box.contribute', $moneyBox->slug) }}" class="space-y-4">
+                                    @csrf
+
+                                    <div class="grid gap-1.5">
+                                        <label for="amount" class="text-[13px] font-medium text-[#6B6862]">
+                                            Amount ({{ $moneyBox->getCurrencySymbol() }}) <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="number" name="amount" id="amount" step="0.01" min="0.01" required
+                                               placeholder="0.00" value="{{ old('amount') }}"
+                                               class="@error('amount') border-red-400 @enderror" />
+                                        @error('amount')
+                                            <p class="text-[12px] text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <div class="grid gap-1.5">
+                                        <label for="contributor_name" class="text-[13px] font-medium text-[#6B6862]">Your name</label>
+                                        <input type="text" name="contributor_name" id="contributor_name"
+                                               value="{{ old('contributor_name', auth()->user()->name ?? '') }}" />
+                                        @error('contributor_name')
+                                            <p class="text-[12px] text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <div class="grid gap-1.5">
+                                        <label for="contributor_email" class="text-[13px] font-medium text-[#6B6862]">
+                                            Email address <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="email" name="contributor_email" id="contributor_email" required
+                                               value="{{ old('contributor_email', auth()->user()->email ?? '') }}"
+                                               class="@error('contributor_email') border-red-400 @enderror" />
+                                        @error('contributor_email')
+                                            <p class="text-[12px] text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <div class="grid gap-1.5">
+                                        <label for="message" class="text-[13px] font-medium text-[#6B6862]">
+                                            Message <span class="text-[#9C998F] font-normal">(optional)</span>
+                                        </label>
+                                        <textarea name="message" id="message" rows="3"
+                                                  placeholder="Leave a kind message…"
+                                                  class="@error('message') border-red-400 @enderror">{{ old('message') }}</textarea>
+                                        @error('message')
+                                            <p class="text-[12px] text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" name="is_anonymous" id="is_anonymous" value="1"
+                                               class="rounded border-[#D9D6CE] text-primary-600"
+                                               {{ old('is_anonymous') ? 'checked' : '' }} />
+                                        <label for="is_anonymous" class="text-[13px] text-[#15140F]">Contribute anonymously</label>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary w-full justify-center py-2.5">
+                                        Proceed to payment
+                                    </button>
+                                </form>
+                            @else
+                                <div class="text-center py-8">
+                                    <div class="w-12 h-12 rounded-xl bg-[#F3F1EB] grid place-items-center mx-auto mb-3">
+                                        <svg viewBox="0 0 24 24" class="w-6 h-6 text-[#9C998F]" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                        </svg>
+                                    </div>
+                                    <h3 class="text-[14px] font-semibold text-[#15140F] mb-1">Not accepting contributions</h3>
+                                    <p class="tiny">This box is currently not accepting contributions.</p>
+                                </div>
+                            @endif
+
+                            {{-- Share --}}
+                            <div class="mt-5 pt-5 border-t border-[#E6E3DC]">
+                                <h3 class="text-[13px] font-semibold text-[#15140F] mb-3">Share this campaign</h3>
+                                <div class="space-y-2">
+                                    <button
+                                        type="button"
+                                        @click="navigator.clipboard.writeText('{{ $moneyBox->getPublicUrl() }}').then(() => { toastMessage = 'Link copied!'; showToast = true; setTimeout(() => showToast = false, 3000); })"
+                                        class="btn w-full justify-center">
+                                        <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                                        </svg>
+                                        Copy link
+                                    </button>
+
+                                    @if($moneyBox->hasQrCode())
+                                        <a href="{{ $moneyBox->getQrCodeUrl() }}" download target="_blank" class="btn w-full justify-center">
+                                            <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M12 15V3m0 12-4-4m4 4 4-4"/><path d="M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17"/>
+                                            </svg>
+                                            Download QR code
+                                        </a>
                                     @endif
                                 </div>
                             </div>
-                            <div>
-                                <div class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
-                                    {{ $moneyBox->contribution_count }}
-                                </div>
-                                <div class="text-xs sm:text-sm text-gray-600 mt-1">
-                                    {{ Str::plural('contribution', $moneyBox->contribution_count) }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Description -->
-                        @if($moneyBox->description)
-                            <div class="prose prose-sm sm:prose max-w-none">
-                                <h2 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3">About</h2>
-                                <p class="text-sm sm:text-base text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">{{ $moneyBox->description }}</p>
-                            </div>
-                        @endif
-                    </div>
-
-                    <!-- Gallery -->
-                    @if($moneyBox->hasMedia('gallery'))
-                        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-md p-4 sm:p-6">
-                            <h2 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">Gallery</h2>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
-                                @foreach($moneyBox->getMedia('gallery') as $image)
-                                    <a href="{{ $image->getTemporaryUrl(now()->addHour()) }}" target="_blank" class="group">
-                                        <img src="{{ $image->getTemporaryUrl(now()->addHour()) }}" 
-                                             alt="Gallery image"
-                                             class="w-full h-32 sm:h-48 object-cover rounded-lg transition-transform group-hover:scale-105">
-                                    </a>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
-                    <!-- Recent Contributions -->
-                    @if($moneyBox->contributions->count() > 0)
-                        <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
-                            <h2 class="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4">Recent Contributions</h2>
-                            <div class="space-y-3 sm:space-y-4">
-                                @foreach($moneyBox->contributions as $contribution)
-                                    <div class="flex items-start space-x-2 sm:space-x-3 pb-3 sm:pb-4 border-b border-gray-200 last:border-0">
-                                        <div class="flex-shrink-0">
-                                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                                <span class="text-sm sm:text-base text-blue-700 font-semibold">
-                                                    {{ substr($contribution->getDisplayName(), 0, 1) }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-xs sm:text-sm font-medium text-gray-900 truncate">
-                                                {{ $contribution->getDisplayName() }}
-                                            </p>
-                                            @if($contribution->message)
-                                                <p class="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">{{ $contribution->message }}</p>
-                                            @endif
-                                            <p class="text-xs text-gray-500 mt-1">
-                                                {{ $contribution->created_at->diffForHumans() }}
-                                            </p>
-                                        </div>
-                                        <div class="text-xs sm:text-sm font-semibold text-gray-900 flex-shrink-0">
-                                            {{ $moneyBox->formatAmount($contribution->amount) }}
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-                </div>
-
-                <!-- Sidebar - Contribution Form -->
-                <div class="lg:col-span-1">
-                    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:sticky lg:top-4">
-                        @if($moneyBox->canAcceptContributions())
-                            <h2 class="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4">Make a Contribution</h2>
-
-                            <form method="POST" action="{{ route('box.contribute', $moneyBox->slug) }}" class="space-y-4">
-                                @csrf
-
-                                <!-- Amount -->
-                                <div>
-                                    <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">
-                                        Amount ({{ $moneyBox->getCurrencySymbol() }})
-                                    </label>
-                                    <input
-                                        type="number"
-                                        name="amount"
-                                        id="amount"
-                                        step="0.01"
-                                        min="0.01"
-                                        required
-                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                                        value="{{ old('amount') }}"
-                                    />
-                                    @error('amount')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
-
-                                <!-- Name -->
-                                <div>
-                                    <label for="contributor_name" class="block text-sm font-medium text-gray-700 mb-1">
-                                        Your Name
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="contributor_name"
-                                        id="contributor_name"
-                                        value="{{ old('contributor_name', auth()->user()->name ?? '') }}"
-                                    />
-                                    @error('contributor_name')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
-
-                                <!-- Email -->
-                                <div>
-                                    <label for="contributor_email" class="block text-sm font-medium text-gray-700 mb-1">
-                                        Email Address *
-                                    </label>
-                                    <input
-                                        type="email"
-                                        name="contributor_email"
-                                        id="contributor_email"
-                                        required
-                                        value="{{ old('contributor_email', auth()->user()->email ?? '') }}"
-                                    />
-                                    @error('contributor_email')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
-
-                                <!-- Message -->
-                                <div>
-                                    <label for="message" class="block text-sm font-medium text-gray-700 mb-1">
-                                        Message (Optional)
-                                    </label>
-                                    <textarea
-                                        name="message"
-                                        id="message"
-                                        rows="3"
-                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                                    >{{ old('message') }}</textarea>
-                                    @error('message')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
-
-                                <!-- Anonymous -->
-                                <div class="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        name="is_anonymous"
-                                        id="is_anonymous"
-                                        value="1"
-                                        class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                                        {{ old('is_anonymous') ? 'checked' : '' }}
-                                    />
-                                    <label for="is_anonymous" class="ml-2 text-sm text-gray-700">
-                                        Contribute anonymously
-                                    </label>
-                                </div>
-
-                                <!-- Submit -->
-                                <button
-                                    type="submit"
-                                    class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm transition"
-                                >
-                                    Proceed to Payment
-                                </button>
-                            </form>
-                        @else
-                            <div class="text-center py-8">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
-                                <h3 class="mt-2 text-sm font-medium text-gray-900">Not Accepting Contributions</h3>
-                                <p class="mt-1 text-sm text-gray-500">This piggy box is currently not accepting contributions.</p>
-                            </div>
-                        @endif
-
-                        <!-- Share Section -->
-                        <div class="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
-                            <h3 class="text-sm font-semibold text-gray-900 mb-2 sm:mb-3">Share this campaign</h3>
-                            <div class="space-y-2 sm:space-y-3">
-                                <!-- Copy Link -->
-                                <button
-                                    type="button"
-                                    @click="navigator.clipboard.writeText('{{ $moneyBox->getPublicUrl() }}').then(() => { toastMessage = 'Link copied!'; showToast = true; setTimeout(() => showToast = false, 3000); })"
-                                    class="w-full flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition text-sm sm:text-base"
-                                >
-                                    <svg class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                    </svg>
-                                    <span>Copy Link</span>
-                                </button>
-
-                                <!-- QR Code Download -->
-                                @if($moneyBox->hasQrCode())
-                                    <a
-                                        href="{{ $moneyBox->getQrCodeUrl() }}"
-                                        download
-                                        target="_blank"
-                                        class="w-full flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition text-sm sm:text-base"
-                                    >
-                                        <svg class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m0 0l-4-4m4 4l4-4"></path>
-                                        </svg>
-                                        <span>Download QR Code</span>
-                                    </a>
-                                @endif
-                            </div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
