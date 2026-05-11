@@ -4,10 +4,10 @@
         $covers = ['cover-emerald','cover-amber','cover-slate','cover-rose','cover-violet'];
     @endphp
 
-    <div class="px-7 py-7 max-w-[1280px]" x-data="{ filter: 'all' }">
+    <div class="page-wrap max-w-[1280px]" x-data="{ filter: 'all' }">
 
         {{-- Page header --}}
-        <div class="flex items-end justify-between gap-6 mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-6 mb-6">
             <div>
                 <h1 class="page-title">Your money boxes</h1>
                 <p class="text-[13.5px] text-[#6B6862] mt-1.5">

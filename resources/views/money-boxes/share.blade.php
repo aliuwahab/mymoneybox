@@ -1,5 +1,5 @@
 <x-layouts.app>
-    <div class="px-7 py-7 max-w-[720px]">
+    <div class="page-wrap max-w-[720px] mx-auto w-full">
 
         {{-- Header --}}
         <div class="flex items-center gap-3 mb-6">

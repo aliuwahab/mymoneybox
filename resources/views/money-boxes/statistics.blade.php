@@ -9,7 +9,7 @@
             : null;
     @endphp
 
-    <div class="px-7 py-7 max-w-[1280px]">
+    <div class="page-wrap max-w-[1280px]">
 
         {{-- Header --}}
         <div class="flex items-center gap-3 mb-6">

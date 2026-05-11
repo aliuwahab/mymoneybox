@@ -9,7 +9,7 @@
     @endphp
 
     <div
-        class="px-7 py-7 max-w-[1280px]"
+        class="page-wrap max-w-[1280px]"
         x-data="{
             tab: 'overview',
             showToast: false,
@@ -47,8 +47,8 @@
         </div>
 
         {{-- Page header --}}
-        <div class="flex items-start justify-between gap-6 mb-6 flex-wrap">
-            <div class="flex items-center gap-4">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
+            <div class="flex items-center gap-4 min-w-0">
                 <div class="{{ $cover }} w-16 h-16 rounded-[12px] relative flex-none overflow-hidden">
                     <div class="absolute inset-0 grid place-items-center text-white/90 font-serif text-[28px]">
                         {{ substr($moneyBox->title, 0, 1) }}

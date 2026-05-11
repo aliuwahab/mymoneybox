@@ -318,12 +318,29 @@ select:focus[data-flux-control] {
 /* Page title in serif */
 .page-title {
     font-family: var(--font-serif);
-    font-size: 2.375rem;
+    font-size: clamp(1.5rem, 5vw, 2.375rem);
     line-height: 1.05;
     letter-spacing: -0.01em;
     font-weight: 400;
     color: var(--color-sand-700);
 }
+
+/* Responsive app page wrapper — used in every authenticated page */
+.page-wrap {
+    width: 100%;
+    padding: 1.25rem 1rem 2rem;
+}
+@media (min-width: 640px) {
+    .page-wrap { padding: 1.75rem 1.5rem 2.5rem; }
+}
+@media (min-width: 1024px) {
+    .page-wrap { padding: 1.75rem 2rem 2.5rem; }
+}
+
+/* Tabs: allow horizontal scroll on small screens */
+.tabs { overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { white-space: nowrap; }
 
 /* Misc helpers */
 .muted  { color: var(--color-sand-600); }

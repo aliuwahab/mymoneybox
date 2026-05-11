@@ -3,19 +3,30 @@
 namespace App\Listeners;
 
 use App\Events\ContributionProcessed;
+use App\Mail\ContributionThankYouMail;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class SendContributionThankYouEmail implements ShouldQueue
 {
     public function handle(ContributionProcessed $event): void
     {
-        // Send thank you email to contributor
-        // Send notification to piggy box owner about new contribution
+        $contribution = $event->contribution;
 
-        // Example:
-        // if ($event->contribution->contributor_email) {
-        //     Mail::to($event->contribution->contributor_email)
-        //         ->send(new ContributionThankYouMail($event->contribution, $event->moneyBox));
-        // }
+        if (!$contribution->contributor_email) {
+            return;
+        }
+
+        try {
+            Mail::to($contribution->contributor_email)
+                ->send(new ContributionThankYouMail($contribution, $event->moneyBox));
+        } catch (\Throwable $e) {
+            Log::error('Failed to send contribution thank-you email', [
+                'contribution_id' => $contribution->id,
+                'email'           => $contribution->contributor_email,
+                'error'           => $e->getMessage(),
+            ]);
+        }
     }
 }

@@ -1,7 +1,7 @@
 <x-layouts.app>
     @php $sym = auth()->user()->country?->currency_symbol ?? '₵'; @endphp
 
-    <div class="px-7 py-7 max-w-[720px]">
+    <div class="page-wrap max-w-[720px] mx-auto w-full">
 
         {{-- Back --}}
         <div class="mb-6">
