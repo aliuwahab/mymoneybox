@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Actions\CalculateWithdrawalFeeAction;
 use App\Actions\CreateMoneyBoxWithdrawalAction;
 use App\Actions\ValidateWithdrawalAmountAction;
+use App\Data\WithdrawalRequestData;
 use App\Models\MoneyBox;
 use App\Models\WithdrawalAccount;
 use Livewire\Attributes\Computed;
@@ -89,17 +90,21 @@ class MoneyBoxWithdrawalForm extends Component
             return;
         }
 
-        $account = WithdrawalAccount::findOrFail($this->withdrawalAccountId);
-        $this->authorize('view', $account);
+        $this->authorize('view', WithdrawalAccount::findOrFail($this->withdrawalAccountId));
 
-        // Create withdrawal
-        $action = app(CreateMoneyBoxWithdrawalAction::class);
-        $withdrawal = $action->execute(
-            $this->moneyBox,
-            $account,
-            (float) $this->amount,
-            $this->note
-        );
+        try {
+            $withdrawal = app(CreateMoneyBoxWithdrawalAction::class)->execute(
+                $this->moneyBox,
+                new WithdrawalRequestData(
+                    amount: (float) $this->amount,
+                    withdrawalAccountId: (int) $this->withdrawalAccountId,
+                    note: $this->note ?: null,
+                ),
+            );
+        } catch (\InvalidArgumentException $e) {
+            $this->addError('amount', $e->getMessage());
+            return;
+        }
 
         session()->flash('success', 'Withdrawal request submitted successfully! Reference: ' . $withdrawal->reference);
         $this->closeModal();

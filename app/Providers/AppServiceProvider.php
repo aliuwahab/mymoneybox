@@ -4,50 +4,42 @@ namespace App\Providers;
 
 use App\Events\ContributionProcessed;
 use App\Events\MoneyBoxCreated;
+use App\Events\WithdrawalRequested;
 use App\Listeners\NotifyMoneyBoxOwner;
 use App\Listeners\SendContributionThankYouEmail;
 use App\Listeners\SendMoneyBoxCreatedNotification;
 use App\Payment\PaymentManager;
 use App\Payment\Providers\TrendiPayProvider;
-use App\Payment\Providers\PaystackProvider; // Kept as reference
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
-        // Register Payment Manager
-        $this->app->singleton(PaymentManager::class, function ($app) {
+        $this->app->singleton(PaymentManager::class, function () {
             $manager = new PaymentManager();
-
-            // Register TrendiPay as default provider
             $manager->extend('trendipay', new TrendiPayProvider());
-
-            // Register Stripe provider (kept as reference for extending to other providers)
-            // $manager->extend('stripe', new StripeProvider());
-
             return $manager;
         });
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        // Register event listeners
-        Event::listen(
-            MoneyBoxCreated::class,
-            SendMoneyBoxCreatedNotification::class
-        );
+        // Fired after a contribution payment is confirmed by the TrendiPay webhook
+        Event::listen(ContributionProcessed::class, [
+            SendContributionThankYouEmail::class,
+            NotifyMoneyBoxOwner::class,
+        ]);
 
-        Event::listen(
-            ContributionProcessed::class,
-//            [SendContributionThankYouEmail::class, NotifyMoneyBoxOwner::class]
-        );
+        // Fired after a new MoneyBox is created (e.g. welcome email, admin alert)
+        Event::listen(MoneyBoxCreated::class, SendMoneyBoxCreatedNotification::class);
+
+        // Fired when a withdrawal request is submitted (ready for admin review)
+        // Wire in your notification logic as needed, e.g.:
+        // Event::listen(WithdrawalRequested::class, NotifyAdminOfWithdrawal::class);
+        Event::listen(WithdrawalRequested::class, function (WithdrawalRequested $event) {
+            // placeholder — add a queued listener when notification infra is ready
+        });
     }
 }

@@ -44,53 +44,41 @@ class PiggyWebhookController extends Controller
             $donation = PiggyDonation::query()->where('payment_reference', $reference)->first();
 
             if (!$donation) {
-                Log::warning('TrendiPay Piggy Webhook: Donation not found', [
-                    'reference' => $reference,
-                    'webhook_data' => $webhookData
-                ]);
-
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Donation not found'
-                ], 404);
+                Log::warning('TrendiPay Piggy Webhook: Donation not found', ['reference' => $reference]);
+                return response()->json(['status' => 'error', 'message' => 'Donation not found'], 404);
             }
 
-            // Map TrendiPay status to our local PaymentStatus enum
+            // Idempotency: terminal states should not be reprocessed
+            if (in_array($donation->payment_status, [PaymentStatus::Completed, PaymentStatus::Failed])) {
+                Log::info('TrendiPay Piggy Webhook: already processed, skipping', [
+                    'reference'      => $reference,
+                    'current_status' => $donation->payment_status->value,
+                ]);
+                return response()->json(['status' => 'success', 'message' => 'Already processed'], 200);
+            }
+
             $paymentStatus = match($webhookData['status']) {
                 'completed' => PaymentStatus::Completed,
-                'failed' => PaymentStatus::Failed,
-                default => PaymentStatus::Pending,
+                'failed'    => PaymentStatus::Failed,
+                default     => PaymentStatus::Pending,
             };
 
-            // Update donation with new status and metadata
             $donation->update([
-                'payment_status' => $paymentStatus,
-                'transaction_rrn' => $webhookData['transaction_rrn'] ?? null,
+                'payment_status'   => $paymentStatus,
+                'transaction_rrn'  => $webhookData['transaction_rrn'] ?? null,
                 'payment_metadata' => $webhookData['raw_data'] ?? null,
             ]);
 
-            Log::info('TrendiPay Piggy Webhook: Status updated', [
+            Log::info('TrendiPay Piggy Webhook: status updated', [
                 'donation_id' => $donation->id,
-                'reference' => $reference,
-                'status' => $paymentStatus->value,
-                'reason' => $webhookData['reason'] ?? null,
+                'reference'   => $reference,
+                'status'      => $paymentStatus->value,
             ]);
 
-            // Take action based on status
             if ($paymentStatus === PaymentStatus::Completed) {
-                // Update piggy box statistics
                 $piggyBox = $donation->piggyBox;
                 $piggyBox->increment('total_received', $donation->amount);
                 $piggyBox->increment('donation_count');
-
-                // TODO: Fire event for payment confirmed notifications
-                // event(new PiggyDonationConfirmed($donation, $piggyBox));
-            }
-
-            // Take action based on status
-            if ($paymentStatus === PaymentStatus::Failed) {
-                // TODO: Fire event for payment failed notifications
-                // event(new PiggyDonationFailed($donation, $donation->piggyBox));
             }
 
             return response()->json(['status' => 'success', 'message' => 'Piggy payment processed successfully'], 200);

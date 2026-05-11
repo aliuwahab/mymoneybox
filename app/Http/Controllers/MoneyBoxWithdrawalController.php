@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\CalculateWithdrawalFeeAction;
 use App\Actions\CreateMoneyBoxWithdrawalAction;
 use App\Actions\ValidateWithdrawalAmountAction;
+use App\Data\WithdrawalRequestData;
 use App\Models\MoneyBox;
-use App\Models\WithdrawalAccount;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class MoneyBoxWithdrawalController extends Controller
 {
@@ -15,25 +15,23 @@ class MoneyBoxWithdrawalController extends Controller
     {
         $this->authorize('update', $moneyBox);
 
-        // Check if user can withdraw
         $user = auth()->user();
         $availableBalance = $moneyBox->getAvailableBalance();
         $withdrawalAccounts = $user->withdrawalAccounts()->active()->get();
 
-        // Redirect with appropriate message if requirements not met
         if (!$user->isVerified()) {
             return redirect()->route('settings.verification')
                 ->with('error', 'You must verify your identity before making withdrawals.');
         }
 
-        if ($withdrawalAccounts->count() === 0) {
+        if ($withdrawalAccounts->isEmpty()) {
             return redirect()->route('settings.withdrawal-accounts')
                 ->with('error', 'Please add a withdrawal account before making withdrawals.');
         }
 
         if ($availableBalance < config('withdrawal.min_amount', 10)) {
             return redirect()->route('money-boxes.show', $moneyBox)
-                ->with('error', 'Insufficient balance for withdrawal. Minimum amount: ' . $moneyBox->formatAmount(config('withdrawal.min_amount', 10)));
+                ->with('error', 'Insufficient balance for withdrawal. Minimum: ' . $moneyBox->formatAmount(config('withdrawal.min_amount', 10)));
         }
 
         return view('money-boxes.withdraw', compact('moneyBox', 'withdrawalAccounts', 'availableBalance'));
@@ -44,36 +42,37 @@ class MoneyBoxWithdrawalController extends Controller
         $this->authorize('update', $moneyBox);
 
         $validated = $request->validate([
-            'amount' => 'required|numeric|min:' . config('withdrawal.min_amount', 10),
+            'amount'                => 'required|numeric|min:' . config('withdrawal.min_amount', 10),
             'withdrawal_account_id' => 'required|exists:withdrawal_accounts,id',
-            'note' => 'nullable|string|max:500',
+            'note'                  => 'nullable|string|max:500',
         ], [
             'withdrawal_account_id.required' => 'Please select a withdrawal account.',
         ]);
 
-        $availableBalance = $moneyBox->getAvailableBalance();
-
-        // Validate amount
-        $validator = app(ValidateWithdrawalAmountAction::class);
-        $validation = $validator->execute((float) $validated['amount'], $availableBalance);
+        // User-facing balance check before acquiring the DB lock
+        $validation = app(ValidateWithdrawalAmountAction::class)
+            ->execute((float) $validated['amount'], $moneyBox->getAvailableBalance());
 
         if (!$validation->valid) {
             return back()->withErrors(['amount' => $validation->errors])->withInput();
         }
 
-        $account = WithdrawalAccount::findOrFail($validated['withdrawal_account_id']);
-        $this->authorize('view', $account);
+        $this->authorize('view', \App\Models\WithdrawalAccount::findOrFail($validated['withdrawal_account_id']));
 
-        // Create withdrawal
-        $action = app(CreateMoneyBoxWithdrawalAction::class);
-        $withdrawal = $action->execute(
-            $moneyBox,
-            $account,
-            (float) $validated['amount'],
-            $validated['note'] ?? null
-        );
+        try {
+            $withdrawal = app(CreateMoneyBoxWithdrawalAction::class)->execute(
+                $moneyBox,
+                new WithdrawalRequestData(
+                    amount: (float) $validated['amount'],
+                    withdrawalAccountId: (int) $validated['withdrawal_account_id'],
+                    note: $validated['note'] ?? null,
+                ),
+            );
+        } catch (\InvalidArgumentException $e) {
+            return back()->withErrors(['amount' => $e->getMessage()])->withInput();
+        }
 
         return redirect()->route('money-boxes.show', $moneyBox)
-            ->with('success', 'Withdrawal request submitted successfully! Reference: ' . $withdrawal->reference);
+            ->with('success', 'Withdrawal request submitted! Reference: ' . $withdrawal->reference);
     }
 }
