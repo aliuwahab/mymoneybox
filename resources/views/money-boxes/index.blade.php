@@ -1,127 +1,139 @@
 <x-layouts.app>
-    <div class="min-h-screen bg-gray-50 py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Header -->
-            <div class="flex justify-between items-center mb-8">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">My Piggy Boxes</h1>
-                    <p class="mt-2 text-gray-600">Manage all your piggy boxes</p>
-                </div>
-                <a
-                    href="{{ route('money-boxes.create') }}"
-                    class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition"
-                >
-                    Create Piggy Box
+    @php
+        $sym    = auth()->user()->country?->currency_symbol ?? '₵';
+        $covers = ['cover-emerald','cover-amber','cover-slate','cover-rose','cover-violet'];
+    @endphp
+
+    <div class="px-7 py-7 max-w-[1280px]" x-data="{ filter: 'all' }">
+
+        {{-- Page header --}}
+        <div class="flex items-end justify-between gap-6 mb-6">
+            <div>
+                <h1 class="page-title">Your money boxes</h1>
+                <p class="text-[13.5px] text-[#6B6862] mt-1.5">
+                    {{ $moneyBoxes->total() }} total ·
+                    {{ $moneyBoxes->getCollection()->where('is_active', true)->count() }} active
+                </p>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('money-boxes.create') }}" class="btn btn-primary">
+                    <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                    New box
                 </a>
             </div>
+        </div>
 
-            @if($moneyBoxes->count() > 0)
-                <!-- Grid of Piggy Boxes -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach($moneyBoxes as $moneyBox)
-                        <div class="bg-white rounded-lg shadow hover:shadow-lg transition">
-                            <!-- Header -->
-                            <div class="p-6">
-                                <div class="flex items-start justify-between mb-4">
-                                    <div class="flex-1">
-                                        <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                                            {{ $moneyBox->title }}
-                                        </h3>
-                                        <div class="flex items-center space-x-2">
-                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $moneyBox->visibility->value === 'public' ? 'bg-primary-100 text-primary-800' : 'bg-gray-100 text-gray-800' }}">
-                                                {{ $moneyBox->visibility->value === 'public' ? 'Public' : 'Private' }}
-                                            </span>
-                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $moneyBox->is_active ? 'bg-secondary-100 text-secondary-800' : 'bg-red-100 text-red-800' }}">
-                                                {{ $moneyBox->is_active ? 'Active' : 'Inactive' }}
-                                            </span>
-                                        </div>
+        {{-- Tabs / filter --}}
+        <div class="tabs">
+            @foreach([['all','All'],['active','Active'],['inactive','Inactive']] as [$val,$label])
+                <button
+                    class="tab"
+                    :class="filter === '{{ $val }}' ? 'active' : ''"
+                    @click="filter = '{{ $val }}'"
+                >
+                    {{ $label }}
+                </button>
+            @endforeach
+        </div>
+
+        @if($moneyBoxes->count() > 0)
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                @foreach($moneyBoxes as $box)
+                    @php
+                        $cover = $covers[$loop->index % count($covers)];
+                        $pct   = $box->goal_amount > 0
+                            ? min(100, round(($box->total_contributions / $box->goal_amount) * 100))
+                            : 0;
+                    @endphp
+                    <div
+                        x-show="filter === 'all' || (filter === 'active' && {{ $box->is_active ? 'true' : 'false' }}) || (filter === 'inactive' && {{ !$box->is_active ? 'true' : 'false' }})"
+                    >
+                        <a href="{{ route('money-boxes.show', $box) }}" wire:navigate
+                           class="card block hover:shadow-[0_1px_0_rgba(20,18,12,.04),0_8px_24px_-8px_rgba(20,18,12,.10)] transition-shadow duration-150 overflow-hidden">
+
+                            {{-- Cover --}}
+                            <div class="p-3.5 pb-0">
+                                <div class="{{ $cover }} h-[90px] rounded-[6px] relative">
+                                    <div class="absolute inset-0 grid place-items-center text-white/90 font-serif text-[28px] tracking-wide">
+                                        {{ substr($box->title, 0, 1) }}
                                     </div>
-                                    @if($moneyBox->category)
-                                        <span class="text-2xl">{{ $moneyBox->category->icon }}</span>
-                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="p-4">
+                                {{-- Badges --}}
+                                <div class="flex items-center gap-1.5 mb-2">
+                                    <span class="pill {{ $box->visibility->value === 'public' ? 'pill-info' : 'pill-muted' }}">
+                                        <span class="pill-dot"></span>
+                                        {{ ucfirst($box->visibility->value) }}
+                                    </span>
+                                    <span class="pill {{ $box->is_active ? 'pill-ok' : 'pill-muted' }}">
+                                        <span class="pill-dot"></span>
+                                        {{ $box->is_active ? 'Active' : 'Inactive' }}
+                                    </span>
                                 </div>
 
-                                <!-- Stats -->
-                                <div class="space-y-3">
-                                    <div>
-                                        <div class="flex justify-between text-sm mb-1">
-                                            <span class="text-gray-600">Raised</span>
-                                            @if($moneyBox->goal_amount)
-                                                <span class="text-gray-900 font-medium">{{ number_format($moneyBox->getProgressPercentage(), 1) }}%</span>
-                                            @endif
+                                <div class="text-[15px] font-semibold text-[#15140F] tracking-tight mb-0.5 leading-snug">
+                                    {{ Str::limit($box->title, 52) }}
+                                </div>
+                                <div class="tiny mb-3">
+                                    {{ $box->category?->name ?? 'General' }} · {{ $box->contributions_count }} contributors
+                                </div>
+
+                                {{-- Progress --}}
+                                @if($box->goal_amount)
+                                    <div class="flex items-baseline justify-between mb-1.5">
+                                        <div class="text-[13px] font-semibold text-[#15140F] tnum">
+                                            {{ $sym }}{{ number_format($box->total_contributions, 2) }}
+                                            <span class="muted font-normal text-[12px]">of {{ $sym }}{{ number_format($box->goal_amount, 2) }}</span>
                                         </div>
-                                        <div class="text-2xl font-bold text-gray-900">
-                                            {{ $moneyBox->formatAmount($moneyBox->total_contributions) }}
-                                        </div>
-                                        @if($moneyBox->goal_amount)
-                                            <div class="text-sm text-gray-500">
-                                                of {{ $moneyBox->formatAmount($moneyBox->goal_amount) }}
-                                            </div>
-                                            <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
-                                                <div
-                                                    class="bg-primary-600 h-2 rounded-full transition-all"
-                                                    style="width: {{ min(100, $moneyBox->getProgressPercentage()) }}%"
-                                                ></div>
-                                            </div>
+                                        <div class="tiny tnum">{{ $pct }}%</div>
+                                    </div>
+                                    <div class="progress-track">
+                                        <div class="progress-fill" style="width: {{ $pct }}%"></div>
+                                    </div>
+                                @else
+                                    <div class="text-[13px] font-semibold text-[#15140F] tnum">
+                                        {{ $sym }}{{ number_format($box->total_contributions, 2) }}
+                                        <span class="muted font-normal text-[12px]">raised · no goal set</span>
+                                    </div>
+                                @endif
+
+                                <div class="flex items-center justify-between mt-3">
+                                    <span class="tiny">
+                                        @if($box->end_date)
+                                            Ends {{ $box->end_date->format('M j, Y') }}
+                                        @else
+                                            Ongoing
                                         @endif
-                                    </div>
-
-                                    <div class="flex items-center justify-between pt-3 border-t border-gray-200 text-sm">
-                                        <div>
-                                            <span class="text-gray-600">Contributors</span>
-                                            <div class="text-lg font-semibold text-gray-900">{{ $moneyBox->contributions_count }}</div>
-                                        </div>
-                                        <div>
-                                            <span class="text-gray-600">Created</span>
-                                            <div class="text-lg font-semibold text-gray-900">{{ $moneyBox->created_at->format('M d') }}</div>
-                                        </div>
-                                    </div>
+                                    </span>
+                                    <span class="text-[12px] font-medium text-primary-600 flex items-center gap-1">
+                                        Open
+                                        <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                                    </span>
                                 </div>
                             </div>
-
-                            <!-- Actions -->
-                            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex space-x-2">
-                                <a
-                                    href="{{ route('money-boxes.show', $moneyBox) }}"
-                                    class="flex-1 px-3 py-2 text-center text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-                                >
-                                    View
-                                </a>
-                                <a
-                                    href="{{ route('money-boxes.edit', $moneyBox) }}"
-                                    class="flex-1 px-3 py-2 text-center text-sm font-medium text-primary-700 bg-primary-50 border border-primary-300 rounded-lg hover:bg-primary-100 transition"
-                                >
-                                    Edit
-                                </a>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-
-                <!-- Pagination -->
-                <div class="mt-8">
-                    {{ $moneyBoxes->links() }}
-                </div>
-            @else
-                <div class="bg-white rounded-lg shadow p-12 text-center">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                    </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">No piggy boxes</h3>
-                    <p class="mt-1 text-sm text-gray-500">Get started by creating your first piggy box.</p>
-                    <div class="mt-6">
-                        <a
-                            href="{{ route('money-boxes.create') }}"
-                            class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 transition"
-                        >
-                            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                            </svg>
-                            Create Piggy Box
                         </a>
                     </div>
-                </div>
+                @endforeach
+            </div>
+
+            {{-- Pagination --}}
+            @if($moneyBoxes->hasPages())
+                <div class="mt-8">{{ $moneyBoxes->links() }}</div>
             @endif
-        </div>
+        @else
+            <div class="border-2 border-dashed border-[#D9D6CE] rounded-[10px] p-12 text-center">
+                <div class="w-12 h-12 rounded-xl bg-primary-50 text-primary-600 grid place-items-center mx-auto mb-4">
+                    <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="M3 7.5 12 12l9-4.5"/><path d="M12 12v9"/></svg>
+                </div>
+                <h3 class="text-[15px] font-semibold text-[#15140F] mb-1">No money boxes</h3>
+                <p class="tiny mb-5">Get started by creating your first money box.</p>
+                <a href="{{ route('money-boxes.create') }}" class="btn btn-primary">
+                    <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                    Create a box
+                </a>
+            </div>
+        @endif
     </div>
 </x-layouts.app>
