@@ -1,234 +1,834 @@
-<x-layouts.guest>
-    {{-- Hero --}}
-    <div class="relative bg-[#15140F] overflow-hidden">
-        {{-- Subtle grid pattern --}}
-        <div class="absolute inset-0 opacity-[0.04]">
-            <svg class="absolute w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <circle cx="20" cy="20" r="1" fill="white"/>
-                </pattern>
-                <rect width="100%" height="100%" fill="url(#grid)"/>
-            </svg>
+<!doctype html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    @include('partials.head')
+    <title>{{ config('app.name') }} — Collect contributions, beautifully.</title>
+    <style>
+        :root {
+            --bg:           #FAFAF7;
+            --bg-2:         #F3F1EB;
+            --panel:        #FFFFFF;
+            --border:       #E6E3DC;
+            --border-2:     #D9D6CE;
+            --fg:           #15140F;
+            --fg-2:         #5C5A54;
+            --fg-3:         #908D83;
+            --accent:       #1B6B4E;
+            --accent-hover: #154F3A;
+            --accent-soft:  #E6F1EB;
+            --accent-deep:  #0E3C2C;
+            --radius:       12px;
+            --shadow-1:     0 1px 0 rgba(20,18,12,.04), 0 1px 2px rgba(20,18,12,.04);
+            --shadow-2:     0 1px 0 rgba(20,18,12,.04), 0 12px 32px -10px rgba(20,18,12,.14);
+            --shadow-pop:   0 28px 80px -20px rgba(20,18,12,.30), 0 6px 18px rgba(20,18,12,.08);
+            --container:    1180px;
+        }
+        *, ::before, ::after { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; }
+        body {
+            background: var(--bg);
+            color: var(--fg);
+            font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+            font-feature-settings: 'cv11', 'ss01', 'tnum';
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+            font-size: 15px;
+            line-height: 1.55;
+        }
+        a { color: inherit; text-decoration: none; }
+        button { font-family: inherit; cursor: pointer; }
+        ::selection { background: var(--accent); color: #fff; }
+        .serif { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; }
+        .mono  { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+        .tnum  { font-variant-numeric: tabular-nums; }
+        .wrap  { max-width: var(--container); margin: 0 auto; padding: 0 28px; }
+
+        /* NAV */
+        .nav {
+            position: sticky; top: 0; z-index: 50;
+            background: rgba(250,250,247,0.88);
+            backdrop-filter: saturate(180%) blur(14px);
+            -webkit-backdrop-filter: saturate(180%) blur(14px);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-inner { display: flex; align-items: center; gap: 28px; height: 64px; }
+        .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: -0.01em; }
+        .brand-mark {
+            width: 28px; height: 28px; border-radius: 7px;
+            background: var(--fg); color: var(--bg);
+            display: grid; place-items: center;
+            font-weight: 700; font-size: 13px; letter-spacing: -0.02em;
+        }
+        .nav-links { display: flex; gap: 22px; margin-left: 16px; }
+        .nav-links a { color: var(--fg-2); font-size: 14px; font-weight: 500; transition: color .15s; }
+        .nav-links a:hover { color: var(--fg); }
+        .nav-cta { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+        /* BUTTONS */
+        .btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 9px 16px; border-radius: 8px;
+            font-size: 14px; font-weight: 500;
+            border: 1px solid var(--border);
+            background: var(--panel); color: var(--fg);
+            box-shadow: var(--shadow-1);
+            transition: background .14s, border-color .14s, transform .08s;
+            cursor: pointer;
+        }
+        .btn:hover { background: #FBFAF6; border-color: var(--border-2); }
+        .btn:active { transform: translateY(0.5px); }
+        .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+        .btn.lg { padding: 12px 22px; font-size: 15px; border-radius: 9px; }
+        .btn.ghost { background: transparent; border-color: transparent; box-shadow: none; }
+        .btn.ghost:hover { background: rgba(0,0,0,0.04); }
+        .btn svg { width: 16px; height: 16px; }
+        .btn-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+        /* EYEBROW PILL */
+        .eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 5px 11px 5px 8px;
+            background: var(--panel); border: 1px solid var(--border);
+            border-radius: 999px; font-size: 12px; font-weight: 500;
+            color: var(--fg-2); box-shadow: var(--shadow-1);
+        }
+        .eyebrow .dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft);
+        }
+
+        /* HERO */
+        .hero { padding: 80px 0 60px; position: relative; overflow: hidden; }
+        .hero::before {
+            content: ''; position: absolute; inset: -40px 0 0 0; pointer-events: none;
+            background:
+                radial-gradient(60% 50% at 50% 0%, rgba(27,107,78,0.06), transparent 70%),
+                linear-gradient(to right, rgba(0,0,0,0.025) 1px, transparent 1px) 0 0 / 64px 64px,
+                linear-gradient(to bottom, rgba(0,0,0,0.025) 1px, transparent 1px) 0 0 / 64px 64px;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
+        }
+        .hero-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 56px; align-items: center; position: relative; }
+        .h1 {
+            font-family: 'Instrument Serif', serif; font-weight: 400;
+            font-size: clamp(48px, 6vw, 76px); line-height: 1.02;
+            letter-spacing: -0.018em; margin: 20px 0 18px;
+        }
+        .h1 em { font-style: italic; color: var(--accent); }
+        .lead { font-size: 18px; line-height: 1.55; color: var(--fg-2); max-width: 520px; margin: 0 0 28px; }
+        .hero-cta { display: flex; gap: 10px; align-items: center; margin-bottom: 26px; }
+        .hero-meta { display: flex; gap: 22px; align-items: center; color: var(--fg-3); font-size: 13px; }
+        .hero-meta .check { display: inline-flex; align-items: center; gap: 6px; }
+        .check-ic {
+            width: 16px; height: 16px; border-radius: 50%;
+            background: var(--accent-soft); color: var(--accent);
+            display: grid; place-items: center;
+        }
+
+        /* HERO VISUAL */
+        .visual { position: relative; height: 540px; }
+        .v-card {
+            position: absolute;
+            background: var(--panel); border: 1px solid var(--border);
+            border-radius: 16px; box-shadow: var(--shadow-pop); overflow: hidden;
+        }
+        .v-card.main { top: 30px; right: -10px; left: 60px; height: 480px; transform: rotate(0.5deg); }
+        .v-card.float { top: -10px; left: -20px; width: 280px; height: 150px; transform: rotate(-3deg); z-index: 2; }
+        .v-card.float-2 { bottom: -10px; right: 30px; width: 240px; height: 110px; transform: rotate(2deg); z-index: 2; }
+        .vc-head { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+        .vc-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border-2); }
+        .vc-dot.r { background: #E67866; } .vc-dot.y { background: #E6B66A; } .vc-dot.g { background: #88B59A; }
+        .vc-title { margin-left: 8px; font-size: 12px; color: var(--fg-3); font-weight: 500; }
+        .vc-body { padding: 22px; }
+        .vc-cover {
+            height: 130px; border-radius: 10px;
+            background: linear-gradient(135deg, #1B6B4E 0%, #2E8E6C 100%);
+            display: grid; place-items: center;
+            color: rgba(255,255,255,0.95);
+            font-family: 'Instrument Serif', serif; font-size: 44px; letter-spacing: 0.02em;
+            margin-bottom: 16px; position: relative;
+        }
+        .vc-cover::after {
+            content: 'Wedding · Public'; position: absolute; left: 12px; bottom: 10px;
+            font-family: 'Inter', sans-serif; font-size: 10.5px;
+            color: rgba(255,255,255,0.8); letter-spacing: 0.06em; text-transform: uppercase;
+        }
+        .vc-h2 { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+        .vc-sub { font-size: 12.5px; color: var(--fg-2); margin: 2px 0 14px; }
+        .vc-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+        .vc-amt { font-weight: 600; font-variant-numeric: tabular-nums; font-size: 15px; }
+        .vc-amt .muted { color: var(--fg-3); font-weight: 400; }
+        .progress { height: 6px; background: var(--bg-2); border-radius: 999px; overflow: hidden; }
+        .progress > span { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+        .vc-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 18px; }
+        .vc-stat-label { font-size: 11px; color: var(--fg-3); }
+        .vc-stat-val { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+        .float-row { display: flex; align-items: center; gap: 10px; padding: 14px 16px; }
+        .avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: var(--accent); color: white;
+            display: grid; place-items: center;
+            font-size: 11.5px; font-weight: 600; flex: none;
+        }
+        .ping {
+            width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+            box-shadow: 0 0 0 4px var(--accent-soft);
+            animation: ping 1.6s infinite;
+        }
+        @keyframes ping {
+            0%   { box-shadow: 0 0 0 0 rgba(27,107,78,.4); }
+            70%  { box-shadow: 0 0 0 8px rgba(27,107,78,0); }
+            100% { box-shadow: 0 0 0 0 rgba(27,107,78,0); }
+        }
+
+        /* LOGOS */
+        .logos { padding: 50px 0 40px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--bg-2); }
+        .logos-label { text-align: center; color: var(--fg-3); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 28px; }
+        .logos-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 32px; align-items: center; justify-items: center; color: var(--fg-2); }
+        .logo { font-family: 'Instrument Serif', serif; font-size: 22px; letter-spacing: -0.01em; opacity: 0.6; transition: opacity .15s; }
+        .logo.alt { font-family: 'Inter'; font-weight: 600; letter-spacing: -0.02em; font-size: 18px; }
+        .logo.mono-f { font-family: 'JetBrains Mono'; font-size: 14px; letter-spacing: 0.02em; font-weight: 500; }
+        .logo:hover { opacity: 0.95; }
+
+        /* SECTION SHELL */
+        .section { padding: 100px 0; }
+        .section-head { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: end; margin-bottom: 56px; }
+        .section-head.center { grid-template-columns: 1fr; text-align: center; max-width: 720px; margin: 0 auto 56px; }
+        .section-title { font-family: 'Instrument Serif', serif; font-size: clamp(36px, 4.4vw, 52px); line-height: 1.05; letter-spacing: -0.015em; margin: 12px 0 0; }
+        .section-sub { color: var(--fg-2); font-size: 16px; line-height: 1.6; max-width: 480px; }
+        .section-head.center .section-sub { margin: 16px auto 0; }
+        .kicker { color: var(--accent); font-size: 13px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; }
+
+        /* FEATURES BENTO */
+        .feat-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; }
+        .feat {
+            background: var(--panel); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 28px;
+            position: relative; overflow: hidden;
+            min-height: 280px; display: flex; flex-direction: column;
+        }
+        .feat .ic {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: var(--accent-soft); color: var(--accent);
+            display: grid; place-items: center; margin-bottom: 18px;
+        }
+        .feat h3 { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 8px; }
+        .feat p { color: var(--fg-2); font-size: 14px; margin: 0; max-width: 340px; line-height: 1.6; }
+        .feat-visual { margin-top: auto; padding-top: 22px; }
+        .feat.f-wide { grid-column: span 7; }
+        .feat.f-narrow { grid-column: span 5; }
+        .feat.f-third { grid-column: span 4; }
+        .vmock { background: var(--bg-2); border-radius: 8px; border: 1px solid var(--border); padding: 14px; }
+        .mini-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+        .mini-row:last-child { border-bottom: 0; }
+        .mini-row .av { width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 10px; font-weight: 600; display: grid; place-items: center; flex: none; }
+        .mini-row .name { font-size: 13px; font-weight: 500; }
+        .mini-row .meta { font-size: 11.5px; color: var(--fg-3); }
+        .mini-row .amt { margin-left: auto; font-weight: 600; font-variant-numeric: tabular-nums; font-size: 13px; }
+        .qr {
+            width: 88px; height: 88px; border-radius: 8px;
+            background:
+                radial-gradient(circle at 12% 12%, var(--fg) 3px, transparent 4px) 0 0 / 12px 12px,
+                radial-gradient(circle at 12% 12%, var(--fg) 3px, transparent 4px) 6px 6px / 12px 12px,
+                var(--panel);
+            border: 1px solid var(--border);
+            position: relative; flex: none;
+        }
+        .qr::before, .qr::after { content: ''; position: absolute; width: 22px; height: 22px; border: 3px solid var(--fg); border-radius: 3px; background: var(--panel); }
+        .qr::before { top: 4px; left: 4px; }
+        .qr::after  { top: 4px; right: 4px; }
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        .chip { font-size: 11.5px; font-weight: 500; padding: 4px 9px; border-radius: 999px; background: var(--bg-2); border: 1px solid var(--border); color: var(--fg-2); }
+        .chip.on { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+        .bars { display: flex; gap: 6px; align-items: flex-end; height: 80px; }
+        .bars > i { flex: 1; display: block; background: var(--accent-soft); border-radius: 3px 3px 0 0; }
+        .bars > i.peak { background: var(--accent); }
+
+        /* HOW IT WORKS */
+        .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .step { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px 28px; }
+        .step-num { font-family: 'Instrument Serif', serif; font-size: 56px; line-height: 1; color: var(--accent); margin-bottom: 16px; }
+        .step h4 { font-size: 18px; font-weight: 600; margin: 0 0 8px; letter-spacing: -0.005em; }
+        .step p { color: var(--fg-2); font-size: 14px; margin: 0; line-height: 1.6; }
+
+        /* USE CASES */
+        .cases { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .case { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: transform .15s, box-shadow .15s; }
+        .case:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); }
+        .case-cover { height: 130px; position: relative; display: grid; place-items: center; color: rgba(255,255,255,0.95); font-family: 'Instrument Serif', serif; font-size: 40px; }
+        .case-cover.c1 { background: linear-gradient(135deg, #1B6B4E 0%, #2E8E6C 100%); }
+        .case-cover.c2 { background: linear-gradient(135deg, #B8810D 0%, #E0A535 100%); }
+        .case-cover.c3 { background: linear-gradient(135deg, #2E3A38 0%, #4F605C 100%); }
+        .case-cover.c4 { background: linear-gradient(135deg, #883647 0%, #B85773 100%); }
+        .case-cover.c5 { background: linear-gradient(135deg, #3F2A6E 0%, #6B4DB8 100%); }
+        .case-cover.c6 { background: linear-gradient(135deg, #1F4068 0%, #3B6FA8 100%); }
+        .case-body { padding: 18px; }
+        .case h5 { font-size: 15px; font-weight: 600; margin: 0 0 4px; letter-spacing: -0.005em; }
+        .case .case-meta { color: var(--fg-3); font-size: 12.5px; }
+
+        /* QUOTE / METRICS */
+        .quote-section { background: var(--accent-deep); color: #F5F1EA; }
+        .quote-section .wrap { padding-top: 100px; padding-bottom: 100px; }
+        .quote-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+        .quote-text { font-family: 'Instrument Serif', serif; font-size: clamp(28px, 3.4vw, 42px); line-height: 1.15; letter-spacing: -0.01em; }
+        .quote-text em { font-style: italic; color: #B8E6CB; }
+        .quote-by { display: flex; align-items: center; gap: 12px; margin-top: 32px; color: rgba(245,241,234,0.75); font-size: 13px; }
+        .quote-by .avatar { background: #B8E6CB; color: var(--accent-deep); }
+        .quote-by b { color: #fff; font-weight: 500; }
+        .quote-aside { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .qstat { border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 22px; background: rgba(255,255,255,0.03); }
+        .qstat .num { font-family: 'Instrument Serif', serif; font-size: 48px; letter-spacing: -0.02em; color: #fff; line-height: 1; font-variant-numeric: tabular-nums; }
+        .qstat .lab { margin-top: 10px; font-size: 12.5px; color: rgba(245,241,234,0.7); line-height: 1.45; }
+
+        /* PRICING */
+        .pricing { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: stretch; }
+        .plan { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px 28px; display: flex; flex-direction: column; }
+        .plan.featured { background: var(--fg); color: var(--bg); border-color: var(--fg); position: relative; box-shadow: var(--shadow-2); }
+        .plan.featured p { color: rgba(255,255,255,0.7); }
+        .plan.featured .price-num { color: #fff; }
+        .plan.featured .ic-check { background: rgba(184,230,203,0.2); color: #B8E6CB; }
+        .plan-name { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+        .plan.featured .plan-name { color: #B8E6CB; }
+        .plan h3 { font-family: 'Instrument Serif', serif; font-size: 28px; font-weight: 400; margin: 0 0 6px; letter-spacing: -0.01em; }
+        .plan p { color: var(--fg-2); margin: 0 0 22px; font-size: 14px; }
+        .price { display: flex; align-items: baseline; gap: 6px; margin-bottom: 22px; }
+        .price-num { font-family: 'Instrument Serif', serif; font-size: 52px; letter-spacing: -0.02em; line-height: 1; font-variant-numeric: tabular-nums; }
+        .price-unit { font-size: 14px; color: var(--fg-2); }
+        .plan ul { list-style: none; padding: 0; margin: 0 0 28px; display: flex; flex-direction: column; gap: 10px; }
+        .plan li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; }
+        .plan li .ic-check { width: 18px; height: 18px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; flex: none; margin-top: 1px; }
+        .plan .label { font-size: 12px; color: var(--fg-3); margin-top: auto; }
+        .plan.featured .label { color: rgba(255,255,255,0.45); }
+
+        /* FAQ */
+        .faq { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
+        .faq-list { display: flex; flex-direction: column; }
+        .faq-item { border-bottom: 1px solid var(--border); padding: 18px 0; }
+        .faq-item summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 500; font-size: 15.5px; letter-spacing: -0.005em; }
+        .faq-item summary::-webkit-details-marker { display: none; }
+        .faq-item summary svg { transition: transform .2s; flex-shrink: 0; }
+        .faq-item[open] summary svg { transform: rotate(45deg); }
+        .faq-item p { color: var(--fg-2); font-size: 14.5px; line-height: 1.6; margin: 12px 0 0; max-width: 520px; }
+
+        /* FINAL CTA */
+        .final-cta { background: var(--bg-2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        .final-cta .wrap { padding-top: 90px; padding-bottom: 90px; text-align: center; }
+        .final-cta h2 { font-family: 'Instrument Serif', serif; font-size: clamp(44px, 5.2vw, 68px); line-height: 1.05; letter-spacing: -0.018em; margin: 0 0 20px; }
+        .final-cta h2 em { font-style: italic; color: var(--accent); }
+        .final-cta p { color: var(--fg-2); font-size: 17px; max-width: 540px; margin: 0 auto 30px; }
+
+        /* FOOTER */
+        footer { padding: 64px 0 40px; color: var(--fg-2); }
+        .foot-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 56px; }
+        .foot-grid h6 { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-3); margin: 0 0 14px; }
+        .foot-grid ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+        .foot-grid li a { font-size: 14px; color: var(--fg-2); transition: color .15s; }
+        .foot-grid li a:hover { color: var(--fg); }
+        .foot-tagline { font-family: 'Instrument Serif', serif; font-size: 20px; line-height: 1.35; max-width: 280px; margin: 14px 0 0; letter-spacing: -0.005em; color: var(--fg); }
+        .foot-bot { display: flex; justify-content: space-between; align-items: center; padding-top: 28px; border-top: 1px solid var(--border); font-size: 12.5px; color: var(--fg-3); }
+        .foot-bot .legal { display: flex; gap: 22px; }
+
+        /* RESPONSIVE */
+        @media (max-width: 980px) {
+            .hero-grid, .section-head, .faq, .quote-grid { grid-template-columns: 1fr; gap: 32px; }
+            .visual { height: 380px; }
+            .v-card.main { left: 0; right: 0; top: 20px; height: 360px; }
+            .v-card.float, .v-card.float-2 { display: none; }
+            .feat.f-wide, .feat.f-narrow, .feat.f-third { grid-column: span 12; }
+            .steps, .pricing { grid-template-columns: 1fr; }
+            .cases { grid-template-columns: repeat(2, 1fr); }
+            .foot-grid { grid-template-columns: 1fr 1fr; }
+            .logos-row { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .nav-links { display: none; }
+            .cases { grid-template-columns: 1fr; }
+            .quote-aside { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+    <div class="wrap nav-inner">
+        <a href="{{ route('home') }}" class="brand">
+            <span class="brand-mark">M</span>
+            <span>MyMoneyBox</span>
+        </a>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#how">How it works</a>
+            <a href="#cases">Use cases</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#faq">FAQ</a>
         </div>
-
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                {{-- Hero text --}}
-                <div class="text-white">
-                    <div class="inline-block mb-4 px-3 py-1.5 bg-white/10 rounded-full text-[12.5px] font-medium border border-white/15 text-[#FAFAF7]">
-                        The modern way to collect & give
-                    </div>
-                    <h1 class="font-serif text-[2.75rem] md:text-[3.5rem] leading-[1.05] tracking-tight mb-5">
-                        Collect Gifts & Contributions <span class="text-primary-400">The Easy Way</span>
-                    </h1>
-                    <p class="text-[#9C998F] text-[15px] md:text-[16px] mb-8 leading-relaxed max-w-lg">
-                        From weddings to charities, birthdays to tithes—everyone contributes with just a link, QR code, or Piggy Number. <strong class="text-[#FAFAF7] font-medium">Transparent. Accessible. Trusted.</strong>
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <a href="{{ route('piggy.lookup') }}" class="btn btn-primary justify-center">
-                            Send a gift
-                        </a>
-                        <a href="{{ route('register') }}" class="btn justify-center bg-white/10 border-white/20 text-white hover:bg-white/15">
-                            Create your box
-                        </a>
-                        <a href="{{ route('browse') }}" class="btn justify-center bg-transparent border-white/15 text-[#9C998F] hover:bg-white/5 hover:text-white">
-                            Browse boxes
-                        </a>
-                    </div>
-
-                    {{-- Platform stats --}}
-                    <div class="mt-10 flex gap-8">
-                        <div>
-                            <div class="text-[24px] font-semibold text-white tnum">{{ \App\Models\MoneyBox::count() }}+</div>
-                            <div class="text-[12px] text-[#6B6862]">Money boxes</div>
-                        </div>
-                        <div>
-                            <div class="text-[24px] font-semibold text-white tnum">{{ \App\Models\Contribution::count() }}+</div>
-                            <div class="text-[12px] text-[#6B6862]">Contributions</div>
-                        </div>
-                        <div>
-                            <div class="text-[24px] font-semibold text-white tnum">{{ \App\Models\User::count() }}+</div>
-                            <div class="text-[12px] text-[#6B6862]">Users</div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Sample cards --}}
-                <div class="relative hidden lg:grid grid-cols-2 gap-4">
-                    @php
-                        $samples = [
-                            ['label' => 'Wedding', 'sub' => 'Sarah & John', 'color' => 'from-[#1B6B4E] to-[#2E8E6C]', 'pct' => 75, 'raised' => 'GH₵7,500', 'goal' => 'GH₵10,000', 'donors' => 42],
-                            ['label' => 'Church', 'sub' => 'Grace Chapel', 'color' => 'from-[#3F2A6E] to-[#6B4DB8]', 'pct' => 65, 'raised' => 'GH₵3,250', 'goal' => 'GH₵5,000', 'donors' => 28],
-                            ['label' => 'Birthday', 'sub' => 'For Emma', 'color' => 'from-[#B8810D] to-[#E0A535]', 'pct' => 45, 'raised' => 'GH₵450', 'goal' => 'GH₵1,000', 'donors' => 18],
-                            ['label' => 'Medical', 'sub' => 'For Michael', 'color' => 'from-[#883647] to-[#B85773]', 'pct' => 82, 'raised' => 'GH₵16,400', 'goal' => 'GH₵20,000', 'donors' => 156],
-                        ];
-                    @endphp
-                    @foreach($samples as $s)
-                        <div class="bg-white/5 border border-white/10 rounded-[12px] p-4 backdrop-blur-sm">
-                            <div class="h-16 bg-gradient-to-br {{ $s['color'] }} rounded-[8px] mb-3 grid place-items-center">
-                                <span class="font-serif text-[22px] text-white/80">{{ substr($s['label'], 0, 1) }}</span>
-                            </div>
-                            <div class="text-[11px] font-medium text-[#9C998F] mb-0.5">{{ $s['label'] }}</div>
-                            <div class="text-[12px] font-semibold text-white mb-2">{{ $s['sub'] }}</div>
-                            <div class="h-1.5 bg-white/10 rounded-full overflow-hidden mb-2">
-                                <div class="h-full bg-primary-400 rounded-full" style="width: {{ $s['pct'] }}%"></div>
-                            </div>
-                            <div class="flex justify-between items-baseline">
-                                <div>
-                                    <div class="text-[13px] font-semibold text-white tnum">{{ $s['raised'] }}</div>
-                                    <div class="text-[10.5px] text-[#6B6862]">of {{ $s['goal'] }}</div>
-                                </div>
-                                <div class="text-right">
-                                    <div class="text-[13px] font-semibold text-white tnum">{{ $s['donors'] }}</div>
-                                    <div class="text-[10.5px] text-[#6B6862]">donors</div>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Features --}}
-    <div class="py-20 bg-[#FAFAF7]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-14">
-                <h2 class="font-serif text-[2rem] md:text-[2.375rem] leading-tight tracking-tight text-[#15140F] mb-3">Why people choose MyMoneyBox</h2>
-                <p class="text-[14.5px] text-[#6B6862] max-w-xl mx-auto">Modernize the age-old practice of communal contributions with complete transparency and security</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                @php
-                    $features = [
-                        ['icon' => '<path d="M13 10V3L4 14h7v7l9-11h-7z"/>', 'title' => 'Lightning fast setup', 'desc' => 'Create your box in under 2 minutes. No complicated forms, no hassle—just simple, intuitive design.'],
-                        ['icon' => '<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>', 'title' => 'Bank-level security', 'desc' => 'Accept payments via cards and mobile money with enterprise-grade encryption. Data always protected.'],
-                        ['icon' => '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98"/>', 'title' => 'Share anywhere', 'desc' => 'QR codes for events, unique links for social media, or your Piggy Number—reach contributors on any platform.'],
-                    ];
-                @endphp
-                @foreach($features as $f)
-                    <div class="card p-6">
-                        <div class="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 grid place-items-center mb-4">
-                            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">{!! $f['icon'] !!}</svg>
-                        </div>
-                        <h3 class="text-[14px] font-semibold text-[#15140F] mb-1.5">{{ $f['title'] }}</h3>
-                        <p class="text-[13px] text-[#6B6862] leading-relaxed">{{ $f['desc'] }}</p>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
-
-    {{-- Use cases --}}
-    <div class="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-14">
-                <h2 class="font-serif text-[2rem] md:text-[2.375rem] leading-tight tracking-tight text-[#15140F] mb-3">Perfect for every occasion</h2>
-                <p class="text-[14.5px] text-[#6B6862]">From personal milestones to community causes—MyMoneyBox adapts to your needs</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                @php
-                    $cases = [
-                        ['emoji' => '💍', 'title' => 'Weddings & Celebrations', 'desc' => 'Guests scan QR codes at tables to send gifts instantly. Modern, seamless, and memorable.'],
-                        ['emoji' => '⛪', 'title' => 'Church & Tithes', 'desc' => 'A permanent box for offerings, tithes, and donations. Transparent and convenient for your congregation.'],
-                        ['emoji' => '🎓', 'title' => 'Group Events & Trips', 'desc' => 'Friends split costs for dinners, trips, or activities. Everyone contributes their share hassle-free.'],
-                        ['emoji' => '🏥', 'title' => 'Medical Fundraisers', 'desc' => 'Rally community support for medical needs. Track progress and thank donors in real-time.'],
-                        ['emoji' => '💰', 'title' => 'Tips & Gratuities', 'desc' => 'Service workers receive tips via their Piggy Number or QR code. Digital tipping made simple.'],
-                        ['emoji' => '🎯', 'title' => 'Community Projects', 'desc' => 'Political parties, clubs, and societies raise funds with clarity and accountability.'],
-                    ];
-                @endphp
-                @foreach($cases as $c)
-                    <div class="card p-5 hover:shadow-[0_1px_0_rgba(20,18,12,.04),0_8px_24px_-8px_rgba(20,18,12,.10)] transition-shadow duration-150">
-                        <div class="text-[30px] mb-3">{{ $c['emoji'] }}</div>
-                        <h3 class="text-[14px] font-semibold text-[#15140F] mb-1.5">{{ $c['title'] }}</h3>
-                        <p class="text-[13px] text-[#6B6862] leading-relaxed">{{ $c['desc'] }}</p>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
-
-    {{-- Featured boxes --}}
-    <div class="py-20 bg-[#F3F1EB]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-end justify-between mb-10">
-                <div>
-                    <h2 class="font-serif text-[2rem] md:text-[2.375rem] leading-tight tracking-tight text-[#15140F] mb-1">Featured boxes</h2>
-                    <p class="text-[13.5px] text-[#6B6862]">Support these amazing causes</p>
-                </div>
-                <a href="{{ route('browse') }}" class="text-[13px] font-medium text-primary-600 hover:text-primary-700 flex items-center gap-1">
-                    View all
-                    <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-                </a>
-            </div>
-
-            @if($featuredMoneyBoxes->count() > 0)
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    @foreach($featuredMoneyBoxes as $moneyBox)
-                        <x-money-box-card :moneyBox="$moneyBox" />
-                    @endforeach
-                </div>
+        <div class="nav-cta">
+            @auth
+                <a class="btn ghost" href="{{ route('dashboard') }}">Dashboard</a>
+                <a class="btn primary" href="{{ route('dashboard') }}">Open console</a>
             @else
-                <div class="border-2 border-dashed border-[#D9D6CE] rounded-[10px] p-12 text-center">
-                    <h3 class="text-[15px] font-semibold text-[#15140F] mb-1">No boxes yet</h3>
-                    <p class="tiny mb-5">Be the first to create one!</p>
-                    <a href="{{ route('register') }}" class="btn btn-primary">Create a box</a>
-                </div>
-            @endif
+                <a class="btn ghost" href="{{ route('login') }}">Sign in</a>
+                <a class="btn primary" href="{{ route('register') }}">Open console</a>
+            @endauth
         </div>
     </div>
+</nav>
 
-    {{-- How it works --}}
-    <div class="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-14">
-                <h2 class="font-serif text-[2rem] md:text-[2.375rem] leading-tight tracking-tight text-[#15140F] mb-3">Get started in 3 simple steps</h2>
-                <p class="text-[14.5px] text-[#6B6862]">From creation to collection—it takes less than 5 minutes</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                @php
-                    $steps = [
-                        ['n' => '1', 'title' => 'Create your box', 'desc' => 'Sign up free and set up your box in under 2 minutes. Add a title, goal, and description.'],
-                        ['n' => '2', 'title' => 'Share with anyone', 'desc' => 'Get your unique link, QR code, or Piggy Number. Share on WhatsApp, Facebook, or print for events.'],
-                        ['n' => '3', 'title' => 'Track & collect', 'desc' => 'Watch contributions come in real-time. Withdraw anytime. 100% transparent and secure.'],
-                    ];
-                @endphp
-                @foreach($steps as $step)
-                    <div class="text-center">
-                        <div class="w-14 h-14 rounded-full bg-[#15140F] text-white grid place-items-center mx-auto mb-5 text-[22px] font-semibold font-serif">
-                            {{ $step['n'] }}
-                        </div>
-                        <h3 class="text-[15px] font-semibold text-[#15140F] mb-2">{{ $step['title'] }}</h3>
-                        <p class="text-[13px] text-[#6B6862] leading-relaxed">{{ $step['desc'] }}</p>
-                    </div>
-                @endforeach
-            </div>
-
-            <div class="text-center mt-12">
-                <a href="{{ route('register') }}" class="btn btn-primary px-6 py-2.5 text-[13.5px]">
-                    Start collecting now — it's free
-                    <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+<!-- HERO -->
+<section class="hero">
+    <div class="wrap hero-grid">
+        <div>
+            <span class="eyebrow"><span class="dot"></span> New · QR contributions in 3 taps</span>
+            <h1 class="h1">Collect for what matters, <em>beautifully</em>.</h1>
+            <p class="lead">MyMoneyBox is the modern way to gather contributions for weddings, medical care, scholarships and team causes — with a link, a QR code, and zero awkwardness.</p>
+            <div class="hero-cta">
+                <a class="btn primary lg" href="{{ route('register') }}">
+                    Start a box — free
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 </a>
-                <p class="text-[12px] text-[#9C998F] mt-3">No credit card required · Setup in 2 minutes · Free forever</p>
+                <a class="btn lg" href="#how">See how it works</a>
+            </div>
+            <div class="hero-meta">
+                <span class="check">
+                    <span class="check-ic"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>
+                    Free to start
+                </span>
+                <span class="check">
+                    <span class="check-ic"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>
+                    No card required
+                </span>
+                <span class="check">
+                    <span class="check-ic"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>
+                    Mobile money + card
+                </span>
+            </div>
+        </div>
+
+        <!-- Product visual -->
+        <div class="visual">
+            <div class="v-card main">
+                <div class="vc-head">
+                    <span class="vc-dot r"></span><span class="vc-dot y"></span><span class="vc-dot g"></span>
+                    <span class="vc-title">mymoneybox.app / kwame-adwoa-wedding</span>
+                </div>
+                <div class="vc-body">
+                    <div class="vc-cover">K&amp;A</div>
+                    <div class="vc-h2">Kwame &amp; Adwoa's Wedding Fund</div>
+                    <div class="vc-sub">87 contributors · ends Jun 14</div>
+                    <div class="vc-row">
+                        <span class="vc-amt">₵18,420 <span class="muted">of ₵25,000</span></span>
+                        <span class="vc-amt tnum">73%</span>
+                    </div>
+                    <div class="progress"><span style="width:73%"></span></div>
+                    <div class="vc-stats">
+                        <div><div class="vc-stat-label">Contributors</div><div class="vc-stat-val">87</div></div>
+                        <div><div class="vc-stat-label">Avg. gift</div><div class="vc-stat-val">₵212</div></div>
+                        <div><div class="vc-stat-label">Remaining</div><div class="vc-stat-val">₵6,580</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="v-card float">
+                <div class="float-row">
+                    <div class="avatar">YM</div>
+                    <div style="flex:1">
+                        <div style="font-size:13px; font-weight:500">Yaw Mensah just gave</div>
+                        <div style="font-size:11.5px; color:var(--fg-3)">"All the best!" · 12 min ago</div>
+                    </div>
+                    <div style="font-weight:600; font-variant-numeric:tabular-nums">₵250</div>
+                </div>
+                <div style="height:1px; background:var(--border)"></div>
+                <div class="float-row">
+                    <span class="ping"></span>
+                    <div style="font-size:12.5px; color:var(--fg-2)">Live · 3 contributions this hour</div>
+                </div>
+            </div>
+
+            <div class="v-card float-2">
+                <div class="float-row">
+                    <div class="qr" style="width:60px; height:60px"></div>
+                    <div>
+                        <div style="font-size:12.5px; font-weight:500">Scan to contribute</div>
+                        <div style="font-size:11px; color:var(--fg-3)">PNG · SVG · PDF</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+</section>
 
-    {{-- CTA --}}
-    <div class="bg-[#15140F] py-16">
-        <div class="max-w-3xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-            <h2 class="font-serif text-[2rem] md:text-[2.375rem] leading-tight tracking-tight text-white mb-4">
-                Join the digital giving revolution
-            </h2>
-            <p class="text-[14px] text-[#9C998F] mb-8 leading-relaxed">
-                Whether it's a wedding gift, church offering, or community fundraiser—start collecting contributions the modern way. <strong class="text-[#FAFAF7] font-medium">Free to create. Easy to share. Secure for everyone.</strong>
-            </p>
-            <a href="{{ route('register') }}" class="btn btn-primary px-6 py-2.5 text-[13.5px]">
-                Create your free account
-                <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
-            </a>
+<!-- TRUST LOGOS -->
+<section class="logos">
+    <div class="wrap">
+        <div class="logos-label">Trusted by communities, families, and teams across West Africa</div>
+        <div class="logos-row">
+            <span class="logo">Akoma Foundation</span>
+            <span class="logo alt">Sankofa Health</span>
+            <span class="logo">Asanteman</span>
+            <span class="logo mono-f">PIVOT.LABS</span>
+            <span class="logo alt">Otumfuo Scholars</span>
+            <span class="logo">Volta Co-op</span>
         </div>
     </div>
-</x-layouts.guest>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+    <div class="wrap">
+        <div class="section-head">
+            <div>
+                <span class="kicker">Why MyMoneyBox</span>
+                <h2 class="section-title">Built for clarity. Designed for trust.</h2>
+            </div>
+            <p class="section-sub">Every detail — from contribution rules to receipts — is engineered to remove friction so giving feels effortless on both sides.</p>
+        </div>
+
+        <div class="feat-grid">
+            <!-- Wide: rules -->
+            <div class="feat f-wide">
+                <div class="ic">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="M3 7.5 12 12l9-4.5"/><path d="M12 12v9"/></svg>
+                </div>
+                <h3>One box, every kind of giving</h3>
+                <p>Fixed amounts, ranges, anonymous gifts, deadlines — set the rules once and your contributors get a frictionless flow that adapts to your goal.</p>
+                <div class="feat-visual">
+                    <div class="vmock">
+                        <div class="chips" style="margin-bottom:12px">
+                            <span class="chip on">Variable amount</span>
+                            <span class="chip">Range</span>
+                            <span class="chip">Fixed</span>
+                            <span class="chip">Minimum</span>
+                        </div>
+                        <div class="chips">
+                            <span class="chip">Anonymous allowed</span>
+                            <span class="chip on">Contributor's choice</span>
+                            <span class="chip">Require name</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Narrow: share -->
+            <div class="feat f-narrow">
+                <div class="ic">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3"/><path d="M21 14v3"/><path d="M14 21h7"/></svg>
+                </div>
+                <h3>Share anywhere instantly</h3>
+                <p>Auto-generated link, QR code, and WhatsApp-ready post for every box. Print it, scan it, send it.</p>
+                <div class="feat-visual" style="display:flex; gap:14px; align-items:center">
+                    <div class="qr"></div>
+                    <div>
+                        <div class="chips" style="margin-bottom:8px"><span class="chip on">WhatsApp</span><span class="chip on">Link</span></div>
+                        <div class="chips"><span class="chip">Twitter</span><span class="chip">Email</span><span class="chip">PDF</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Third: contributors -->
+            <div class="feat f-third">
+                <div class="ic">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M21.5 20c0-3-1.7-5.2-4.5-5.8"/></svg>
+                </div>
+                <h3>Know every giver</h3>
+                <p>A clean ledger of every contribution — name, message, method, amount. Export to CSV anytime.</p>
+                <div class="feat-visual">
+                    <div class="vmock">
+                        <div class="mini-row"><div class="av">YM</div><div><div class="name">Yaw Mensah</div><div class="meta">MTN MoMo</div></div><div class="amt">₵250</div></div>
+                        <div class="mini-row"><div class="av" style="background:var(--bg-2);color:var(--fg-3)">·</div><div><div class="name">Anonymous</div><div class="meta">Card</div></div><div class="amt">₵50</div></div>
+                        <div class="mini-row"><div class="av">EA</div><div><div class="name">Esi Asante</div><div class="meta">Vodafone</div></div><div class="amt">₵500</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Third: payments -->
+            <div class="feat f-third">
+                <div class="ic">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="17" cy="14.5" r="1"/></svg>
+                </div>
+                <h3>Local payments, no surprises</h3>
+                <p>MTN MoMo, Vodafone Cash, AirtelTigo, cards. Payouts to your wallet, receipts to contributors.</p>
+                <div class="feat-visual">
+                    <div class="chips">
+                        <span class="chip on">MTN MoMo</span>
+                        <span class="chip on">Vodafone Cash</span>
+                        <span class="chip on">AirtelTigo</span>
+                        <span class="chip on">Visa</span>
+                        <span class="chip on">Mastercard</span>
+                        <span class="chip">Bank transfer</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Third: analytics -->
+            <div class="feat f-third">
+                <div class="ic">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V8"/><path d="M10 20V4"/><path d="M16 20v-8"/><path d="M22 20H2"/></svg>
+                </div>
+                <h3>Real-time analytics</h3>
+                <p>Track progress, top contributors, and where shares convert best — clear charts, no clutter.</p>
+                <div class="feat-visual">
+                    <div class="vmock">
+                        <div class="bars">
+                            <i style="height:30%"></i><i style="height:48%"></i><i style="height:38%"></i>
+                            <i style="height:62%"></i><i style="height:78%"></i><i style="height:54%"></i>
+                            <i style="height:68%" class="peak"></i><i style="height:88%" class="peak"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how" style="background:var(--bg-2); border-top:1px solid var(--border); border-bottom:1px solid var(--border)">
+    <div class="wrap">
+        <div class="section-head center">
+            <span class="kicker">How it works</span>
+            <h2 class="section-title">From idea to first contribution in under a minute.</h2>
+        </div>
+        <div class="steps">
+            <div class="step">
+                <div class="step-num">01</div>
+                <h4>Create your box</h4>
+                <p>Name it, set a goal (or don't), choose how contributors give — fixed, range, or any amount.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">02</div>
+                <h4>Share the link or QR</h4>
+                <p>Drop the auto-generated link in WhatsApp, print the QR on invitations, or post it anywhere.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">03</div>
+                <h4>Watch it fill up</h4>
+                <p>Contributions land in real time. Withdraw to mobile money or your bank whenever you want.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- USE CASES -->
+<section class="section" id="cases">
+    <div class="wrap">
+        <div class="section-head">
+            <div>
+                <span class="kicker">Use cases</span>
+                <h2 class="section-title">Built for any moment worth gathering for.</h2>
+            </div>
+            <p class="section-sub">From a wedding gift pool to a community library, from medical treatment to your team's offsite — MyMoneyBox adapts to the occasion.</p>
+        </div>
+        <div class="cases">
+            <div class="case"><div class="case-cover c1">K&amp;A</div><div class="case-body"><h5>Weddings &amp; engagements</h5><div class="case-meta">Honeymoon funds, gift pools</div></div></div>
+            <div class="case"><div class="case-cover c2">M</div><div class="case-body"><h5>Medical care</h5><div class="case-meta">Treatments, surgeries, recovery</div></div></div>
+            <div class="case"><div class="case-cover c3">S</div><div class="case-body"><h5>Scholarships</h5><div class="case-meta">Tuition, books, mentorship</div></div></div>
+            <div class="case"><div class="case-cover c4">T</div><div class="case-body"><h5>Team &amp; offsites</h5><div class="case-meta">Retreats, parties, gifts</div></div></div>
+            <div class="case"><div class="case-cover c5">C</div><div class="case-body"><h5>Community projects</h5><div class="case-meta">Libraries, water, clean-ups</div></div></div>
+            <div class="case"><div class="case-cover c6">B</div><div class="case-body"><h5>Birthdays &amp; baby</h5><div class="case-meta">Cake funds, nursery gifts</div></div></div>
+            <div class="case"><div class="case-cover c2">F</div><div class="case-body"><h5>Funeral support</h5><div class="case-meta">Memorial expenses, family aid</div></div></div>
+            <div class="case"><div class="case-cover c1">R</div><div class="case-body"><h5>Religious causes</h5><div class="case-meta">Building funds, missions</div></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- QUOTE / METRICS -->
+<section class="quote-section">
+    <div class="wrap">
+        <div class="quote-grid">
+            <div>
+                <span class="kicker" style="color:#B8E6CB">In their words</span>
+                <div class="quote-text" style="margin-top:18px">
+                    "We raised <em>₵42,000</em> for our wedding in three weeks. No awkward bank details, no chasing — just a QR on the invitation and a link in the family group chat."
+                </div>
+                <div class="quote-by">
+                    <div class="avatar">EA</div>
+                    <div>
+                        <b>Esi &amp; Adjei</b>
+                        <div>Married February 2026 · Kumasi, Ghana</div>
+                    </div>
+                </div>
+            </div>
+            <div class="quote-aside">
+                <div class="qstat"><div class="num">₵4.2M</div><div class="lab">Contributed to date across all MyMoneyBox communities</div></div>
+                <div class="qstat"><div class="num">12k+</div><div class="lab">Active boxes — weddings, medical, education, more</div></div>
+                <div class="qstat"><div class="num">2.4×</div><div class="lab">More raised vs. ad-hoc bank transfers, on average</div></div>
+                <div class="qstat"><div class="num">48s</div><div class="lab">Median time to set up your first box from sign-up</div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing">
+    <div class="wrap">
+        <div class="section-head center">
+            <span class="kicker">Pricing</span>
+            <h2 class="section-title">Simple, transparent, and free to start.</h2>
+            <p class="section-sub">No subscription. A small platform fee on successful contributions covers payment processing and infrastructure. You only pay when you raise.</p>
+        </div>
+        <div class="pricing">
+            <div class="plan">
+                <div class="plan-name">Personal</div>
+                <h3>Starter</h3>
+                <p>For one-off events and personal causes.</p>
+                <div class="price"><span class="price-num">2.9%</span><span class="price-unit">+ ₵1 per contribution</span></div>
+                <ul>
+                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Unlimited boxes</li>
+                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Mobile money + card payments</li>
+                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> QR code, share kit</li>
+                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> CSV export</li>
+                </ul>
+                <a class="btn" style="justify-content:center; width:100%" href="{{ route('register') }}">Get started</a>
+                <div class="label" style="margin-top:12px">No monthly fee</div>
+            </div>
+
+            <div class="plan featured">
+                <div class="plan-name">Most popular</div>
+                <h3>Community</h3>
+                <p>For organisations, congregations, and recurring causes.</p>
+                <div class="price"><span class="price-num">1.9%</span><span class="price-unit" style="color:rgba(255,255,255,0.6)">+ ₵1 per contribution</span></div>
+                <ul>
+                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Everything in Starter</li>
+                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Custom domain &amp; branding</li>
+                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Multi-admin teams</li>
+                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Advanced analytics</li>
+                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Priority support</li>
+                </ul>
+                <a class="btn primary" style="justify-content:center; width:100%; background:#fff; color:var(--fg); border-color:#fff" href="{{ route('register') }}">Start free 30-day trial</a>
+                <div class="label" style="margin-top:12px">₵149 / month after trial</div>
+            </div>
+
+            <div class="plan">
+                <div class="plan-name">Enterprise</div>
+                <h3>Foundation</h3>
+                <p>For NGOs, large institutions, and bespoke needs.</p>
+                <div class="price"><span class="price-num">Custom</span></div>
+                <ul>
+                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Volume pricing</li>
+                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> SSO &amp; SAML</li>
+                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Dedicated account manager</li>
+                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Custom integrations &amp; API</li>
+                </ul>
+                <a class="btn" style="justify-content:center; width:100%" href="{{ route('about') }}">Talk to sales</a>
+                <div class="label" style="margin-top:12px">SLAs available</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="faq" style="padding-top:0">
+    <div class="wrap">
+        <div class="faq">
+            <div>
+                <span class="kicker">Common questions</span>
+                <h2 class="section-title" style="margin-top:12px">Everything you'd want to ask, before signing up.</h2>
+                <p class="section-sub" style="margin-top:18px">Still curious? Reach our team at <a style="color:var(--accent); font-weight:500" href="mailto:hello@mymoneybox.app">hello@mymoneybox.app</a> — we usually reply within an hour.</p>
+            </div>
+            <div class="faq-list">
+                <details class="faq-item" open>
+                    <summary>How quickly do funds land in my account?
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                    </summary>
+                    <p>Mobile money contributions settle in your wallet within minutes. Card payments are batched and paid out on the next business day. You can withdraw at any time.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Can contributors give anonymously?
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                    </summary>
+                    <p>Yes. Each box can require names, allow anonymity, or leave it to the contributor's choice. Anonymous gifts still appear in your ledger with amount and method, just no identifying info.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>What if I don't reach my goal?
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                    </summary>
+                    <p>You keep every contribution. Goals are guideposts, not commitments — there's no penalty for raising less than you hoped.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Is it secure? How is my data handled?
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                    </summary>
+                    <p>Payments are processed by PCI-DSS Level 1 providers. We never store card numbers. Two-factor authentication is available for every account, and all data is encrypted in transit and at rest.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Do you charge a monthly subscription?
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                    </summary>
+                    <p>No. The Starter plan is entirely usage-based — you only pay a small fee per successful contribution. Community and Foundation tiers add monthly features for teams.</p>
+                </details>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+    <div class="wrap">
+        <h2>Start your first box <em>today.</em></h2>
+        <p>It takes about a minute. No credit card, no commitment. Just a clean link, a QR code, and somewhere for the love to land.</p>
+        <div class="btn-row" style="justify-content:center">
+            <a class="btn primary lg" href="{{ route('register') }}">
+                Create a money box
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+            <a class="btn lg" href="{{ route('browse') }}">Browse boxes</a>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="wrap">
+        <div class="foot-grid">
+            <div>
+                <a href="{{ route('home') }}" class="brand"><span class="brand-mark">M</span><span>MyMoneyBox</span></a>
+                <p class="foot-tagline">Collect for what matters — beautifully, transparently, together.</p>
+            </div>
+            <div>
+                <h6>Product</h6>
+                <ul>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#how">How it works</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="{{ route('dashboard') }}">Console</a></li>
+                </ul>
+            </div>
+            <div>
+                <h6>Use cases</h6>
+                <ul>
+                    <li><a href="#cases">Weddings</a></li>
+                    <li><a href="#cases">Medical</a></li>
+                    <li><a href="#cases">Scholarships</a></li>
+                    <li><a href="#cases">Community</a></li>
+                </ul>
+            </div>
+            <div>
+                <h6>Company</h6>
+                <ul>
+                    <li><a href="{{ route('about') }}">About</a></li>
+                    <li><a href="{{ route('browse') }}">Browse</a></li>
+                    <li><a href="mailto:hello@mymoneybox.app">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h6>Legal</h6>
+                <ul>
+                    <li><a href="{{ route('privacy') }}">Privacy</a></li>
+                    <li><a href="{{ route('terms') }}">Terms</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="foot-bot">
+            <div>&copy; {{ date('Y') }} {{ config('app.name') }}. Made with care in Accra.</div>
+            <div class="legal">
+                <a href="{{ route('privacy') }}">Privacy</a>
+                <a href="{{ route('terms') }}">Terms</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+@vite(['resources/js/app.js'])
+</body>
+</html>
