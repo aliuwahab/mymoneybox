@@ -69,4 +69,20 @@ class PublicBoxController extends Controller
 
         return view('public.show', compact('moneyBox'));
     }
+
+    /**
+     * Render the embeddable contribution widget for a box.
+     * Served in an <iframe> — no navigation, no sidebar.
+     */
+    public function embed(string $slug)
+    {
+        $moneyBox = MoneyBox::where('slug', $slug)
+            ->with(['user'])
+            ->firstOrFail();
+
+        return response()
+            ->view('public.embed', compact('moneyBox'))
+            ->header('Content-Security-Policy', "frame-ancestors *")
+            ->header('X-Frame-Options', 'ALLOWALL');
+    }
 }

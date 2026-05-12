@@ -19,6 +19,9 @@ use Laravel\Fortify\Features;
 Route::get('/', [PublicBoxController::class, 'home'])->name('home');
 Route::get('/browse', [PublicBoxController::class, 'index'])->name('browse');
 Route::get('/box/{slug}', [PublicBoxController::class, 'show'])->name('box.show');
+Route::get('/embed/box/{slug}', [PublicBoxController::class, 'embed'])
+    ->name('box.embed')
+    ->withoutMiddleware(\Illuminate\Http\Middleware\FrameGuard::class);
 
 // Static Pages
 Route::view('/about', 'pages.about')->name('about');

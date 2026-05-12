@@ -131,14 +131,74 @@
                 </div>
             </div>
 
-            {{-- Embed (coming soon) --}}
-            <div class="card">
+            {{-- Embed --}}
+            @php
+                $embedUrl  = route('box.embed', $moneyBox->slug);
+                $heights   = ['480' => 'Compact (480px)', '580' => 'Standard (580px)', '720' => 'Tall (720px)'];
+                $snippet   = fn($h) => '<iframe' . "\n" .
+                    '  src="' . $embedUrl . '"' . "\n" .
+                    '  width="100%"' . "\n" .
+                    '  height="' . $h . '"' . "\n" .
+                    '  frameborder="0"' . "\n" .
+                    '  loading="lazy"' . "\n" .
+                    '  style="border-radius:12px;border:1px solid #E6E3DC;"' . "\n" .
+                    '  title="{{ $moneyBox->title }}"' . "\n" .
+                    '  allowpaymentrequest' . "\n" .
+                    '></iframe>';
+            @endphp
+
+            <div class="card" x-data="{ height: '580', copied: false }">
                 <div class="card-head">
-                    <span class="card-title">Embed code</span>
-                    <span class="pill pill-muted">Coming soon</span>
+                    <span class="card-title">Embed on your website</span>
+                    <div class="flex items-center gap-2 ml-auto">
+                        <select x-model="height"
+                                class="text-[11.5px] border border-[#E6E3DC] rounded-[6px] px-2 py-1 bg-white text-[#6B6862] focus:outline-none focus:border-[#D9D6CE]">
+                            @foreach($heights as $val => $label)
+                                <option value="{{ $val }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <p class="text-[13px] text-[#6B6862]">Embed this money box on your website with a simple code snippet.</p>
+                <div class="card-body space-y-4">
+
+                    {{-- Live preview --}}
+                    <div class="rounded-[10px] overflow-hidden border border-[#E6E3DC] bg-white"
+                         :style="'height:' + height + 'px'">
+                        <iframe
+                            src="{{ $embedUrl }}"
+                            width="100%"
+                            :height="height"
+                            frameborder="0"
+                            loading="lazy"
+                            style="display:block;"
+                            title="{{ $moneyBox->title }}"
+                            allowpaymentrequest
+                        ></iframe>
+                    </div>
+
+                    {{-- Snippet --}}
+                    <div>
+                        <div class="text-[11.5px] font-medium text-[#6B6862] mb-1.5">Copy this code and paste it into your website's HTML</div>
+                        <div class="relative">
+                            <pre
+                                class="bg-[#15140F] text-[#FAFAF7] text-[11.5px] leading-relaxed rounded-[8px] px-4 py-3.5 overflow-x-auto whitespace-pre font-mono select-all"
+                                x-text="`<iframe\n  src=&quot;{{ $embedUrl }}&quot;\n  width=&quot;100%&quot;\n  height=&quot;${height}&quot;\n  frameborder=&quot;0&quot;\n  loading=&quot;lazy&quot;\n  style=&quot;border-radius:12px;border:1px solid #E6E3DC;&quot;\n  title=&quot;{{ addslashes($moneyBox->title) }}&quot;\n  allowpaymentrequest\n></iframe>`"
+                            ></pre>
+                            <button
+                                @click="
+                                    const code = `<iframe\n  src=&quot;{{ $embedUrl }}&quot;\n  width=&quot;100%&quot;\n  height=&quot;${height}&quot;\n  frameborder=&quot;0&quot;\n  loading=&quot;lazy&quot;\n  style=&quot;border-radius:12px;border:1px solid #E6E3DC;&quot;\n  title=&quot;{{ addslashes($moneyBox->title) }}&quot;\n  allowpaymentrequest\n></iframe>`;
+                                    navigator.clipboard.writeText(code.replace(/&quot;/g, '\''));
+                                    copied = true; setTimeout(() => copied = false, 2000);
+                                "
+                                class="absolute top-2.5 right-2.5 btn text-[11px] py-1 px-2.5"
+                                x-text="copied ? '✓ Copied' : 'Copy'"
+                            ></button>
+                        </div>
+                    </div>
+
+                    <p class="text-[12px] text-[#9C998F] leading-relaxed">
+                        Works on any website — WordPress, Webflow, Squarespace, or raw HTML. Visitors can contribute directly without leaving your site.
+                    </p>
                 </div>
             </div>
         </div>
