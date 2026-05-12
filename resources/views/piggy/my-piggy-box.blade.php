@@ -1,270 +1,284 @@
-<x-layouts.app :title="'My Piggy Box'">
-    <div class="min-h-screen bg-gray-50 py-8" x-data="{
-        showToast: false,
-        toastMessage: '',
-        shareUrl: '{{ $shareUrl }}',
-        piggyCode: '{{ auth()->user()->piggy_code }}',
-        userName: '{{ auth()->user()->name }}',
-        copyLink() {
-            navigator.clipboard.writeText(this.shareUrl).then(() => {
-                this.showToastMessage('✅ Link copied to clipboard!');
-            }).catch(() => {
-                this.showToastMessage('❌ Failed to copy');
-            });
-        },
-        shareViaWhatsApp() {
-            const text = `🎁 ${this.userName} is collecting gifts!\n\nMy Piggy Code: ${this.piggyCode}\n\nOr use this link: ${this.shareUrl}`;
-            const encodedText = encodeURIComponent(text);
-            window.open(`https://wa.me/?text=${encodedText}`, '_blank');
-        },
-        copyPiggyCode() {
-            const text = `🎁 ${this.userName} is collecting gifts!\n\nMy Piggy Code: ${this.piggyCode}\n\nOr use this link: ${this.shareUrl}`;
-            navigator.clipboard.writeText(text).then(() => {
-                this.showToastMessage('✅ Piggy message copied to clipboard!');
-            }).catch(() => {
-                this.showToastMessage('❌ Failed to copy');
-            });
-        },
-        showToastMessage(message) {
-            this.toastMessage = message;
-            this.showToast = true;
-            setTimeout(() => { this.showToast = false; }, 3000);
-        }
-    }" x-init="
-        @if(session('success'))
-            showToastMessage('{{ session('success') }}');
-        @endif
-    ">
-        <!-- Toast Notification -->
-        <div
-            x-show="showToast"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 translate-y-2"
-            x-transition:enter-end="opacity-100 translate-y-0"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            class="fixed top-4 right-4 z-50 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2"
-            style="display: none;"
-        >
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-            <span x-text="toastMessage"></span>
+<x-layouts.app :title="'My Piggy'">
+    @php
+        $sym      = auth()->user()->country?->currency_symbol ?? '₵';
+        $balance  = $piggyBox->getAvailableBalance();
+        $canWd    = auth()->user()->isVerified()
+                    && $balance >= config('withdrawal.min_amount', 10)
+                    && auth()->user()->withdrawalAccounts()->active()->count() > 0;
+    @endphp
+
+    <div class="page-wrap max-w-[1080px]"
+         x-data="{
+             copied: false,
+             codeCopied: false,
+             shareUrl: '{{ $shareUrl }}',
+             piggyCode: '{{ auth()->user()->piggy_code }}',
+             userName: '{{ addslashes(auth()->user()->name) }}',
+             copyLink() {
+                 navigator.clipboard.writeText(this.shareUrl)
+                     .then(() => { this.copied = true; setTimeout(() => this.copied = false, 2000); });
+             },
+             copyCode() {
+                 const msg = `🎁 ${this.userName} is collecting gifts!\n\nPiggy Code: ${this.piggyCode}\nOr visit: ${this.shareUrl}`;
+                 navigator.clipboard.writeText(msg)
+                     .then(() => { this.codeCopied = true; setTimeout(() => this.codeCopied = false, 2000); });
+             },
+             whatsapp() {
+                 const msg = `🎁 ${this.userName} is collecting gifts!\n\nMy Piggy Code: ${this.piggyCode}\n\nOr use this link: ${this.shareUrl}`;
+                 window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+             }
+         }">
+
+        {{-- Page header --}}
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+            <div>
+                <h1 class="page-title" style="font-size:1.875rem;">My Piggy</h1>
+                <p class="text-[13px] text-[#6B6862] mt-1">Your personal gift collection box</p>
+            </div>
+            <div class="flex items-center gap-2 flex-none flex-wrap">
+                @if($canWd)
+                    <a href="{{ route('piggy.withdraw.create') }}" class="btn btn-primary">
+                        <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+                        Withdraw
+                    </a>
+                @elseif(!auth()->user()->isVerified())
+                    <a href="{{ route('settings.verification') }}" class="btn">
+                        <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        Verify ID to Withdraw
+                    </a>
+                @elseif(auth()->user()->withdrawalAccounts()->active()->count() === 0)
+                    <a href="{{ route('settings.withdrawal-accounts') }}" class="btn">
+                        <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                        Add Withdrawal Account
+                    </a>
+                @endif
+                <a href="{{ $shareUrl }}" target="_blank" class="btn">
+                    <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    View donation page
+                </a>
+            </div>
         </div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Header with Actions -->
-            <div class="bg-white rounded-lg shadow mb-6 p-4 sm:p-6">
-                <div class="flex flex-col space-y-4">
-                    <div>
-                        <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3">
-                            🎁 {{ $piggyBox->title }}
-                        </h1>
-                        <p class="text-gray-600 mb-3">
-                            Your personal piggy box for receiving gifts from friends and family!
-                        </p>
-                        <div class="flex flex-wrap items-center gap-2">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                                Code: <span class="ml-1 font-bold">{{ auth()->user()->piggy_code }}</span>
-                            </span>
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $piggyBox->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                {{ $piggyBox->is_active ? 'Active' : 'Inactive' }}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                        <a
-                            href="{{ $shareUrl }}"
-                            target="_blank"
-                            class="flex-1 sm:flex-none text-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:shadow-md transition-all cursor-pointer transform hover:scale-105"
-                        >
-                            🔗 View Donation Page
-                        </a>
-                        @if(auth()->user()->isVerified() && $piggyBox->getAvailableBalance() >= config('withdrawal.min_amount', 10) && auth()->user()->withdrawalAccounts()->active()->count() > 0)
-                            <a
-                                href="{{ route('piggy.withdraw.create') }}"
-                                class="flex-1 sm:flex-none text-center px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 hover:shadow-md transition-all cursor-pointer transform hover:scale-105"
-                            >
-                                💰 Withdraw Funds
-                            </a>
-                        @elseif(!auth()->user()->isVerified())
-                            <a
-                                href="{{ route('settings.verification') }}"
-                                class="flex-1 sm:flex-none text-center px-4 py-2 text-sm font-medium text-yellow-700 bg-yellow-100 border border-yellow-300 rounded-lg hover:bg-yellow-200 transition"
-                            >
-                                🔒 Verify ID to Withdraw
-                            </a>
-                        @elseif(auth()->user()->withdrawalAccounts()->active()->count() === 0)
-                            <a
-                                href="{{ route('settings.withdrawal-accounts') }}"
-                                class="flex-1 sm:flex-none text-center px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 border border-blue-300 rounded-lg hover:bg-blue-200 transition"
-                            >
-                                🏦 Add Account to Withdraw
-                            </a>
-                        @elseif($piggyBox->getAvailableBalance() < config('withdrawal.min_amount', 10))
-                            <button
-                                type="button"
-                                disabled
-                                class="flex-1 sm:flex-none text-center px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-200 rounded-lg cursor-not-allowed"
-                            >
-                                💰 Insufficient Balance
-                            </button>
-                        @endif
-                        <button
-                            @click="shareViaWhatsApp()"
-                            class="flex-1 sm:flex-none text-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 hover:shadow-md transition-all cursor-pointer transform hover:scale-105 flex items-center justify-center gap-2"
-                        >
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-4.946 1.196c-1.54.92-2.846 2.454-3.297 4.12 1.357-2.119 3.2-3.913 5.408-5.028 1.265-.72 2.88-1.288 2.835 0 0 0 0 0zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z"/></svg>
-                            Share via WhatsApp
-                        </button>
-                        <button
-                            @click="copyPiggyCode()"
-                            class="flex-1 sm:flex-none text-center px-4 py-2 text-sm font-medium text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 hover:shadow-md transition-all cursor-pointer transform hover:scale-105"
-                        >
-                            📋 Copy Piggy Code
-                        </button>
-                    </div>
-                </div>
+        {{-- Stat row --}}
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+            <div class="stat-card">
+                <div class="stat-label">Total received</div>
+                <div class="stat-value">{{ $piggyBox->formatAmount($piggyBox->total_received) }}</div>
+                <div class="stat-delta">All time</div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Stats Overview -->
-                <div class="lg:col-span-3">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div class="bg-white rounded-lg shadow p-6">
-                            <div class="text-sm font-medium text-gray-600 mb-1">Total Received</div>
-                            <div class="text-3xl font-bold text-gray-900">
-                                {{ $piggyBox->formatAmount($piggyBox->total_received) }}
-                            </div>
-                            <div class="text-sm text-gray-500 mt-1">
-                                all time
+            <div class="stat-card" style="background:var(--color-primary-50);border-color:var(--color-primary-200);">
+                <div class="stat-label" style="color:var(--color-primary-700);">Available balance</div>
+                <div class="stat-value" style="color:var(--color-primary-600);">{{ $piggyBox->formatAmount($balance) }}</div>
+                <div class="stat-delta" style="color:var(--color-primary-500);">Ready to withdraw</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Total gifts</div>
+                <div class="stat-value" style="font-variant-numeric:tabular-nums;">{{ number_format($piggyBox->donation_count) }}</div>
+                <div class="stat-delta">{{ Str::plural('gift', $piggyBox->donation_count) }} received</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Piggy code</div>
+                <div class="text-[18px] font-bold font-mono tracking-wider text-[#15140F] mt-1.5">{{ auth()->user()->piggy_code }}</div>
+                <div class="stat-delta mt-1.5">
+                    <span class="pill {{ $piggyBox->canReceiveDonations() ? 'pill-ok' : 'pill-muted' }}">
+                        <span class="pill-dot"></span>
+                        {{ $piggyBox->canReceiveDonations() ? 'Accepting gifts' : 'Paused' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4 mb-4">
+
+            {{-- Left: Share + Recent gifts --}}
+            <div class="space-y-4">
+
+                {{-- Share card --}}
+                <div class="card">
+                    <div class="card-head">
+                        <h2 class="card-title">Share your piggy</h2>
+                    </div>
+                    <div class="card-body space-y-3">
+
+                        {{-- Direct link --}}
+                        <div>
+                            <div class="text-[11.5px] font-medium text-[#9C998F] uppercase tracking-[0.06em] mb-1.5">Direct link</div>
+                            <div class="flex items-center gap-2">
+                                <code class="flex-1 text-[12px] bg-[#F3F1EB] border border-[#E6E3DC] rounded-[6px] px-2.5 py-2 text-[#15140F] truncate font-mono">{{ $shareUrl }}</code>
+                                <button @click="copyLink()" class="btn btn-sm flex-none">
+                                    <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                    <span x-text="copied ? 'Copied!' : 'Copy'"></span>
+                                </button>
                             </div>
                         </div>
 
-                        <div class="bg-green-50 border-2 border-green-200 rounded-lg shadow p-6">
-                            <div class="text-sm font-medium text-green-700 mb-1">Available Balance</div>
-                            <div class="text-3xl font-bold text-green-600">
-                                {{ $piggyBox->formatAmount($piggyBox->getAvailableBalance()) }}
+                        {{-- Piggy code --}}
+                        <div>
+                            <div class="text-[11.5px] font-medium text-[#9C998F] uppercase tracking-[0.06em] mb-1.5">Piggy code — share this with anyone</div>
+                            <div class="flex items-center gap-2">
+                                <div class="flex-1 flex items-center gap-3 bg-[#F3F1EB] border border-[#E6E3DC] rounded-[6px] px-3 py-2">
+                                    <span class="font-mono text-[15px] font-bold tracking-widest text-[#15140F]">{{ auth()->user()->piggy_code }}</span>
+                                </div>
+                                <button @click="copyCode()" class="btn btn-sm flex-none">
+                                    <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                    <span x-text="codeCopied ? 'Copied!' : 'Copy message'"></span>
+                                </button>
                             </div>
-                            <div class="text-sm text-green-600 mt-1">
-                                ready to withdraw
-                            </div>
+                            <p class="text-[11.5px] text-[#9C998F] mt-1.5">Tell people to visit the app and click "Piggy Someone", then enter this code</p>
                         </div>
 
-                        <div class="bg-white rounded-lg shadow p-6">
-                            <div class="text-sm font-medium text-gray-600 mb-1">Total Gifts</div>
-                            <div class="text-3xl font-bold text-gray-900">
-                                {{ $piggyBox->donation_count }}
-                            </div>
-                            <div class="text-sm text-gray-500 mt-1">
-                                {{ Str::plural('gift', $piggyBox->donation_count) }} received
-                            </div>
-                        </div>
-
-                        <div class="bg-white rounded-lg shadow p-6">
-                            <div class="text-sm font-medium text-gray-600 mb-1">Status</div>
-                            <div class="text-xl font-bold {{ $piggyBox->canReceiveDonations() ? 'text-green-600' : 'text-red-600' }}">
-                                {{ $piggyBox->canReceiveDonations() ? 'Accepting' : 'Not Accepting' }}
-                            </div>
-                            <div class="text-sm text-gray-500 mt-1">
-                                gifts
-                            </div>
+                        {{-- Social share row --}}
+                        <div class="flex flex-wrap gap-2 pt-1">
+                            <button @click="whatsapp()" class="btn btn-sm" style="background:#22C55E;color:#fff;border-color:#16A34A;">
+                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374A9.86 9.86 0 012.1 11.974C2.1 6.524 6.536 2.09 11.988 2.09c2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884"/></svg>
+                                WhatsApp
+                            </button>
+                            <a href="https://wa.me/?text={{ urlencode('🎁 Gift me! Scan my QR code or visit: ' . $shareUrl) }}" target="_blank" class="btn btn-sm">
+                                <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                                Share QR via WhatsApp
+                            </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- QR Code Section -->
-                <div class="lg:col-span-3">
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <h2 class="text-lg font-semibold text-gray-900 mb-4">🔲 Your QR Code</h2>
+                {{-- Recent gifts --}}
+                <div class="card">
+                    <div class="card-head">
+                        <h2 class="card-title">Recent gifts</h2>
+                        @if($recentDonations->count() > 0)
+                            <span class="pill">{{ $recentDonations->count() }} shown</span>
+                        @endif
+                    </div>
+                    @if($recentDonations->count() > 0)
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>From</th>
+                                        <th class="num">Amount</th>
+                                        <th>Status</th>
+                                        <th>When</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($recentDonations as $donation)
+                                        <tr>
+                                            <td>
+                                                <div class="font-medium text-[#15140F]">{{ $donation->getDisplayName() }}</div>
+                                                @if($donation->message)
+                                                    <div class="text-[11.5px] text-[#9C998F] italic mt-0.5">"{{ Str::limit($donation->message, 48) }}"</div>
+                                                @endif
+                                            </td>
+                                            <td class="num font-semibold text-[#15140F]">{{ $piggyBox->formatAmount($donation->amount) }}</td>
+                                            <td>
+                                                <span class="pill {{ $donation->payment_status->value === 'completed' ? 'pill-ok' : 'pill-warn' }}">
+                                                    <span class="pill-dot"></span>
+                                                    {{ ucfirst($donation->payment_status->value) }}
+                                                </span>
+                                            </td>
+                                            <td class="text-[#6B6862]">{{ $donation->created_at->diffForHumans() }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="card-body text-center py-10">
+                            <div class="text-[40px] mb-3">🎁</div>
+                            <div class="text-[14px] font-medium text-[#15140F] mb-1">No gifts yet</div>
+                            <p class="tiny mb-4">Share your piggy code or link to start receiving gifts from friends.</p>
+                            <button @click="whatsapp()" class="btn btn-sm">Share via WhatsApp</button>
+                        </div>
+                    @endif
+                </div>
+
+                {{-- Withdrawals --}}
+                @if($withdrawals->count() > 0)
+                <div class="card">
+                    <div class="card-head">
+                        <h2 class="card-title">Withdrawals</h2>
+                        <span class="pill">{{ $withdrawals->count() }}</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Reference</th>
+                                    <th class="num">Amount</th>
+                                    <th class="num">Net</th>
+                                    <th>Account</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($withdrawals as $w)
+                                    <tr>
+                                        <td>
+                                            <code class="text-[11.5px] font-mono text-[#6B6862]">{{ $w->reference }}</code>
+                                            @if($w->user_note)
+                                                <div class="text-[11px] text-[#9C998F] mt-0.5">{{ Str::limit($w->user_note, 32) }}</div>
+                                            @endif
+                                        </td>
+                                        <td class="num text-[#6B6862]">{{ $piggyBox->formatAmount($w->amount) }}</td>
+                                        <td class="num font-semibold text-primary-600">{{ $piggyBox->formatAmount($w->net_amount) }}</td>
+                                        <td class="text-[#6B6862]">{{ $w->withdrawalAccount?->getDisplayName() ?? '—' }}</td>
+                                        <td>
+                                            <span class="pill {{ match($w->status->value) {
+                                                'disbursed' => 'pill-ok',
+                                                'rejected','failed' => 'pill-danger',
+                                                'approved' => 'pill-info',
+                                                default => 'pill-warn',
+                                            } }}">
+                                                <span class="pill-dot"></span>
+                                                {{ $w->status->label() }}
+                                            </span>
+                                        </td>
+                                        <td class="text-[#6B6862]">{{ $w->created_at->format('M d, Y') }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                @endif
+            </div>
+
+            {{-- Right: QR code --}}
+            <div class="space-y-4">
+                <div class="card">
+                    <div class="card-head"><h2 class="card-title">QR code</h2></div>
+                    <div class="card-body">
                         @if($piggyBox->hasQrCode())
-                            <div class="flex flex-col lg:flex-row gap-6">
-                                <!-- QR Code Display -->
-                                <div class="flex flex-col items-center lg:w-1/3">
-                                    <img
-                                        src="{{ $piggyBox->getQrCodeUrl() }}"
-                                        alt="QR Code for Piggy Box"
-                                        class="w-64 h-64 border-2 border-gray-200 rounded-lg mb-3"
-                                    />
-                                    <div class="w-full max-w-xs space-y-2">
-                                        <a
-                                            href="{{ route('piggy.download-qr') }}"
-                                            class="flex items-center justify-center space-x-2 w-full px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition"
-                                        >
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                            </svg>
-                                            <span>Download QR Code</span>
-                                        </a>
-                                        <a
-                                            href="https://wa.me/?text={{ urlencode('🎁 Gift me! Scan my QR code or visit: ' . $shareUrl) }}"
-                                            target="_blank"
-                                            class="flex items-center justify-center space-x-2 w-full px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-lg hover:bg-green-600 transition"
-                                        >
-                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                                            </svg>
-                                            <span>Share QR via WhatsApp</span>
-                                        </a>
-                                    </div>
-                                </div>
-                                
-                                <!-- Instructions -->
-                                <div class="flex-1">
-                                    <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg p-6 border-2 border-yellow-200 h-full">
-                                        <h3 class="text-md font-semibold text-gray-900 mb-3">📢 How to Share Your QR Code</h3>
-                                        <div class="space-y-3">
-                                            <div class="flex items-start space-x-3">
-                                                <div class="flex-shrink-0 w-8 h-8 bg-yellow-500 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                                    1
-                                                </div>
-                                                <div>
-                                                    <p class="text-sm font-medium text-gray-900">Download the QR Code</p>
-                                                    <p class="text-sm text-gray-600">Click the download button above to save the QR code to your device.</p>
-                                                </div>
-                                            </div>
-                                            <div class="flex items-start space-x-3">
-                                                <div class="flex-shrink-0 w-8 h-8 bg-yellow-500 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                                    2
-                                                </div>
-                                                <div>
-                                                    <p class="text-sm font-medium text-gray-900">Share Anywhere</p>
-                                                    <p class="text-sm text-gray-600">Share the QR code on social media, WhatsApp, email, or print it on flyers, invitations, etc.</p>
-                                                </div>
-                                            </div>
-                                            <div class="flex items-start space-x-3">
-                                                <div class="flex-shrink-0 w-8 h-8 bg-yellow-500 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                                    3
-                                                </div>
-                                                <div>
-                                                    <p class="text-sm font-medium text-gray-900">People Scan & Gift</p>
-                                                    <p class="text-sm text-gray-600">Anyone who scans your QR code will be taken directly to your gift page to send you money!</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div class="flex flex-col items-center gap-3">
+                                <img src="{{ $piggyBox->getQrCodeUrl() }}" alt="Piggy QR Code"
+                                     class="w-48 h-48 rounded-[8px] border border-[#E6E3DC]">
+                                <div class="w-full space-y-2">
+                                    <a href="{{ route('piggy.download-qr') }}" class="btn btn-primary w-full justify-center">
+                                        <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                        Download QR
+                                    </a>
+                                    <a href="https://wa.me/?text={{ urlencode('🎁 Gift me! Scan my QR or visit: ' . $shareUrl) }}"
+                                       target="_blank" class="btn w-full justify-center">
+                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374A9.86 9.86 0 012.1 11.974C2.1 6.524 6.536 2.09 11.988 2.09c2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884"/></svg>
+                                        Share QR on WhatsApp
+                                    </a>
                                 </div>
                             </div>
                         @else
-                            <div class="text-center py-8">
-                                <div class="mb-4 p-8 bg-gray-50 rounded-lg inline-block">
-                                    <svg class="mx-auto h-20 w-20 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                                    </svg>
+                            <div class="text-center py-6">
+                                <div class="w-14 h-14 rounded-xl bg-[#F3F1EB] grid place-items-center mx-auto mb-3">
+                                    <svg viewBox="0 0 24 24" class="w-7 h-7 text-[#9C998F]" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
                                 </div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-2">Generate Your QR Code</h3>
-                                <p class="text-gray-600 mb-6 max-w-md mx-auto">Create a QR code that people can scan to send you gifts instantly!</p>
-                                <form action="{{ route('piggy.generate-qr') }}" method="POST" class="inline">
+                                <p class="text-[13px] text-[#6B6862] mb-4">Generate a QR code so people can contribute by scanning it.</p>
+                                <form action="{{ route('piggy.generate-qr') }}" method="POST">
                                     @csrf
-                                    <button
-                                        type="submit"
-                                        class="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition inline-flex items-center space-x-2"
-                                    >
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                        </svg>
-                                        <span>Generate QR Code</span>
+                                    <button type="submit" class="btn btn-primary w-full justify-center">
+                                        <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                                        Generate QR code
                                     </button>
                                 </form>
                             </div>
@@ -272,217 +286,26 @@
                     </div>
                 </div>
 
-                <!-- Share Information -->
-                <div class="lg:col-span-3">
-                    <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg shadow p-6 border-2 border-yellow-200">
-                        <h2 class="text-lg font-semibold text-gray-900 mb-4">📢 Other Ways to Share</h2>
-                        <div class="space-y-3">
-                            <div class="flex items-start space-x-3">
-                                <div class="flex-shrink-0 w-8 h-8 bg-yellow-500 text-white rounded-full flex items-center justify-center font-bold">
-                                    1
-                                </div>
+                {{-- How to share --}}
+                <div class="card">
+                    <div class="card-head"><h2 class="card-title">How to share</h2></div>
+                    <div class="card-body space-y-3">
+                        @foreach([
+                            ['01', 'Share your code', 'Tell friends to visit the app → "Piggy Someone" → enter your code.'],
+                            ['02', 'Send the link', 'Share your direct donation link via WhatsApp, email, or any social platform.'],
+                            ['03', 'Print your QR', 'Download your QR code and put it on invitations, flyers, or your phone wallpaper.'],
+                        ] as [$n, $title, $desc])
+                            <div class="flex gap-3">
+                                <span class="font-serif text-[22px] text-[#D9D6CE] leading-none flex-none w-7">{{ $n }}</span>
                                 <div>
-                                    <p class="text-sm font-medium text-gray-900">Share Your Code</p>
-                                    <p class="text-sm text-gray-600">Tell friends to visit the homepage and click "Piggy Someone", then enter your code: <span class="font-bold text-yellow-700">{{ auth()->user()->piggy_code }}</span></p>
+                                    <div class="text-[13px] font-semibold text-[#15140F]">{{ $title }}</div>
+                                    <div class="text-[12px] text-[#6B6862] mt-0.5">{{ $desc }}</div>
                                 </div>
                             </div>
-                            <div class="flex items-start space-x-3">
-                                <div class="flex-shrink-0 w-8 h-8 bg-yellow-500 text-white rounded-full flex items-center justify-center font-bold">
-                                    2
-                                </div>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-900">Share Your Direct Link</p>
-                                    <p class="text-sm text-gray-600">Or send them this direct link:</p>
-                                    <div class="mt-2 p-2 bg-white rounded border border-yellow-300">
-                                        <code class="text-xs break-all text-gray-700">{{ $shareUrl }}</code>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Gifts -->
-                <div class="lg:col-span-3">
-                    <div class="bg-white rounded-lg shadow">
-                        <div class="px-6 py-4 border-b border-gray-200">
-                            <h2 class="text-lg font-semibold text-gray-900">Recent Gifts</h2>
-                        </div>
-                        <div class="p-6">
-                            @if($recentDonations->count() > 0)
-                                <div class="space-y-4">
-                                    @foreach($recentDonations as $donation)
-                                        <div class="flex items-start space-x-3 pb-4 border-b border-gray-200 last:border-0">
-                                            <div class="flex-shrink-0">
-                                                <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
-                                                    <span class="text-yellow-700 font-semibold">
-                                                        {{ substr($donation->getDisplayName(), 0, 1) }}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div class="flex-1 min-w-0">
-                                                <div class="flex items-center justify-between">
-                                                    <p class="text-sm font-medium text-gray-900">
-                                                        {{ $donation->getDisplayName() }}
-                                                    </p>
-                                                    <span class="text-sm font-semibold text-gray-900">
-                                                        {{ $piggyBox->formatAmount($donation->amount) }}
-                                                    </span>
-                                                </div>
-                                                @if($donation->message)
-                                                    <div class="mt-2 p-2 bg-gray-50 rounded text-sm text-gray-700">
-                                                        "{{ $donation->message }}"
-                                                    </div>
-                                                @endif
-                                                <div class="flex items-center space-x-2 mt-2">
-                                                    <p class="text-xs text-gray-500">
-                                                        {{ $donation->created_at->diffForHumans() }}
-                                                    </p>
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $donation->payment_status->value === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                                        {{ ucfirst($donation->payment_status->value) }}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @else
-                                <div class="text-center py-12">
-                                    <div class="text-6xl mb-4">🎁</div>
-                                    <h3 class="text-lg font-medium text-gray-900 mb-2">No gifts yet</h3>
-                                    <p class="text-gray-600 mb-4">Share your piggy code with friends to start receiving gifts!</p>
-                                    <div class="flex flex-col sm:flex-row gap-2 justify-center">
-                                        <button
-                                            @click="shareViaWhatsApp()"
-                                            class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 hover:shadow-md transition-all cursor-pointer transform hover:scale-105 flex items-center justify-center gap-2"
-                                        >
-                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-4.946 1.196c-1.54.92-2.846 2.454-3.297 4.12 1.357-2.119 3.2-3.913 5.408-5.028 1.265-.72 2.88-1.288 2.835 0 0 0 0 0zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z"/></svg>
-                                            Share via WhatsApp
-                                        </button>
-                                        <button
-                                            @click="copyPiggyCode()"
-                                            class="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 hover:shadow-md transition-all cursor-pointer transform hover:scale-105"
-                                        >
-                                            📋 Copy Piggy Code
-                                        </button>
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Withdrawal Requests -->
-                <div class="lg:col-span-3">
-                    <div class="bg-white rounded-lg shadow">
-                        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                            <h2 class="text-lg font-semibold text-gray-900">Withdrawal Requests</h2>
-                            @if($withdrawals->count() > 0)
-                                <span class="text-sm text-gray-600">
-                                    Total: {{ $withdrawals->count() }}
-                                </span>
-                            @endif
-                        </div>
-                        <div class="p-6">
-                            @if($withdrawals->count() > 0)
-                                <div class="overflow-x-auto">
-                                    <table class="min-w-full divide-y divide-gray-200">
-                                        <thead>
-                                            <tr>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference</th>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fee</th>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Net Amount</th>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Account</th>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="bg-white divide-y divide-gray-200">
-                                            @foreach($withdrawals as $withdrawal)
-                                                <tr class="hover:bg-gray-50">
-                                                    <td class="px-4 py-4 whitespace-nowrap">
-                                                        <div class="text-sm font-medium text-gray-900">
-                                                            {{ $withdrawal->reference }}
-                                                        </div>
-                                                        @if($withdrawal->user_note)
-                                                            <div class="text-xs text-gray-500 mt-1">
-                                                                {{ Str::limit($withdrawal->user_note, 30) }}
-                                                            </div>
-                                                        @endif
-                                                    </td>
-                                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                        {{ $piggyBox->formatAmount($withdrawal->amount) }}
-                                                    </td>
-                                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                        - {{ $piggyBox->formatAmount($withdrawal->fee) }}
-                                                    </td>
-                                                    <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
-                                                        {{ $piggyBox->formatAmount($withdrawal->net_amount) }}
-                                                    </td>
-                                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                        @if($withdrawal->withdrawalAccount)
-                                                            <div class="text-sm">{{ $withdrawal->withdrawalAccount->getDisplayName() }}</div>
-                                                        @else
-                                                            <span class="text-gray-400">N/A</span>
-                                                        @endif
-                                                    </td>
-                                                    <td class="px-4 py-4 whitespace-nowrap">
-                                                        @php
-                                                            $statusClasses = match($withdrawal->status->value) {
-                                                                'pending' => 'bg-yellow-100 text-yellow-800',
-                                                                'in_review' => 'bg-blue-100 text-blue-800',
-                                                                'approved' => 'bg-green-100 text-green-800',
-                                                                'disbursed' => 'bg-emerald-100 text-emerald-800',
-                                                                'rejected' => 'bg-red-100 text-red-800',
-                                                                'failed' => 'bg-orange-100 text-orange-800',
-                                                                default => 'bg-gray-100 text-gray-800',
-                                                            };
-                                                        @endphp
-                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusClasses }}">
-                                                            {{ $withdrawal->status->label() }}
-                                                        </span>
-                                                        @if($withdrawal->rejection_reason)
-                                                            <div class="text-xs text-red-600 mt-1">
-                                                                {{ Str::limit($withdrawal->rejection_reason, 20) }}
-                                                            </div>
-                                                        @endif
-                                                    </td>
-                                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        <div>{{ $withdrawal->created_at->format('M d, Y') }}</div>
-                                                        <div class="text-xs text-gray-400">{{ $withdrawal->created_at->format('h:i A') }}</div>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            @else
-                                <div class="text-center py-8">
-                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <h3 class="mt-2 text-sm font-medium text-gray-900">No withdrawal requests yet</h3>
-                                    <p class="mt-1 text-sm text-gray-500">
-                                        When you request withdrawals, they will appear here.
-                                    </p>
-                                    @if($piggyBox->getAvailableBalance() >= config('withdrawal.min_amount', 10))
-                                        <div class="mt-4">
-                                            <a
-                                                href="{{ route('piggy.withdraw.create') }}"
-                                                class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition"
-                                            >
-                                                Request Withdrawal
-                                            </a>
-                                        </div>
-                                    @endif
-                                </div>
-                            @endif
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 </x-layouts.app>

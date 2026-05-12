@@ -92,13 +92,23 @@
 
             <flux:navlist>
                 <flux:navlist.item
+                    icon="gift"
+                    :href="route('piggy.my-piggy-box')"
+                    :current="request()->routeIs('piggy.my-piggy-box')"
+                    wire:navigate
+                    class="mmb-nav-item"
+                >
+                    My Piggy
+                </flux:navlist.item>
+
+                <flux:navlist.item
                     icon="globe-alt"
                     :href="route('browse')"
                     :current="request()->routeIs('browse')"
                     wire:navigate
                     class="mmb-nav-item"
                 >
-                    Public Page
+                    Browse
                 </flux:navlist.item>
 
                 <flux:navlist.item
