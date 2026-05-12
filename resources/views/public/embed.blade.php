@@ -15,35 +15,31 @@
 <body class="bg-[#FAFAF7]" x-data x-cloak>
 
 @php
-    $progress   = $moneyBox->goal_amount > 0
+    $progress      = $moneyBox->goal_amount > 0
         ? min(100, ($moneyBox->total_contributions / $moneyBox->goal_amount) * 100)
         : null;
-    $canContrib = $moneyBox->canAcceptContributions();
-    $currency   = $moneyBox->getCurrencySymbol();
-
-    use App\Enums\AmountType;
-    use App\Enums\ContributorIdentity;
-
-    $amountType  = $moneyBox->amount_type;
-    $identityRule = $moneyBox->contributor_identity;
-    $mustIdentify = $identityRule === ContributorIdentity::MustIdentify;
-    $neverIdentify = $identityRule === ContributorIdentity::Anonymous;
+    $canContrib    = $moneyBox->canAcceptContributions();
+    $currency      = $moneyBox->getCurrencySymbol();
+    $amountType    = $moneyBox->amount_type;
+    $identityRule  = $moneyBox->contributor_identity;
+    $mustIdentify  = $identityRule === \App\Enums\ContributorIdentity::MustIdentify;
+    $neverIdentify = $identityRule === \App\Enums\ContributorIdentity::Anonymous;
 
     $presets = match($amountType) {
-        AmountType::Fixed    => [$moneyBox->fixed_amount],
-        AmountType::Minimum  => array_filter([
+        \App\Enums\AmountType::Fixed   => [$moneyBox->fixed_amount],
+        \App\Enums\AmountType::Minimum => array_values(array_filter([
             $moneyBox->minimum_amount,
             $moneyBox->minimum_amount ? $moneyBox->minimum_amount * 2 : null,
             $moneyBox->minimum_amount ? $moneyBox->minimum_amount * 5 : null,
-        ]),
-        AmountType::Range    => array_filter([
+        ])),
+        \App\Enums\AmountType::Range   => array_values(array_filter([
             $moneyBox->minimum_amount,
-            $moneyBox->minimum_amount && $moneyBox->maximum_amount
+            ($moneyBox->minimum_amount && $moneyBox->maximum_amount)
                 ? round(($moneyBox->minimum_amount + $moneyBox->maximum_amount) / 2)
                 : null,
             $moneyBox->maximum_amount,
-        ]),
-        default              => [10, 20, 50, 100],
+        ])),
+        default                        => [10, 20, 50, 100],
     };
 @endphp
 
@@ -70,7 +66,7 @@
         </a>
     </div>
 
-    {{-- Progress bar --}}
+    {{-- Progress / stats band --}}
     @if($progress !== null)
         <div class="bg-[#F3F1EB] border-b border-[#E6E3DC] px-4 py-2.5">
             <div class="flex justify-between text-[11.5px] text-[#6B6862] mb-1.5">
@@ -78,8 +74,7 @@
                 <span>goal: {{ $currency }}{{ number_format($moneyBox->goal_amount, 2) }}</span>
             </div>
             <div class="h-1.5 bg-[#E6E3DC] rounded-full overflow-hidden">
-                <div class="h-full bg-[#1B6B4E] rounded-full transition-all duration-500"
-                     style="width: {{ $progress }}%"></div>
+                <div class="h-full bg-[#1B6B4E] rounded-full" style="width: {{ $progress }}%"></div>
             </div>
         </div>
     @else
@@ -112,9 +107,15 @@
             </div>
         @endif
 
+        @php
+            $isFixed    = $amountType === \App\Enums\AmountType::Fixed;
+            $isMinimum  = $amountType === \App\Enums\AmountType::Minimum;
+            $isRange    = $amountType === \App\Enums\AmountType::Range;
+        @endphp
+
         <form method="POST" action="{{ route('box.contribute', $moneyBox->slug) }}"
               x-data="{
-                  amount: '{{ $amountType === \App\Enums\AmountType::Fixed ? $moneyBox->fixed_amount : '' }}',
+                  amount: '{{ $isFixed ? $moneyBox->fixed_amount : '' }}',
                   customAmount: '',
                   isAnon: {{ $neverIdentify ? 'true' : 'false' }},
                   showCustom: false,
@@ -131,11 +132,10 @@
               }">
             @csrf
 
-            {{-- Hidden amount field --}}
             <input type="hidden" name="amount" :value="showCustom ? customAmount : amount" />
 
-            {{-- Amount presets --}}
-            @if($amountType === \App\Enums\AmountType::Fixed)
+            {{-- Amount --}}
+            @if($isFixed)
                 <div class="mb-4">
                     <div class="text-[11.5px] font-medium text-[#6B6862] uppercase tracking-wide mb-1.5">Amount</div>
                     <div class="bg-[#F3F1EB] border border-[#E6E3DC] rounded-[8px] px-3 py-2.5 text-[15px] font-semibold text-[#15140F]">
@@ -149,14 +149,18 @@
                         @foreach($presets as $p)
                             <button type="button"
                                     @click="setPreset('{{ $p }}')"
-                                    :class="amount == '{{ $p }}' && !showCustom ? 'border-[#1B6B4E] bg-[#1B6B4E]/8 text-[#1B6B4E] font-semibold' : 'border-[#E6E3DC] text-[#6B6862] hover:border-[#D9D6CE]'"
+                                    :class="amount == '{{ $p }}' && !showCustom
+                                        ? 'border-[#1B6B4E] bg-[#1B6B4E]/10 text-[#1B6B4E] font-semibold'
+                                        : 'border-[#E6E3DC] text-[#6B6862] hover:border-[#D9D6CE]'"
                                     class="px-3 py-1.5 text-[12.5px] rounded-[7px] border transition-colors duration-100">
                                 {{ $currency }}{{ number_format($p, 0) }}
                             </button>
                         @endforeach
                         <button type="button"
                                 @click="setCustom()"
-                                :class="showCustom ? 'border-[#1B6B4E] bg-[#1B6B4E]/8 text-[#1B6B4E] font-semibold' : 'border-[#E6E3DC] text-[#6B6862] hover:border-[#D9D6CE]'"
+                                :class="showCustom
+                                    ? 'border-[#1B6B4E] bg-[#1B6B4E]/10 text-[#1B6B4E] font-semibold'
+                                    : 'border-[#E6E3DC] text-[#6B6862] hover:border-[#D9D6CE]'"
                                 class="px-3 py-1.5 text-[12.5px] rounded-[7px] border transition-colors duration-100">
                             Custom
                         </button>
@@ -171,10 +175,9 @@
                                @if($moneyBox->maximum_amount) max="{{ $moneyBox->maximum_amount }}" @endif
                                class="w-full pl-7 pr-3 py-2 text-[13px] border border-[#E6E3DC] rounded-[7px] bg-white focus:outline-none focus:border-[#1B6B4E]" />
                     </div>
-
-                    @if($amountType === \App\Enums\AmountType::Minimum && $moneyBox->minimum_amount)
+                    @if($isMinimum && $moneyBox->minimum_amount)
                         <p class="text-[11px] text-[#9C998F] mt-1.5">Minimum: {{ $currency }}{{ number_format($moneyBox->minimum_amount, 2) }}</p>
-                    @elseif($amountType === \App\Enums\AmountType::Range && $moneyBox->minimum_amount && $moneyBox->maximum_amount)
+                    @elseif($isRange && $moneyBox->minimum_amount && $moneyBox->maximum_amount)
                         <p class="text-[11px] text-[#9C998F] mt-1.5">{{ $currency }}{{ number_format($moneyBox->minimum_amount, 2) }} – {{ $currency }}{{ number_format($moneyBox->maximum_amount, 2) }}</p>
                     @endif
                 </div>
@@ -203,23 +206,22 @@
 
             {{-- Anonymous toggle --}}
             @if(!$mustIdentify && !$neverIdentify)
-                <label class="flex items-center gap-2 mb-4 cursor-pointer select-none">
+                <div class="flex items-center gap-2 mb-4">
                     <input type="hidden" name="is_anonymous" :value="isAnon ? '1' : '0'" />
                     <button type="button"
                             @click="isAnon = !isAnon"
                             :class="isAnon ? 'bg-[#1B6B4E] border-[#1B6B4E]' : 'bg-white border-[#E6E3DC]'"
                             class="w-4 h-4 rounded border flex-none grid place-items-center transition-colors">
-                        <svg x-show="isAnon" class="w-2.5 h-2.5 text-white" viewBox="0 0 12 12" fill="currentColor"><path d="M10 3L5 8.5 2 5.5"/><path stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M10 3L5 8.5 2 5.5" fill="none"/></svg>
+                        <svg x-show="isAnon" class="w-2.5 h-2.5 text-white" viewBox="0 0 10 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4l2.5 2.5L9 1"/></svg>
                     </button>
-                    <span class="text-[12px] text-[#6B6862]">Contribute anonymously</span>
-                </label>
+                    <span class="text-[12px] text-[#6B6862] cursor-pointer select-none" @click="isAnon = !isAnon">Contribute anonymously</span>
+                </div>
             @elseif($neverIdentify)
                 <input type="hidden" name="is_anonymous" value="1" />
             @endif
 
-            {{-- Submit --}}
             <button type="submit"
-                    class="w-full py-2.5 px-4 bg-[#1B6B4E] text-white text-[13.5px] font-semibold rounded-[8px] hover:bg-[#15563E] transition-colors duration-150 disabled:opacity-50">
+                    class="w-full py-2.5 px-4 bg-[#1B6B4E] text-white text-[13.5px] font-semibold rounded-[8px] hover:bg-[#15563E] transition-colors duration-150">
                 Contribute now →
             </button>
         </form>
@@ -237,7 +239,5 @@
     </div>
 
 </div>
-
-@vite(['resources/js/app.js'])
 </body>
 </html>

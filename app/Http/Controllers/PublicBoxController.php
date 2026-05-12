@@ -82,7 +82,7 @@ class PublicBoxController extends Controller
 
         return response()
             ->view('public.embed', compact('moneyBox'))
-            ->header('Content-Security-Policy', "frame-ancestors *")
-            ->header('X-Frame-Options', 'ALLOWALL');
+            ->withoutHeader('X-Frame-Options')
+            ->header('Content-Security-Policy', "frame-ancestors *");
     }
 }
