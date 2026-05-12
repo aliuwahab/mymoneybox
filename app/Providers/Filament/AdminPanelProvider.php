@@ -23,11 +23,6 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        \Log::info('Filament Admin Panel Loading', [
-            'authenticated' => auth()->check(),
-            'user' => auth()->user()?->email,
-        ]);
-
         return $panel
             ->default()
             ->id('admin')

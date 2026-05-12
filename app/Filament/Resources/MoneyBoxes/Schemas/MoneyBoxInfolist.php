@@ -4,6 +4,7 @@ namespace App\Filament\Resources\MoneyBoxes\Schemas;
 
 use App\Models\MoneyBox;
 use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
@@ -13,60 +14,80 @@ class MoneyBoxInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('user.name')
-                    ->label('User'),
-                TextEntry::make('category.name')
-                    ->label('Category')
-                    ->placeholder('-'),
-                TextEntry::make('title'),
-                TextEntry::make('slug'),
-                TextEntry::make('description')
-                    ->placeholder('-')
-                    ->columnSpanFull(),
-                TextEntry::make('goal_amount')
-                    ->numeric()
-                    ->placeholder('-'),
-                TextEntry::make('currency_code'),
-                TextEntry::make('visibility')
-                    ->badge(),
-                TextEntry::make('contributor_identity')
-                    ->badge(),
-                TextEntry::make('amount_type')
-                    ->badge(),
-                TextEntry::make('fixed_amount')
-                    ->numeric()
-                    ->placeholder('-'),
-                TextEntry::make('minimum_amount')
-                    ->numeric()
-                    ->placeholder('-'),
-                TextEntry::make('maximum_amount')
-                    ->numeric()
-                    ->placeholder('-'),
-                TextEntry::make('start_date')
-                    ->dateTime()
-                    ->placeholder('-'),
-                TextEntry::make('end_date')
-                    ->dateTime()
-                    ->placeholder('-'),
-                IconEntry::make('is_ongoing')
-                    ->boolean(),
-                TextEntry::make('qr_code_path')
-                    ->placeholder('-'),
-                TextEntry::make('total_contributions')
-                    ->numeric(),
-                TextEntry::make('contribution_count')
-                    ->numeric(),
-                IconEntry::make('is_active')
-                    ->boolean(),
-                TextEntry::make('created_at')
-                    ->dateTime()
-                    ->placeholder('-'),
-                TextEntry::make('updated_at')
-                    ->dateTime()
-                    ->placeholder('-'),
-                TextEntry::make('deleted_at')
-                    ->dateTime()
-                    ->visible(fn (MoneyBox $record): bool => $record->trashed()),
+                Section::make('Box Overview')
+                    ->columns(3)
+                    ->schema([
+                        TextEntry::make('user.name')
+                            ->label('Owner'),
+                        TextEntry::make('category.name')
+                            ->label('Category')
+                            ->placeholder('—'),
+                        TextEntry::make('currency_code')
+                            ->label('Currency'),
+                        TextEntry::make('title')
+                            ->columnSpan(2),
+                        TextEntry::make('slug')
+                            ->copyable()
+                            ->url(fn ($record) => $record->getPublicUrl())
+                            ->openUrlInNewTab(),
+                        TextEntry::make('description')
+                            ->placeholder('—')
+                            ->columnSpanFull(),
+                    ]),
+
+                Section::make('Settings')
+                    ->columns(3)
+                    ->schema([
+                        TextEntry::make('visibility')
+                            ->badge(),
+                        TextEntry::make('contributor_identity')
+                            ->badge(),
+                        TextEntry::make('amount_type')
+                            ->badge(),
+                        TextEntry::make('goal_amount')
+                            ->money('GHS')
+                            ->placeholder('No goal'),
+                        TextEntry::make('fixed_amount')
+                            ->money('GHS')
+                            ->placeholder('—'),
+                        TextEntry::make('minimum_amount')
+                            ->money('GHS')
+                            ->placeholder('—'),
+                        TextEntry::make('maximum_amount')
+                            ->money('GHS')
+                            ->placeholder('—'),
+                        TextEntry::make('start_date')
+                            ->dateTime()
+                            ->placeholder('—'),
+                        TextEntry::make('end_date')
+                            ->dateTime()
+                            ->placeholder('—'),
+                        IconEntry::make('is_ongoing')
+                            ->label('Ongoing')
+                            ->boolean(),
+                        IconEntry::make('is_active')
+                            ->label('Active')
+                            ->boolean(),
+                    ]),
+
+                Section::make('Stats')
+                    ->columns(3)
+                    ->schema([
+                        TextEntry::make('total_contributions')
+                            ->label('Total Raised')
+                            ->money('GHS'),
+                        TextEntry::make('contribution_count')
+                            ->label('Contributions')
+                            ->numeric(),
+                        TextEntry::make('created_at')
+                            ->dateTime(),
+                        TextEntry::make('updated_at')
+                            ->dateTime(),
+                        TextEntry::make('deleted_at')
+                            ->dateTime()
+                            ->placeholder('—')
+                            ->visible(fn (MoneyBox $record): bool => $record->trashed()),
+                    ]),
             ]);
     }
 }

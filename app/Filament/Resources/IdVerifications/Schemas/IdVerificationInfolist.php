@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\IdVerifications\Schemas;
 
+use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
@@ -11,34 +12,61 @@ class IdVerificationInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('user.name')
-                    ->label('User'),
-                TextEntry::make('id_type'),
-                TextEntry::make('first_name'),
-                TextEntry::make('last_name'),
-                TextEntry::make('other_names')
-                    ->placeholder('-'),
-                TextEntry::make('id_number')
-                    ->placeholder('-'),
-                TextEntry::make('status'),
-                TextEntry::make('rejection_reason')
-                    ->placeholder('-')
-                    ->columnSpanFull(),
-                TextEntry::make('verified_by')
-                    ->numeric()
-                    ->placeholder('-'),
-                TextEntry::make('verified_at')
-                    ->dateTime()
-                    ->placeholder('-'),
-                TextEntry::make('expires_at')
-                    ->dateTime()
-                    ->placeholder('-'),
-                TextEntry::make('created_at')
-                    ->dateTime()
-                    ->placeholder('-'),
-                TextEntry::make('updated_at')
-                    ->dateTime()
-                    ->placeholder('-'),
+                Section::make('Identity')
+                    ->columns(3)
+                    ->schema([
+                        TextEntry::make('user.name')
+                            ->label('Account Holder'),
+                        TextEntry::make('user.email')
+                            ->label('Email')
+                            ->copyable(),
+                        TextEntry::make('status')
+                            ->badge()
+                            ->colors([
+                                'warning' => 'pending',
+                                'success' => 'approved',
+                                'danger'  => 'rejected',
+                            ]),
+                        TextEntry::make('first_name'),
+                        TextEntry::make('last_name'),
+                        TextEntry::make('other_names')
+                            ->placeholder('—'),
+                        TextEntry::make('id_type')
+                            ->label('ID Type')
+                            ->formatStateUsing(fn ($state) => match ($state) {
+                                'passport'       => 'Passport',
+                                'national_card'  => 'Ghana Card',
+                                'drivers_license' => "Driver's License",
+                                default          => $state,
+                            }),
+                        TextEntry::make('id_number')
+                            ->label('ID Number')
+                            ->copyable()
+                            ->placeholder('—'),
+                        TextEntry::make('expires_at')
+                            ->label('ID Expires')
+                            ->date()
+                            ->placeholder('—'),
+                    ]),
+
+                Section::make('Review')
+                    ->columns(3)
+                    ->schema([
+                        TextEntry::make('verifiedBy.name')
+                            ->label('Reviewed By')
+                            ->placeholder('Not yet reviewed'),
+                        TextEntry::make('verified_at')
+                            ->label('Reviewed At')
+                            ->dateTime()
+                            ->placeholder('—'),
+                        TextEntry::make('created_at')
+                            ->label('Submitted At')
+                            ->dateTime(),
+                        TextEntry::make('rejection_reason')
+                            ->placeholder('—')
+                            ->columnSpanFull()
+                            ->visible(fn ($record) => $record->status === 'rejected'),
+                    ]),
             ]);
     }
 }

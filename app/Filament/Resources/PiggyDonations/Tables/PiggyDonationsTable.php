@@ -2,12 +2,13 @@
 
 namespace App\Filament\Resources\PiggyDonations\Tables;
 
+use App\Enums\PaymentStatus;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class PiggyDonationsTable
@@ -15,48 +16,56 @@ class PiggyDonationsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('piggyBox.title')
+                    ->label('Piggy Box')
+                    ->limit(25)
                     ->searchable(),
                 TextColumn::make('donor_name')
+                    ->label('Donor')
+                    ->formatStateUsing(fn ($state, $record) => $record->is_anonymous ? 'Anonymous' : ($state ?? '—'))
                     ->searchable(),
                 TextColumn::make('donor_email')
-                    ->searchable(),
-                TextColumn::make('donor_phone')
-                    ->searchable(),
+                    ->label('Email')
+                    ->searchable()
+                    ->copyable()
+                    ->toggleable(),
                 TextColumn::make('amount')
-                    ->numeric()
+                    ->money('GHS')
                     ->sortable(),
-                TextColumn::make('currency_code')
-                    ->searchable(),
-                IconColumn::make('is_anonymous')
-                    ->boolean(),
-                TextColumn::make('payment_provider')
-                    ->searchable(),
-                TextColumn::make('payment_method')
-                    ->searchable(),
-                TextColumn::make('payment_reference')
-                    ->searchable(),
                 TextColumn::make('payment_status')
                     ->badge()
-                    ->searchable(),
-                TextColumn::make('ip_address')
-                    ->searchable(),
+                    ->colors([
+                        'success' => PaymentStatus::Completed,
+                        'warning' => PaymentStatus::Pending,
+                        'danger'  => PaymentStatus::Failed,
+                        'gray'    => PaymentStatus::Refunded,
+                    ])
+                    ->sortable(),
+                TextColumn::make('payment_reference')
+                    ->label('Reference')
+                    ->searchable()
+                    ->copyable()
+                    ->toggleable(),
+                TextColumn::make('payment_method')
+                    ->label('Method')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                IconColumn::make('is_anonymous')
+                    ->label('Anon')
+                    ->boolean()
+                    ->toggleable(),
                 TextColumn::make('created_at')
+                    ->label('Date')
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('payment_status')
+                    ->options(PaymentStatus::class),
             ])
             ->recordActions([
                 ViewAction::make(),
-                EditAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

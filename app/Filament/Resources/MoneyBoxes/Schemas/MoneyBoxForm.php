@@ -20,19 +20,26 @@ class MoneyBoxForm
             ->components([
                 Select::make('user_id')
                     ->relationship('user', 'name')
+                    ->searchable()
+                    ->preload()
                     ->required(),
                 Select::make('category_id')
-                    ->relationship('category', 'name'),
+                    ->relationship('category', 'name')
+                    ->searchable()
+                    ->preload(),
                 TextInput::make('title')
                     ->required(),
                 TextInput::make('slug')
-                    ->required(),
+                    ->required()
+                    ->unique(ignoreRecord: true),
                 Textarea::make('description')
                     ->columnSpanFull(),
-                TextInput::make('goal_amount')
-                    ->numeric(),
                 TextInput::make('currency_code')
-                    ->required(),
+                    ->required()
+                    ->default('GHS'),
+                TextInput::make('goal_amount')
+                    ->numeric()
+                    ->minValue(0),
                 Select::make('visibility')
                     ->options(Visibility::class)
                     ->default('public')
@@ -46,26 +53,22 @@ class MoneyBoxForm
                     ->default('variable')
                     ->required(),
                 TextInput::make('fixed_amount')
-                    ->numeric(),
+                    ->numeric()
+                    ->minValue(0),
                 TextInput::make('minimum_amount')
-                    ->numeric(),
+                    ->numeric()
+                    ->minValue(0),
                 TextInput::make('maximum_amount')
-                    ->numeric(),
+                    ->numeric()
+                    ->minValue(0),
                 DateTimePicker::make('start_date'),
                 DateTimePicker::make('end_date'),
                 Toggle::make('is_ongoing')
-                    ->required(),
-                TextInput::make('qr_code_path'),
-                TextInput::make('total_contributions')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-                TextInput::make('contribution_count')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
+                    ->label('No end date (ongoing)')
+                    ->default(false),
                 Toggle::make('is_active')
-                    ->required(),
+                    ->label('Active')
+                    ->default(true),
             ]);
     }
 }
