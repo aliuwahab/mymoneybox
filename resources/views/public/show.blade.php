@@ -70,8 +70,8 @@
         </div>
 
         {{-- pub-shell: the campaign card ──────────────────────────────────────── --}}
-        <div class="max-w-[980px] mx-auto"
-             style="background:#F7F5EF;border:1px solid #E6E3DC;border-radius:12px;padding:28px;display:grid;grid-template-columns:1.2fr 1fr;gap:24px;align-items:start;">
+        <div class="pub-shell max-w-[980px] mx-auto"
+             style="background:#F7F5EF;border:1px solid #E6E3DC;border-radius:12px;padding:28px;align-items:start;">
 
             {{-- ── LEFT: pill + title + description + progress + form ── --}}
             <div id="contribute-form" style="display:flex;flex-direction:column;gap:20px;">
@@ -282,7 +282,7 @@
             </div>
 
             {{-- ── RIGHT: cover visual + contributors + QR/share ── --}}
-            <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:84px;">
+            <div class="pub-right" style="display:flex;flex-direction:column;gap:16px;">
 
                 {{-- Campaign cover visual --}}
                 <div style="height:200px;border-radius:10px;overflow:hidden;position:relative;
@@ -420,18 +420,39 @@
         }
     </style>
 
-    {{-- Mobile responsive overrides --}}
     <style>
+        /* Desktop: two-column grid */
+        .pub-shell {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 24px;
+        }
+        .pub-right {
+            position: sticky;
+            top: 84px;
+        }
+
+        /* Mobile: single column, right col drops below */
         @media (max-width: 768px) {
-            .max-w-\[980px\] > div[style*="grid-template-columns"] {
-                grid-template-columns: 1fr !important;
+            .pub-shell {
+                grid-template-columns: 1fr;
+                padding: 20px !important;
             }
-            .max-w-\[980px\] > div[style*="grid-template-columns"] > div:last-child {
-                position: static !important;
+            .pub-right {
+                position: static;
             }
         }
-        @media (max-width: 640px) {
-            .max-w-\[980px\] { margin: 0 !important; border-radius: 0 !important; border-left: 0 !important; border-right: 0 !important; }
+
+        /* Small mobile: remove card borders for edge-to-edge feel */
+        @media (max-width: 600px) {
+            .pub-shell {
+                border-radius: 0 !important;
+                border-left: 0 !important;
+                border-right: 0 !important;
+                margin-left: -1rem !important;
+                margin-right: -1rem !important;
+                padding: 16px !important;
+            }
         }
     </style>
 </x-layouts.guest>
