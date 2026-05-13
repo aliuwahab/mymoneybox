@@ -39,6 +39,7 @@ class MoneyBox extends Model implements HasMedia
         'total_contributions',
         'contribution_count',
         'is_active',
+        'is_featured',
         'fee_percentage',
     ];
 
@@ -50,6 +51,7 @@ class MoneyBox extends Model implements HasMedia
         'end_date' => 'datetime',
         'is_ongoing' => 'boolean',
         'is_active' => 'boolean',
+        'is_featured' => 'boolean',
         'goal_amount' => 'decimal:2',
         'fixed_amount' => 'decimal:2',
         'minimum_amount' => 'decimal:2',

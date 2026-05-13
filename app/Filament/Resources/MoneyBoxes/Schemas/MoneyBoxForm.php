@@ -69,6 +69,10 @@ class MoneyBoxForm
                 Toggle::make('is_active')
                     ->label('Active')
                     ->default(true),
+                Toggle::make('is_featured')
+                    ->label('Featured on homepage')
+                    ->helperText('Only one box should be featured at a time. Enabling this on a new box will not auto-disable others — unset the previous manually.')
+                    ->default(false),
                 TextInput::make('fee_percentage')
                     ->label('Fee override (%)')
                     ->numeric()
