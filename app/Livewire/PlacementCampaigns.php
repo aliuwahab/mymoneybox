@@ -12,13 +12,24 @@ class PlacementCampaigns extends Component
     #[Computed]
     public function campaigns(): Collection
     {
-        return MoneyBox::with(['user', 'category'])
+        $base = fn () => MoneyBox::with(['user', 'category'])
             ->public()
-            ->active()
+            ->active();
+
+        $campaigns = $base()
             ->where('is_featured', false)
             ->latest()
             ->take(3)
             ->get();
+
+        if ($campaigns->isEmpty()) {
+            $campaigns = $base()
+                ->latest()
+                ->take(3)
+                ->get();
+        }
+
+        return $campaigns;
     }
 
     public function render()
