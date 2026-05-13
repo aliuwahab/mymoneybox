@@ -350,10 +350,10 @@
         <div class="nav-cta">
             @auth
                 <a class="btn ghost" href="{{ route('dashboard') }}">Dashboard</a>
-                <a class="btn primary" href="{{ route('dashboard') }}">Open console</a>
+                <a class="btn primary" href="{{ route('money-boxes.create') }}">Create a box</a>
             @else
                 <a class="btn ghost" href="{{ route('login') }}">Sign in</a>
-                <a class="btn primary" href="{{ route('register') }}">Open console</a>
+                <a class="btn primary" href="{{ route('register') }}">Get started</a>
             @endauth
         </div>
     </div>
@@ -753,7 +753,7 @@
                     <li><a href="#features">Features</a></li>
                     <li><a href="#how">How it works</a></li>
                     <li><a href="#pricing">Pricing</a></li>
-                    <li><a href="{{ route('dashboard') }}">Console</a></li>
+                    <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
                 </ul>
             </div>
             <div>
