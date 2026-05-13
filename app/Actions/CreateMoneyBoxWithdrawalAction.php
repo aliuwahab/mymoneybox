@@ -30,7 +30,7 @@ class CreateMoneyBoxWithdrawalAction
             }
 
             $account = WithdrawalAccount::findOrFail($data->withdrawalAccountId);
-            $feeData = $this->calculateFee->execute($data->amount);
+            $feeData = $this->calculateFee->execute($data->amount, $moneyBox->getEffectiveFeePercentage());
 
             $withdrawal = MoneyBoxWithdrawal::create([
                 'money_box_id'          => $moneyBox->id,

@@ -20,12 +20,14 @@ class PiggyBox extends Model implements HasMedia
         'total_received',
         'donation_count',
         'is_active',
+        'fee_percentage',
     ];
 
     protected $casts = [
         'total_received' => 'decimal:2',
         'donation_count' => 'integer',
         'is_active' => 'boolean',
+        'fee_percentage' => 'decimal:2',
     ];
 
     // Relationships
@@ -42,6 +44,11 @@ class PiggyBox extends Model implements HasMedia
     public function withdrawals(): HasMany
     {
         return $this->hasMany(PiggyBoxWithdrawal::class);
+    }
+
+    public function getEffectiveFeePercentage(): float
+    {
+        return (float) ($this->fee_percentage ?? config('withdrawal.fee_percentage', 2.5));
     }
 
     // Helper Methods

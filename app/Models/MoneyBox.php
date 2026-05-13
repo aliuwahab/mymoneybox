@@ -39,6 +39,7 @@ class MoneyBox extends Model implements HasMedia
         'total_contributions',
         'contribution_count',
         'is_active',
+        'fee_percentage',
     ];
 
     protected $casts = [
@@ -55,6 +56,7 @@ class MoneyBox extends Model implements HasMedia
         'maximum_amount' => 'decimal:2',
         'total_contributions' => 'decimal:2',
         'contribution_count' => 'integer',
+        'fee_percentage' => 'decimal:2',
     ];
 
     // Relationships
@@ -76,6 +78,11 @@ class MoneyBox extends Model implements HasMedia
     public function withdrawals(): HasMany
     {
         return $this->hasMany(MoneyBoxWithdrawal::class);
+    }
+
+    public function getEffectiveFeePercentage(): float
+    {
+        return (float) ($this->fee_percentage ?? config('withdrawal.fee_percentage', 2.5));
     }
 
     // Scopes

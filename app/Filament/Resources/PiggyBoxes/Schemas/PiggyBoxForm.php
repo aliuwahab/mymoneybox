@@ -16,6 +16,8 @@ class PiggyBoxForm
             ->components([
                 Select::make('user_id')
                     ->relationship('user', 'name')
+                    ->searchable()
+                    ->preload()
                     ->required(),
                 TextInput::make('title')
                     ->required()
@@ -23,17 +25,19 @@ class PiggyBoxForm
                 Textarea::make('description')
                     ->columnSpanFull(),
                 TextInput::make('currency_code')
-                    ->required(),
-                TextInput::make('total_received')
                     ->required()
-                    ->numeric()
-                    ->default(0),
-                TextInput::make('donation_count')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
+                    ->default('GHS'),
                 Toggle::make('is_active')
-                    ->required(),
+                    ->label('Active')
+                    ->default(true),
+                TextInput::make('fee_percentage')
+                    ->label('Fee override (%)')
+                    ->numeric()
+                    ->minValue(0)
+                    ->maxValue(100)
+                    ->step(0.01)
+                    ->placeholder(config('withdrawal.fee_percentage', 2.5))
+                    ->helperText('Leave blank to use the global default (' . config('withdrawal.fee_percentage', 2.5) . '%). Set a custom percentage to override for this piggy box only.'),
             ]);
     }
 }

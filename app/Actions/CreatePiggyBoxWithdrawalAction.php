@@ -30,7 +30,7 @@ class CreatePiggyBoxWithdrawalAction
             }
 
             $account = WithdrawalAccount::findOrFail($data->withdrawalAccountId);
-            $feeData = $this->calculateFee->execute($data->amount);
+            $feeData = $this->calculateFee->execute($data->amount, $piggyBox->getEffectiveFeePercentage());
 
             $withdrawal = PiggyBoxWithdrawal::create([
                 'piggy_box_id'          => $piggyBox->id,

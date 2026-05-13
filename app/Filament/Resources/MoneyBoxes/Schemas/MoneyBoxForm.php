@@ -69,6 +69,14 @@ class MoneyBoxForm
                 Toggle::make('is_active')
                     ->label('Active')
                     ->default(true),
+                TextInput::make('fee_percentage')
+                    ->label('Fee override (%)')
+                    ->numeric()
+                    ->minValue(0)
+                    ->maxValue(100)
+                    ->step(0.01)
+                    ->placeholder(config('withdrawal.fee_percentage', 2.5))
+                    ->helperText('Leave blank to use the global default (' . config('withdrawal.fee_percentage', 2.5) . '%). Set a custom percentage (e.g. 0 for fee-free) to override for this box only.'),
             ]);
     }
 }

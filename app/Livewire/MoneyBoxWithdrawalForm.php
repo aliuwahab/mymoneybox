@@ -56,7 +56,7 @@ class MoneyBoxWithdrawalForm extends Component
         }
 
         $calculator = app(CalculateWithdrawalFeeAction::class);
-        $this->feeData = $calculator->execute((float) $this->amount);
+        $this->feeData = $calculator->execute((float) $this->amount, $this->moneyBox->getEffectiveFeePercentage());
     }
 
     public function openModal(): void
