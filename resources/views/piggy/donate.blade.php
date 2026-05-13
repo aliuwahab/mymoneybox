@@ -91,7 +91,7 @@
                     </div>
 
                     <!-- Hidden Email Field (required by validation but not shown) -->
-                    <input type="hidden" name="donor_email" value="noreply@mymoneybox.com">
+                    <input type="hidden" name="donor_email" value="noreply@mypiggybox.com">
 
                     <!-- Submit Button -->
                     <button

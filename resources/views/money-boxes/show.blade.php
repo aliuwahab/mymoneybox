@@ -395,7 +395,7 @@
                         <div>
                             <div class="text-[12.5px] font-medium text-[#6B6862] mb-1.5">Public link</div>
                             <div class="flex items-center border border-[#E6E3DC] rounded-[6px] bg-white px-2.5 overflow-hidden">
-                                <span class="text-[13px] text-[#9C998F] shrink-0">mymoneybox.app/</span>
+                                <span class="text-[13px] text-[#9C998F] shrink-0">mypiggybox.com/</span>
                                 <input type="text" value="{{ $moneyBox->slug }}" readonly
                                        class="flex-1 border-0 py-2 text-[13.5px] bg-transparent focus:ring-0 focus:outline-none px-0" />
                                 <button

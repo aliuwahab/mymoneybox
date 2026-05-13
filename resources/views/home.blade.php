@@ -527,24 +527,11 @@
             <div class="v-card main">
                 <div class="vc-head">
                     <span class="vc-dot r"></span><span class="vc-dot y"></span><span class="vc-dot g"></span>
-                    <span class="vc-title">mypiggybox.app / kwame-adwoa-wedding</span>
+                    <span class="vc-title">mypiggybox.com / kwame-adwoa-wedding</span>
                 </div>
                 <div class="vc-body">
-                    @php
-                        $heroBox = ($featuredMoneyBoxes ?? collect())->first();
-                        $heroImage = $heroBox?->getMainImageUrl();
-                        $heroInitials = $heroBox
-                            ? strtoupper(collect(explode(' ', $heroBox->title))->take(2)->map(fn($w) => substr($w, 0, 1))->implode(''))
-                            : 'K&A';
-                    @endphp
                     <div class="vc-cover">
-                        @if($heroImage)
-                            <img class="vc-cover-img" src="{{ $heroImage }}" alt="">
-                            <div class="vc-cover-shade"></div>
-                            <div class="vc-cover-initials">{{ $heroInitials }}</div>
-                        @else
-                            K&amp;A
-                        @endif
+                        K&amp;A
                     </div>
                     <div class="vc-h2">Kwame &amp; Adwoa's Wedding Fund</div>
                     <div class="vc-sub">87 contributors · ends Jun 14</div>
@@ -837,7 +824,7 @@
             <div>
                 <span class="kicker">Common questions</span>
                 <h2 class="section-title" style="margin-top:12px">Everything you'd want to ask, before signing up.</h2>
-                <p class="section-sub" style="margin-top:18px">Still curious? Reach our team at <a style="color:var(--accent); font-weight:500" href="mailto:hello@mymoneybox.app">hello@mymoneybox.app</a> — we usually reply within an hour.</p>
+                <p class="section-sub" style="margin-top:18px">Still curious? Reach our team at <a style="color:var(--accent); font-weight:500" href="mailto:hello@mypiggybox.com">hello@mypiggybox.com</a> — we usually reply within an hour.</p>
             </div>
             <div class="faq-list">
                 <details class="faq-item" open>
@@ -925,7 +912,7 @@
                     <li><a href="{{ route('about') }}">About</a></li>
                     <li><a href="#">Careers</a></li>
                     <li><a href="#">Press</a></li>
-                    <li><a href="mailto:hello@mymoneybox.app">Contact</a></li>
+                    <li><a href="mailto:hello@mypiggybox.com">Contact</a></li>
                 </ul>
             </div>
             <div>
