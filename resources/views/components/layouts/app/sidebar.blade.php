@@ -16,7 +16,7 @@
                         M
                     </div>
                     <div>
-                        <div class="text-[14.5px] font-semibold tracking-tight text-[#15140F] leading-none">MyMoneyBox</div>
+                        <div class="text-[14.5px] font-semibold tracking-tight text-[#15140F] leading-none">MyPiggyBox</div>
                         <div class="text-[11px] text-[#9C998F] mt-0.5">
                             {{ auth()->user()->country?->name ?? 'Ghana' }} · {{ auth()->user()->country?->currency_code ?? 'GHS' }}
                         </div>
@@ -165,7 +165,7 @@
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
             <div class="flex items-center gap-2 ms-3">
                 <div class="w-6 h-6 rounded-[5px] bg-[#15140F] text-[#FAFAF7] grid place-items-center text-[11px] font-bold">M</div>
-                <span class="text-[13.5px] font-semibold text-[#15140F]">MyMoneyBox</span>
+                <span class="text-[13.5px] font-semibold text-[#15140F]">MyPiggyBox</span>
             </div>
             <flux:spacer />
             <flux:dropdown position="bottom" align="end">
