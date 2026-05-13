@@ -252,21 +252,6 @@
         .step h4 { font-size: 18px; font-weight: 600; margin: 0 0 8px; letter-spacing: -0.005em; }
         .step p { color: var(--fg-2); font-size: 14px; margin: 0; line-height: 1.6; }
 
-        /* USE CASES */
-        .cases { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-        .case { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: transform .15s, box-shadow .15s; }
-        .case:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); }
-        .case-cover { height: 130px; position: relative; display: grid; place-items: center; color: rgba(255,255,255,0.95); font-family: 'Instrument Serif', serif; font-size: 40px; }
-        .case-cover.c1 { background: linear-gradient(135deg, #1B6B4E 0%, #2E8E6C 100%); }
-        .case-cover.c2 { background: linear-gradient(135deg, #B8810D 0%, #E0A535 100%); }
-        .case-cover.c3 { background: linear-gradient(135deg, #2E3A38 0%, #4F605C 100%); }
-        .case-cover.c4 { background: linear-gradient(135deg, #883647 0%, #B85773 100%); }
-        .case-cover.c5 { background: linear-gradient(135deg, #3F2A6E 0%, #6B4DB8 100%); }
-        .case-cover.c6 { background: linear-gradient(135deg, #1F4068 0%, #3B6FA8 100%); }
-        .case-body { padding: 18px; }
-        .case h5 { font-size: 15px; font-weight: 600; margin: 0 0 4px; letter-spacing: -0.005em; }
-        .case .case-meta { color: var(--fg-3); font-size: 12.5px; }
-
         /* QUOTE / METRICS */
         .quote-section { background: var(--accent-deep); color: #F5F1EA; }
         .quote-section .wrap { padding-top: 100px; padding-bottom: 100px; }
@@ -337,13 +322,11 @@
             .v-card.float, .v-card.float-2 { display: none; }
             .feat.f-wide, .feat.f-narrow, .feat.f-third { grid-column: span 12; }
             .steps, .pricing { grid-template-columns: 1fr; }
-            .cases { grid-template-columns: repeat(2, 1fr); }
             .foot-grid { grid-template-columns: 1fr 1fr; }
             .logos-row { grid-template-columns: repeat(3, 1fr); }
         }
         @media (max-width: 640px) {
             .nav-links { display: none; }
-            .cases { grid-template-columns: 1fr; }
             .quote-aside { grid-template-columns: 1fr; }
         }
     </style>
@@ -609,28 +592,7 @@
     </div>
 </section>
 
-<!-- USE CASES -->
-<section class="section" id="cases">
-    <div class="wrap">
-        <div class="section-head">
-            <div>
-                <span class="kicker">Use cases</span>
-                <h2 class="section-title">Built for any moment worth gathering for.</h2>
-            </div>
-            <p class="section-sub">From a wedding gift pool to a community library, from medical treatment to your team's offsite — MyMoneyBox adapts to the occasion.</p>
-        </div>
-        <div class="cases">
-            <div class="case"><div class="case-cover c1">K&amp;A</div><div class="case-body"><h5>Weddings &amp; engagements</h5><div class="case-meta">Honeymoon funds, gift pools</div></div></div>
-            <div class="case"><div class="case-cover c2">M</div><div class="case-body"><h5>Medical care</h5><div class="case-meta">Treatments, surgeries, recovery</div></div></div>
-            <div class="case"><div class="case-cover c3">S</div><div class="case-body"><h5>Scholarships</h5><div class="case-meta">Tuition, books, mentorship</div></div></div>
-            <div class="case"><div class="case-cover c4">T</div><div class="case-body"><h5>Team &amp; offsites</h5><div class="case-meta">Retreats, parties, gifts</div></div></div>
-            <div class="case"><div class="case-cover c5">C</div><div class="case-body"><h5>Community projects</h5><div class="case-meta">Libraries, water, clean-ups</div></div></div>
-            <div class="case"><div class="case-cover c6">B</div><div class="case-body"><h5>Birthdays &amp; baby</h5><div class="case-meta">Cake funds, nursery gifts</div></div></div>
-            <div class="case"><div class="case-cover c2">F</div><div class="case-body"><h5>Funeral support</h5><div class="case-meta">Memorial expenses, family aid</div></div></div>
-            <div class="case"><div class="case-cover c1">R</div><div class="case-body"><h5>Religious causes</h5><div class="case-meta">Building funds, missions</div></div></div>
-        </div>
-    </div>
-</section>
+<x-use-cases-bento />
 
 <!-- QUOTE / METRICS -->
 <section class="quote-section">
