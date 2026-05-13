@@ -197,8 +197,9 @@
                 </div>
 
                 <div class="featured-cta">
+                    @php $firstName = trim(explode(' ', $box->user->name ?? '')[0] ?? ''); @endphp
                     <a class="btn primary lg" href="{{ $box->getPublicUrl() }}">
-                        Contribute now
+                        {{ $firstName ? "Contribute to {$firstName}'s journey" : 'Contribute now' }}
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </a>
                     <a class="btn lg" href="{{ route('money-boxes.share', $box) }}">
@@ -209,13 +210,13 @@
 
                 <div class="featured-recent">
                     @php
-                        $recentContribs = $box->contributions()->with('user')->latest()->take(5)->get();
+                        $recentContribs = $box->contributions()->latest()->take(5)->get();
                         $avatarColors = ['#1B6B4E', '#B8810D', '#883647', '#3F2A6E', '#2E3A38'];
                     @endphp
                     <div class="av-stack">
                         @foreach($recentContribs->take(5) as $i => $contrib)
                             @php
-                                $cName = $contrib->user?->name ?? ($contrib->contributor_name ?? 'Anonymous');
+                                $cName = $contrib->getDisplayName();
                                 $cInitials = strtoupper(substr($cName, 0, 1) . (strstr($cName, ' ') ? substr(strstr($cName, ' '), 1, 1) : substr($cName, 1, 1)));
                                 $avColor = $avatarColors[$i % count($avatarColors)];
                             @endphp

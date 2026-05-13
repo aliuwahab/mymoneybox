@@ -75,7 +75,7 @@
                 <span class="kicker">Use cases</span>
                 <h2 class="section-title">Built for any moment worth gathering for.</h2>
             </div>
-            <p class="section-sub">From a wedding gift pool to a community library, from medical treatment to your team's offsite — MyMoneyBox adapts to the occasion.</p>
+            <p class="section-sub">From a wedding gift pool to a community library, from medical treatment to your team's offsite — MyPiggyBox adapts to the occasion.</p>
         </div>
 
         {{-- Bento grid --}}

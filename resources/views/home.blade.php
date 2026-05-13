@@ -188,7 +188,7 @@
         .logos-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 32px; align-items: center; justify-items: center; color: var(--fg-2); }
         .logo { font-family: 'Instrument Serif', serif; font-size: 22px; letter-spacing: -0.01em; opacity: 0.6; transition: opacity .15s; }
         .logo.alt { font-family: 'Inter'; font-weight: 600; letter-spacing: -0.02em; font-size: 18px; }
-        .logo.mono-f { font-family: 'JetBrains Mono'; font-size: 14px; letter-spacing: 0.02em; font-weight: 500; }
+        .logo.mono { font-family: 'JetBrains Mono'; font-size: 14px; letter-spacing: 0.02em; font-weight: 500; }
         .logo:hover { opacity: 0.95; }
 
         /* SECTION SHELL */
@@ -495,7 +495,7 @@
             <div class="v-card main">
                 <div class="vc-head">
                     <span class="vc-dot r"></span><span class="vc-dot y"></span><span class="vc-dot g"></span>
-                    <span class="vc-title">mymoneybox.app / kwame-adwoa-wedding</span>
+                    <span class="vc-title">mypiggybox.app / kwame-adwoa-wedding</span>
                 </div>
                 <div class="vc-body">
                     <div class="vc-cover">K&amp;A</div>
@@ -551,7 +551,7 @@
             <span class="logo">Akoma Foundation</span>
             <span class="logo alt">Sankofa Health</span>
             <span class="logo">Asanteman</span>
-            <span class="logo mono-f">PIVOT.LABS</span>
+            <span class="logo mono">PIVOT.LABS</span>
             <span class="logo alt">Otumfuo Scholars</span>
             <span class="logo">Volta Co-op</span>
         </div>
@@ -716,7 +716,7 @@
                 </div>
             </div>
             <div class="quote-aside">
-                <div class="qstat"><div class="num">₵4.2M</div><div class="lab">Contributed to date across all MyPiggyBox campaigns</div></div>
+                <div class="qstat"><div class="num">₵4.2M</div><div class="lab">Contributed to date across all MyPiggyBox communities</div></div>
                 <div class="qstat"><div class="num">12k+</div><div class="lab">Active boxes — weddings, medical, education, more</div></div>
                 <div class="qstat"><div class="num">2.4×</div><div class="lab">More raised vs. ad-hoc bank transfers, on average</div></div>
                 <div class="qstat"><div class="num">48s</div><div class="lab">Median time to set up your first box from sign-up</div></div>
@@ -838,10 +838,10 @@
         <p>It takes about a minute. No credit card, no commitment. Just a clean link, a QR code, and somewhere for the love to land.</p>
         <div class="btn-row" style="justify-content:center">
             <a class="btn primary lg" href="{{ route('register') }}">
-                Create a piggy box
+                Create a money box
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </a>
-            <a class="btn lg" href="{{ route('browse') }}">Browse boxes</a>
+            <a class="btn lg" href="{{ route('dashboard') }}">See the console</a>
         </div>
     </div>
 </section>
@@ -860,7 +860,7 @@
                     <li><a href="#features">Features</a></li>
                     <li><a href="#how">How it works</a></li>
                     <li><a href="#pricing">Pricing</a></li>
-                    <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ route('dashboard') }}">Console</a></li>
                 </ul>
             </div>
             <div>
@@ -876,7 +876,8 @@
                 <h6>Company</h6>
                 <ul>
                     <li><a href="{{ route('about') }}">About</a></li>
-                    <li><a href="{{ route('browse') }}">Browse</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press</a></li>
                     <li><a href="mailto:hello@mymoneybox.app">Contact</a></li>
                 </ul>
             </div>
@@ -885,6 +886,8 @@
                 <ul>
                     <li><a href="{{ route('privacy') }}">Privacy</a></li>
                     <li><a href="{{ route('terms') }}">Terms</a></li>
+                    <li><a href="#">Security</a></li>
+                    <li><a href="#">Status</a></li>
                 </ul>
             </div>
         </div>
@@ -893,6 +896,7 @@
             <div class="legal">
                 <a href="{{ route('privacy') }}">Privacy</a>
                 <a href="{{ route('terms') }}">Terms</a>
+                <a href="#">Cookies</a>
             </div>
         </div>
     </div>
