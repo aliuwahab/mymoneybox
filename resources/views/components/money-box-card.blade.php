@@ -14,15 +14,18 @@
 
     {{-- Cover --}}
     <div class="p-3.5 pb-0">
-        <div class="{{ $cover }} h-[90px] rounded-[6px] relative overflow-hidden">
-            @if($moneyBox->hasMedia('main'))
-                <img src="{{ $moneyBox->getMainImageUrl() }}" alt="" class="absolute inset-0 w-full h-full object-cover">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-            @endif
-            <div class="absolute inset-0 grid place-items-center text-white/90 font-serif text-[28px] tracking-wide">
-                {{ substr($moneyBox->title, 0, 1) }}
+        @if($moneyBox->hasMedia('main'))
+            <div class="h-[160px] rounded-[6px] relative overflow-hidden">
+                <img src="{{ $moneyBox->getMainImageUrl() }}" alt="{{ $moneyBox->title }}" class="absolute inset-0 w-full h-full object-cover object-center">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
             </div>
-        </div>
+        @else
+            <div class="{{ $cover }} h-[90px] rounded-[6px] relative overflow-hidden">
+                <div class="absolute inset-0 grid place-items-center text-white/90 font-serif text-[28px] tracking-wide">
+                    {{ substr($moneyBox->title, 0, 1) }}
+                </div>
+            </div>
+        @endif
     </div>
 
     <div class="p-4">
