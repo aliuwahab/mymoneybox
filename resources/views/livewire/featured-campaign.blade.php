@@ -197,8 +197,9 @@
                 </div>
 
                 <div class="featured-cta">
+                    @php $firstName = trim(explode(' ', $box->user->name ?? '')[0] ?? ''); @endphp
                     <a class="btn primary lg" href="{{ $box->getPublicUrl() }}">
-                        Contribute now
+                        {{ $firstName ? "Contribute to {$firstName}'s journey" : 'Contribute now' }}
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </a>
                     <a class="btn lg" href="{{ route('money-boxes.share', $box) }}">
