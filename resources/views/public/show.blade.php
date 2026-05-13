@@ -285,11 +285,11 @@
             <div class="pub-right" style="display:flex;flex-direction:column;gap:16px;">
 
                 {{-- Campaign cover visual --}}
-                <div style="height:200px;border-radius:10px;overflow:hidden;position:relative;
+                <div style="border-radius:10px;overflow:hidden;position:relative;aspect-ratio:16/10;
                             {{ $hasImg ? '' : 'background:linear-gradient(135deg,#1B6B4E 0%,#2E8E6C 100%);' }}">
                     @if($hasImg)
                         <img src="{{ $moneyBox->getMainImageUrl() }}" alt="{{ $moneyBox->title }}"
-                             style="width:100%;height:100%;object-fit:cover;display:block;">
+                             style="width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;">
                         <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55) 0%,rgba(0,0,0,.05) 60%,transparent 100%);"></div>
                     @else
                         {{-- Serif initials centered --}}
@@ -426,11 +426,20 @@
             display: grid;
             grid-template-columns: 1.2fr 1fr;
             gap: 24px;
+            align-items: start;
         }
         .pub-right {
             position: sticky;
             top: 84px;
+            align-self: start;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0,0,0,.1) transparent;
         }
+        .pub-right::-webkit-scrollbar { width: 4px; }
+        .pub-right::-webkit-scrollbar-thumb { background: rgba(0,0,0,.1); border-radius: 4px; }
+        .pub-right::-webkit-scrollbar-track { background: transparent; }
 
         /* Mobile: single column, right col drops below */
         @media (max-width: 768px) {

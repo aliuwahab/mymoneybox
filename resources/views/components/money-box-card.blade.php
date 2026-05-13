@@ -15,9 +15,10 @@
     {{-- Cover --}}
     <div class="p-3.5 pb-0">
         @if($moneyBox->hasMedia('main'))
-            <div class="h-[160px] rounded-[6px] relative overflow-hidden">
-                <img src="{{ $moneyBox->getMainImageUrl() }}" alt="{{ $moneyBox->title }}" class="absolute inset-0 w-full h-full object-cover object-center">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+            <div class="rounded-[6px] overflow-hidden" style="aspect-ratio: 16/9;">
+                <img src="{{ $moneyBox->getMainImageUrl() }}" alt="{{ $moneyBox->title }}"
+                     class="w-full h-full object-cover"
+                     style="object-position: center 30%;">
             </div>
         @else
             <div class="{{ $cover }} h-[90px] rounded-[6px] relative overflow-hidden">
