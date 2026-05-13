@@ -147,12 +147,32 @@
             display: grid; place-items: center;
             color: rgba(255,255,255,0.95);
             font-family: 'Instrument Serif', serif; font-size: 44px; letter-spacing: 0.02em;
-            margin-bottom: 16px; position: relative;
+            margin-bottom: 16px; position: relative; overflow: hidden;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
         }
         .vc-cover::after {
             content: 'Wedding · Public'; position: absolute; left: 12px; bottom: 10px;
             font-family: 'Inter', sans-serif; font-size: 10.5px;
-            color: rgba(255,255,255,0.8); letter-spacing: 0.06em; text-transform: uppercase;
+            color: rgba(255,255,255,0.85); letter-spacing: 0.06em; text-transform: uppercase;
+            z-index: 2;
+        }
+        .vc-cover-img {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            object-fit: cover; z-index: 0;
+        }
+        .vc-cover-img + .vc-cover-initials {
+            position: absolute; right: 14px; top: 12px;
+            width: 44px; height: 44px; border-radius: 10px;
+            background: rgba(14,60,44,0.78);
+            border: 1.5px solid rgba(232,199,122,0.9);
+            color: #fff; font-family: 'Instrument Serif', serif; font-size: 20px;
+            display: grid; place-items: center; z-index: 2;
+            backdrop-filter: blur(4px);
+        }
+        .vc-cover-img ~ .vc-cover-shade {
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(14,60,44,0.55) 100%);
+            z-index: 1;
         }
         .vc-h2 { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
         .vc-sub { font-size: 12.5px; color: var(--fg-2); margin: 2px 0 14px; }
@@ -339,6 +359,18 @@
         .featured-cover { position: relative; min-height: 540px; background: #0E3C2C; color: #F5F1EA; padding: 28px; display: flex; flex-direction: column; overflow: hidden; isolation: isolate; }
         .featured-cover .cover-illus { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
         .featured-cover .cover-illus svg { width: 100%; height: 100%; display: block; }
+        .featured-cover .cover-photo {
+            position: absolute; top: 80px; right: 36px; z-index: 1;
+            width: 150px; height: 150px; border-radius: 14px;
+            border: 2px solid #E8C77A;
+            box-shadow: 0 18px 40px -10px rgba(0,0,0,0.55), 0 0 0 4px rgba(232,199,122,0.12);
+            overflow: hidden; transform: rotate(2.5deg);
+            background: #0E3C2C;
+        }
+        .featured-cover .cover-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        @media (max-width: 980px) {
+            .featured-cover .cover-photo { top: 60px; right: 20px; width: 110px; height: 110px; }
+        }
         .featured-cover .cover-top { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; }
         .live-badge { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #F5F1EA; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); padding: 6px 11px 6px 9px; border-radius: 999px; backdrop-filter: blur(6px); }
         .live-badge .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #FF6B5C; box-shadow: 0 0 0 3px rgba(255,107,92,0.25); animation: live-pulse-red 1.6s ease-in-out infinite; }
@@ -498,7 +530,22 @@
                     <span class="vc-title">mypiggybox.app / kwame-adwoa-wedding</span>
                 </div>
                 <div class="vc-body">
-                    <div class="vc-cover">K&amp;A</div>
+                    @php
+                        $heroBox = ($featuredMoneyBoxes ?? collect())->first();
+                        $heroImage = $heroBox?->getMainImageUrl();
+                        $heroInitials = $heroBox
+                            ? strtoupper(collect(explode(' ', $heroBox->title))->take(2)->map(fn($w) => substr($w, 0, 1))->implode(''))
+                            : 'K&A';
+                    @endphp
+                    <div class="vc-cover">
+                        @if($heroImage)
+                            <img class="vc-cover-img" src="{{ $heroImage }}" alt="">
+                            <div class="vc-cover-shade"></div>
+                            <div class="vc-cover-initials">{{ $heroInitials }}</div>
+                        @else
+                            K&amp;A
+                        @endif
+                    </div>
                     <div class="vc-h2">Kwame &amp; Adwoa's Wedding Fund</div>
                     <div class="vc-sub">87 contributors · ends Jun 14</div>
                     <div class="vc-row">
