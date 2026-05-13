@@ -51,6 +51,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [MoneyBoxController::class, 'dashboard'])->name('dashboard');
 
+    // Contributors & Analytics
+    Route::get('/contributors', [MoneyBoxController::class, 'contributors'])->name('contributors.index');
+    Route::get('/analytics', [MoneyBoxController::class, 'analytics'])->name('analytics.index');
+
     // Piggy Box Resource Routes
     Route::resource('money-boxes', MoneyBoxController::class);
 

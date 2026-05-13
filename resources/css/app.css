@@ -342,6 +342,22 @@ select:focus[data-flux-control] {
 .tabs::-webkit-scrollbar { display: none; }
 .tab { white-space: nowrap; }
 
+/* Donut chart */
+.donut {
+    width: 132px; height: 132px;
+    border-radius: 50%;
+    background: conic-gradient(var(--color-primary-600) calc(var(--p) * 1%), var(--color-sand-200) 0);
+    display: grid; place-items: center;
+    position: relative;
+}
+.donut::after {
+    content: ''; position: absolute; inset: 14px;
+    border-radius: 50%; background: white;
+}
+.donut-inner { position: relative; z-index: 1; text-align: center; }
+.donut-num { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.donut-sub { font-size: 11px; color: var(--color-sand-500); }
+
 /* Misc helpers */
 .muted  { color: var(--color-sand-600); }
 .tiny   { font-size: 11.5px; color: var(--color-sand-500); }

@@ -64,10 +64,10 @@
                     New Box
                 </flux:navlist.item>
 
-                <flux:navlist.item
+            <flux:navlist.item
                     icon="users"
-                    :href="route('money-boxes.index')"
-                    :current="false"
+                    :href="route('contributors.index')"
+                    :current="request()->routeIs('contributors.index')"
                     wire:navigate
                     class="mmb-nav-item"
                 >
@@ -76,8 +76,8 @@
 
                 <flux:navlist.item
                     icon="chart-bar"
-                    :href="route('money-boxes.index')"
-                    :current="false"
+                    :href="route('analytics.index')"
+                    :current="request()->routeIs('analytics.index')"
                     wire:navigate
                     class="mmb-nav-item"
                 >
@@ -184,6 +184,52 @@
                 </flux:menu>
             </flux:dropdown>
         </flux:header>
+
+        {{-- Topbar --}}
+        <div class="sticky top-0 z-10 flex items-center gap-3 px-5 lg:px-7 py-3 border-b border-[#E6E3DC] bg-[#FAFAF7]">
+            {{-- Breadcrumbs --}}
+            <nav class="flex items-center gap-1.5 text-[12.5px] text-[#9C998F]">
+                @php
+                    $crumbs = match(true) {
+                        request()->routeIs('dashboard') => ['Workspace', 'Overview'],
+                        request()->routeIs('money-boxes.index') => ['Workspace', 'My Boxes'],
+                        request()->routeIs('money-boxes.create') => ['Workspace', 'New Box'],
+                        request()->routeIs('money-boxes.show') => ['Workspace', 'My Boxes', $title ?? 'Box'],
+                        request()->routeIs('money-boxes.edit') => ['Workspace', 'My Boxes', 'Edit'],
+                        request()->routeIs('money-boxes.share') => ['Workspace', 'My Boxes', 'Share'],
+                        request()->routeIs('money-boxes.statistics') => ['Workspace', 'My Boxes', 'Statistics'],
+                        request()->routeIs('contributors.index') => ['Workspace', 'Contributors'],
+                        request()->routeIs('analytics.index') => ['Workspace', 'Analytics'],
+                        request()->routeIs('piggy.my-piggy-box') => ['Account', 'My Piggy'],
+                        request()->routeIs('browse') => ['Account', 'Browse'],
+                        request()->routeIs('profile.edit') || request()->routeIs('user-password.edit') || request()->routeIs('settings.*') || request()->routeIs('two-factor.show') || request()->routeIs('appearance.edit') => ['Account', 'Settings'],
+                        default => ['Workspace'],
+                    };
+                @endphp
+                @foreach($crumbs as $i => $crumb)
+                    @if($i > 0)
+                        <span class="text-[#D9D6CE]">/</span>
+                    @endif
+                    @if($loop->last)
+                        <span class="text-[#15140F] font-medium">{{ $crumb }}</span>
+                    @else
+                        <span>{{ $crumb }}</span>
+                    @endif
+                @endforeach
+            </nav>
+
+            {{-- Search --}}
+            <div class="ml-auto hidden sm:flex items-center gap-2 bg-white border border-[#E6E3DC] rounded-[6px] px-2.5 py-1.5 w-[260px] text-[#9C998F] text-[13px]">
+                <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 flex-none" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <span class="flex-1 truncate">Search boxes, contributors…</span>
+                <span class="font-mono text-[10.5px] bg-[#ECEAE3] px-1.5 py-0.5 rounded border border-[#E6E3DC] text-[#6B6862]">⌘K</span>
+            </div>
+
+            {{-- Notification bell --}}
+            <button class="btn btn-ghost btn-icon hidden sm:inline-flex" title="Notifications">
+                <svg viewBox="0 0 24 24" class="w-4 h-4 text-[#6B6862]" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 7 3 9H3c0-2 3-2 3-9Z"/><path d="M10.5 21a1.5 1.5 0 0 0 3 0"/></svg>
+            </button>
+        </div>
 
         {{ $slot }}
 

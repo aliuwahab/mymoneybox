@@ -885,10 +885,10 @@
         <p>It takes about a minute. No credit card, no commitment. Just a clean link, a QR code, and somewhere for the love to land.</p>
         <div class="btn-row" style="justify-content:center">
             <a class="btn primary lg" href="{{ route('register') }}">
-                Create a money box
+                Create a piggy box
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </a>
-            <a class="btn lg" href="{{ route('dashboard') }}">See the console</a>
+            <a class="btn lg" href="{{ route('dashboard') }}">Go to dashboard</a>
         </div>
     </div>
 </section>
@@ -907,7 +907,7 @@
                     <li><a href="#features">Features</a></li>
                     <li><a href="#how">How it works</a></li>
                     <li><a href="#pricing">Pricing</a></li>
-                    <li><a href="{{ route('dashboard') }}">Console</a></li>
+                    <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
                 </ul>
             </div>
             <div>

@@ -4,7 +4,7 @@
     $sym  = $user->country?->currency_symbol ?? '₵';
     $firstName = explode(' ', $user->name)[0];
 
-    // Aggregate stats across all user's money boxes
+    // Aggregate stats across all user's piggy boxes
     $totalRaised       = $user->moneyBoxes()->sum('total_contributions');
     $totalContributors = $user->moneyBoxes()->sum('contribution_count');
     $activeBoxes       = $user->moneyBoxes()->where('is_active', true)->count();
@@ -20,6 +20,24 @@
     // Quick pick first active box for quick action link
     $firstActiveBox = $user->moneyBoxes()->where('is_active', true)->first();
     $availableBalance = $user->moneyBoxes()->get()->sum(fn($b) => $b->getAvailableBalance());
+
+    // Weekly bar chart data (last 7 days)
+    $boxIds = $user->moneyBoxes->pluck('id');
+    $weeklyData = collect();
+    for ($i = 6; $i >= 0; $i--) {
+        $date = now()->subDays($i);
+        $dayTotal = \App\Models\Contribution::whereIn('money_box_id', $boxIds)
+            ->whereDate('created_at', $date->format('Y-m-d'))
+            ->sum('amount');
+        $weeklyData->push(['label' => $date->format('D'), 'total' => (float) $dayTotal]);
+    }
+    $weekMax = $weeklyData->max('total') ?: 1;
+    $weekTotal = $weeklyData->sum('total');
+
+    // Goal progress (combined)
+    $totalGoal = $user->moneyBoxes()->where('goal_amount', '>', 0)->sum('goal_amount');
+    $totalTowardGoal = $user->moneyBoxes()->where('goal_amount', '>', 0)->sum('total_contributions');
+    $goalPct = $totalGoal > 0 ? min(100, round(($totalTowardGoal / $totalGoal) * 100)) : 0;
 @endphp
 
 <div class="page-wrap max-w-[1280px]">
@@ -31,6 +49,10 @@
             <p class="text-[13.5px] text-[#6B6862] mt-1.5">Here's what's happening across your piggy boxes this week.</p>
         </div>
         <div class="flex items-center gap-2">
+            <button class="btn">
+                <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12"/><path d="m6 10 6 6 6-6"/><path d="M4 20h16"/></svg>
+                Export
+            </button>
             <a href="{{ route('money-boxes.create') }}" wire:navigate class="btn btn-primary">
                 <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
                 New box
@@ -59,6 +81,75 @@
             <div class="stat-label">Avg. gift</div>
             <div class="stat-value tnum">{{ $avgGift > 0 ? $sym . number_format($avgGift, 2) : '—' }}</div>
             <div class="stat-delta text-[#6B6862]">per contributor</div>
+        </div>
+    </div>
+
+    {{-- Charts row --}}
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4 mb-4">
+
+        {{-- Contributions this week bar chart --}}
+        <div class="card">
+            <div class="card-head">
+                <div>
+                    <div class="card-title">Contributions this week</div>
+                    <div class="tiny mt-0.5">{{ now()->subDays(6)->format('M j') }} – {{ now()->format('M j, Y') }}</div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="flex items-end gap-6 mb-4">
+                    <div>
+                        <div class="tiny">This week</div>
+                        <div class="text-[28px] font-semibold tracking-tight tnum leading-tight">{{ $sym }}{{ number_format($weekTotal, 2) }}</div>
+                    </div>
+                </div>
+                <div class="flex items-end gap-2" style="height: 180px; padding: 8px 0;">
+                    @foreach($weeklyData as $d)
+                        <div class="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
+                            <div
+                                class="w-full rounded-t {{ $loop->last ? 'bg-primary-600' : 'bg-primary-50' }}"
+                                style="height: {{ max(4, ($d['total'] / $weekMax) * 100) }}%;"
+                                title="{{ $d['label'] }}: {{ $sym }}{{ number_format($d['total'], 2) }}"
+                            ></div>
+                            <div class="tiny text-[10.5px]">{{ $d['label'] }}</div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        {{-- Goal progress donut --}}
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title">Goal progress</div>
+            </div>
+            <div class="card-body flex items-center gap-5">
+                @if($totalGoal > 0)
+                    <div class="donut flex-none" style="--p: {{ $goalPct }}">
+                        <div class="donut-inner">
+                            <div class="donut-num">{{ $goalPct }}%</div>
+                            <div class="donut-sub">of combined goals</div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-3.5 flex-1">
+                        <div class="flex items-baseline justify-between">
+                            <div class="tiny text-[12px]">Goal</div>
+                            <div class="tnum font-semibold text-[14px]">{{ $sym }}{{ number_format($totalGoal) }}</div>
+                        </div>
+                        <div class="flex items-baseline justify-between">
+                            <div class="tiny text-[12px]">Raised</div>
+                            <div class="tnum font-semibold text-[14px] text-primary-600">{{ $sym }}{{ number_format($totalTowardGoal) }}</div>
+                        </div>
+                        <div class="flex items-baseline justify-between">
+                            <div class="tiny text-[12px]">Remaining</div>
+                            <div class="tnum font-semibold text-[14px] text-[#6B6862]">{{ $sym }}{{ number_format(max(0, $totalGoal - $totalTowardGoal)) }}</div>
+                        </div>
+                    </div>
+                @else
+                    <div class="text-center py-6 w-full">
+                        <div class="tiny">No goals set on any boxes yet.</div>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 
@@ -174,8 +265,8 @@
                         <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a13 13 0 0 1 0 18"/><path d="M12 3a13 13 0 0 0 0 18"/></svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="text-[13px] font-medium text-[#15140F]">Browse campaigns</div>
-                        <div class="tiny">Discover and support causes</div>
+                        <div class="text-[13px] font-medium text-[#15140F]">Browse piggy boxes</div>
+                        <div class="tiny">Discover and support piggy boxes</div>
                     </div>
                     <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-[#9C998F]" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                 </a>

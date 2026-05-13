@@ -13,9 +13,9 @@
         <a href="{{ route('profile.edit') }}" wire:navigate
            class="tab {{ request()->routeIs('profile.edit') ? 'active' : '' }}">Profile</a>
         <a href="{{ route('user-password.edit') }}" wire:navigate
-           class="tab {{ request()->routeIs('user-password.edit') ? 'active' : '' }}">Password</a>
+           class="tab {{ request()->routeIs('user-password.edit') ? 'active' : '' }}">Security</a>
         <a href="{{ route('settings.withdrawal-accounts') }}" wire:navigate
-           class="tab {{ request()->routeIs('settings.withdrawal-accounts') ? 'active' : '' }}">Withdrawal Accounts</a>
+           class="tab {{ request()->routeIs('settings.withdrawal-accounts') ? 'active' : '' }}">Payouts</a>
         <a href="{{ route('settings.verification') }}" wire:navigate
            class="tab {{ request()->routeIs('settings.verification') ? 'active' : '' }}">
             ID Verification
@@ -29,10 +29,6 @@
                 @endif
             @endif
         </a>
-        @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
-        <a href="{{ route('two-factor.show') }}" wire:navigate
-           class="tab {{ request()->routeIs('two-factor.show') ? 'active' : '' }}">Two-Factor Auth</a>
-        @endif
         <a href="{{ route('appearance.edit') }}" wire:navigate
            class="tab {{ request()->routeIs('appearance.edit') ? 'active' : '' }}">Appearance</a>
     </div>

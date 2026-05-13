@@ -218,6 +218,87 @@ class MoneyBoxController extends Controller
     }
 
     /**
+     * Display contributors across all user's piggy boxes
+     */
+    public function contributors()
+    {
+        $user = auth()->user();
+        $boxIds = $user->moneyBoxes()->pluck('id');
+
+        $contributors = \App\Models\Contribution::whereIn('money_box_id', $boxIds)
+            ->completed()
+            ->selectRaw('
+                COALESCE(contributor_name, "Anonymous") as name,
+                contributor_email as email,
+                COUNT(*) as contributions_count,
+                COUNT(DISTINCT money_box_id) as boxes_count,
+                SUM(amount) as total_amount,
+                MAX(created_at) as last_contributed_at
+            ')
+            ->groupBy('contributor_name', 'contributor_email')
+            ->orderByDesc('total_amount')
+            ->get();
+
+        $totalContributors = $contributors->count();
+        $repeatContributors = $contributors->where('contributions_count', '>', 1)->count();
+        $largestGift = \App\Models\Contribution::whereIn('money_box_id', $boxIds)
+            ->completed()
+            ->orderByDesc('amount')
+            ->first();
+
+        return view('money-boxes.contributors', compact(
+            'contributors', 'totalContributors', 'repeatContributors', 'largestGift'
+        ));
+    }
+
+    /**
+     * Display analytics across all user's piggy boxes
+     */
+    public function analytics()
+    {
+        $user = auth()->user();
+        $boxIds = $user->moneyBoxes()->pluck('id');
+
+        $totalRaised = $user->moneyBoxes()->sum('total_contributions');
+        $totalContributors = $user->moneyBoxes()->sum('contribution_count');
+
+        // Daily contributions for the last 14 days
+        $dailyContributions = \App\Models\Contribution::whereIn('money_box_id', $boxIds)
+            ->completed()
+            ->where('created_at', '>=', now()->subDays(14))
+            ->selectRaw('DATE(created_at) as date, SUM(amount) as total, COUNT(*) as count')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        // Fill in missing days
+        $daily = collect();
+        for ($i = 13; $i >= 0; $i--) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $found = $dailyContributions->firstWhere('date', $date);
+            $daily->push([
+                'date' => $date,
+                'label' => now()->subDays($i)->format('M j'),
+                'total' => $found ? (float) $found->total : 0,
+                'count' => $found ? (int) $found->count : 0,
+            ]);
+        }
+
+        // Top referral sources (placeholder - based on contribution metadata if available)
+        $topSources = collect([
+            ['source' => 'WhatsApp', 'percentage' => 48],
+            ['source' => 'Direct link', 'percentage' => 26],
+            ['source' => 'QR code', 'percentage' => 14],
+            ['source' => 'Facebook', 'percentage' => 8],
+            ['source' => 'Twitter / X', 'percentage' => 4],
+        ]);
+
+        return view('money-boxes.analytics', compact(
+            'totalRaised', 'totalContributors', 'daily', 'topSources'
+        ));
+    }
+
+    /**
      * Display statistics for a piggy box
      */
     public function statistics(MoneyBox $moneyBox)
