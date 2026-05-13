@@ -171,27 +171,26 @@
                                 @foreach($presets as $preset)
                                     <button type="button"
                                             @click="setAmount('{{ number_format($preset, 2, '.', '') }}')"
-                                            style="flex:1;padding:7px 4px;border-radius:6px;font-size:13px;font-weight:500;border:1px solid;cursor:pointer;transition:all .12s;text-align:center;"
+                                            style="flex:1;padding:7px 13px;border-radius:6px;font-size:13px;font-weight:500;border:1px solid;cursor:pointer;transition:background .12s,border-color .12s,transform .08s;text-align:center;box-shadow:0 1px 0 rgba(20,18,12,.04),0 1px 2px rgba(20,18,12,.04);"
                                             :style="amount == '{{ number_format($preset, 2, '.', '') }}'
-                                                ? 'background:#15140F;color:#fff;border-color:#15140F;'
-                                                : 'background:#fff;color:#6B6862;border-color:#E6E3DC;'">
+                                                ? 'background:#1B6B4E;color:#fff;border-color:#1B6B4E;box-shadow:none;'
+                                                : 'background:#fff;color:#15140F;border-color:#E6E3DC;'">
                                         {{ $sym }}{{ number_format($preset, 0) }}
                                     </button>
                                 @endforeach
                             </div>
 
                             {{-- "Or enter another amount" input --}}
-                            <div style="display:flex;flex-direction:column;gap:5px;">
-                                <div style="font-size:12.5px;color:#6B6862;">Or enter another amount</div>
-                                <div style="display:flex;align-items:center;background:#fff;border:1px solid #E6E3DC;border-radius:6px;padding-left:10px;transition:border-color .15s,box-shadow .15s;"
-                                     x-bind:style="document.activeElement && document.activeElement.name === 'amount' ? 'border-color:#9C998F;box-shadow:0 0 0 3px #E6F1EB;' : ''">
-                                    <span style="font-size:13px;color:#9C998F;user-select:none;flex:none;">{{ $sym }}</span>
+                            <div style="display:grid;gap:6px;">
+                                <div style="font-size:12.5px;color:#6B6862;font-weight:500;">Or enter another amount</div>
+                                <div class="pub-amt-field" style="display:flex;align-items:center;background:#fff;border:1px solid #E6E3DC;border-radius:6px;padding-left:10px;transition:border-color .12s,box-shadow .12s;">
+                                    <span style="color:#9C998F;font-size:13px;flex:none;user-select:none;">{{ $sym }}</span>
                                     <input type="number" name="amount" id="amount"
                                            x-model="amount"
                                            step="0.01" min="{{ $minAmt }}"
                                            @if($maxAmt) max="{{ $maxAmt }}" @endif
                                            required placeholder="0.00"
-                                           style="border:0;padding:8px 10px;outline:0;width:100%;background:transparent;font-size:13.5px;color:#15140F;font-weight:500;box-shadow:none!important;">
+                                           style="border:0;padding:8px 10px;outline:0;width:100%;background:transparent;font-size:13.5px;color:#15140F;box-shadow:none!important;">
                                 </div>
                                 @error('amount')<p style="font-size:12px;color:#DC2626;margin:0;">{{ $message }}</p>@enderror
                             </div>
@@ -408,6 +407,18 @@
         @endif
 
     </div>
+
+    {{-- Scoped styles for amount field --}}
+    <style>
+        .pub-amt-field:focus-within {
+            border-color: #1B6B4E !important;
+            box-shadow: 0 0 0 3px #E6F1EB !important;
+        }
+        .pub-amt-field input:focus {
+            outline: 0;
+            box-shadow: none !important;
+        }
+    </style>
 
     {{-- Mobile responsive overrides --}}
     <style>
