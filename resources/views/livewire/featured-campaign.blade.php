@@ -11,6 +11,7 @@
     $initials = $box ? strtoupper(substr($box->user->name ?? 'U', 0, 1) . substr(strstr($box->user->name ?? ' X', ' ') ?: 'X', 1, 1)) : 'MB';
     $categoryName = $box?->category?->name ?? 'Community';
     $location = 'Ghana';
+    $coverImage = $box?->getMainImageUrl();
 @endphp
 
 @if($box)
@@ -105,6 +106,12 @@
                             letter-spacing="0.18em" fill="#F5F1EA" opacity="0.55">CAMPAIGN · {{ now()->format('Y / W') }}</text>
                     </svg>
                 </div>
+
+                @if($coverImage)
+                <div class="cover-photo" aria-hidden="true">
+                    <img src="{{ $coverImage }}" alt="">
+                </div>
+                @endif
 
                 <div class="cover-top">
                     <span class="live-badge">
