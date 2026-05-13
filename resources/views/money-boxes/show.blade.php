@@ -468,50 +468,136 @@
 
         {{-- ── Settings tab ── --}}
         <div x-show="tab === 'settings'" x-cloak>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div class="flex flex-col gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-4">
 
+                {{-- Left: editable settings --}}
+                <div class="flex flex-col gap-4">
+                    {{-- Visibility & access --}}
                     <div class="card">
-                        <div class="card-head"><div class="card-title">Danger zone</div></div>
-                        <div class="card-body flex flex-col gap-2">
-                            @if($moneyBox->is_active)
-                                <a href="{{ route('money-boxes.edit', $moneyBox) }}" class="btn">Pause contributions</a>
-                            @endif
-                            <a href="{{ route('money-boxes.edit', $moneyBox) }}"
-                               class="btn text-red-600 border-red-200 hover:bg-red-50">
-                                Edit / archive box
+                        <div class="card-head"><div class="card-title">Visibility & access</div></div>
+                        <div class="card-body flex flex-col gap-3">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="text-[13px] font-medium text-[#15140F]">Public listing</div>
+                                    <div class="tiny">Who can find and view this box</div>
+                                </div>
+                                <span class="pill {{ $moneyBox->visibility->value === 'public' ? 'pill-ok' : 'pill-muted' }}">
+                                    <span class="pill-dot"></span>{{ ucfirst($moneyBox->visibility->value) }}
+                                </span>
+                            </div>
+                            <div class="divider"></div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="text-[13px] font-medium text-[#15140F]">Accepting contributions</div>
+                                    <div class="tiny">{{ $moneyBox->canAcceptContributions() ? 'Open for contributions' : 'Closed — not accepting' }}</div>
+                                </div>
+                                <span class="pill {{ $moneyBox->canAcceptContributions() ? 'pill-ok' : 'pill-danger' }}">
+                                    <span class="pill-dot"></span>{{ $moneyBox->canAcceptContributions() ? 'Open' : 'Closed' }}
+                                </span>
+                            </div>
+                            <div class="divider"></div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="text-[13px] font-medium text-[#15140F]">Featured on homepage</div>
+                                    <div class="tiny">Shown in the hero campaign spotlight</div>
+                                </div>
+                                <span class="pill {{ $moneyBox->is_featured ? 'pill-ok' : 'pill-muted' }}">
+                                    <span class="pill-dot"></span>{{ $moneyBox->is_featured ? 'Featured' : 'Not featured' }}
+                                </span>
+                            </div>
+                            <div class="divider"></div>
+                            <a href="{{ route('money-boxes.edit', $moneyBox) }}" wire:navigate
+                               class="btn btn-sm self-start">
+                                <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6L8 22H2v-6L14 4Z"/></svg>
+                                Edit visibility settings
                             </a>
                         </div>
                     </div>
 
+                    {{-- Box details --}}
+                    <div class="card">
+                        <div class="card-head"><div class="card-title">Box details</div></div>
+                        <div class="card-body">
+                            <dl class="space-y-3 text-[13px]">
+                                <div class="flex justify-between gap-4">
+                                    <dt class="text-[#6B6862]">Title</dt>
+                                    <dd class="font-medium text-right">{{ $moneyBox->title }}</dd>
+                                </div>
+                                <div class="flex justify-between gap-4">
+                                    <dt class="text-[#6B6862]">Category</dt>
+                                    <dd class="font-medium">{{ $moneyBox->category?->name ?? '—' }}</dd>
+                                </div>
+                                <div class="flex justify-between gap-4">
+                                    <dt class="text-[#6B6862]">Amount type</dt>
+                                    <dd class="font-medium">{{ ucfirst($moneyBox->amount_type->value) }}</dd>
+                                </div>
+                                @if($moneyBox->goal_amount)
+                                    <div class="flex justify-between gap-4">
+                                        <dt class="text-[#6B6862]">Goal</dt>
+                                        <dd class="font-medium tnum">{{ $sym }}{{ number_format($moneyBox->goal_amount, 2) }}</dd>
+                                    </div>
+                                @endif
+                                <div class="flex justify-between gap-4">
+                                    <dt class="text-[#6B6862]">Currency</dt>
+                                    <dd class="font-medium">{{ $moneyBox->currency_code }}</dd>
+                                </div>
+                                <div class="flex justify-between gap-4">
+                                    <dt class="text-[#6B6862]">Created</dt>
+                                    <dd class="font-medium">{{ $moneyBox->created_at->format('M j, Y') }}</dd>
+                                </div>
+                                @if($moneyBox->start_date)
+                                    <div class="flex justify-between gap-4">
+                                        <dt class="text-[#6B6862]">Start date</dt>
+                                        <dd class="font-medium">{{ $moneyBox->start_date->format('M j, Y') }}</dd>
+                                    </div>
+                                @endif
+                                @if($moneyBox->end_date)
+                                    <div class="flex justify-between gap-4">
+                                        <dt class="text-[#6B6862]">End date</dt>
+                                        <dd class="font-medium">{{ $moneyBox->end_date->format('M j, Y') }}</dd>
+                                    </div>
+                                @endif
+                            </dl>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-head"><div class="card-title">Visibility & access</div></div>
-                    <div class="card-body flex flex-col gap-3">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <div class="text-[13px] font-medium text-[#15140F]">Listed publicly</div>
-                                <div class="tiny">{{ ucfirst($moneyBox->visibility->value) }}</div>
-                            </div>
-                            <span class="pill {{ $moneyBox->visibility->value === 'public' ? 'pill-ok' : 'pill-muted' }}">
-                                <span class="pill-dot"></span>{{ ucfirst($moneyBox->visibility->value) }}
-                            </span>
+                {{-- Right: danger zone --}}
+                <div class="flex flex-col gap-4">
+                    <div class="card">
+                        <div class="card-head"><div class="card-title">Actions</div></div>
+                        <div class="card-body flex flex-col gap-2">
+                            <a href="{{ route('money-boxes.edit', $moneyBox) }}" wire:navigate class="btn w-full justify-start gap-2.5">
+                                <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-[#6B6862]" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6L8 22H2v-6L14 4Z"/></svg>
+                                Edit box details
+                            </a>
+                            <a href="{{ route('money-boxes.share', $moneyBox) }}" wire:navigate class="btn w-full justify-start gap-2.5">
+                                <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-[#6B6862]" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M8.6 13.5 15.4 17"/><path d="M15.4 7 8.6 10.5"/></svg>
+                                Share & promote
+                            </a>
+                            @if($moneyBox->getAvailableBalance() > 0)
+                                <a href="{{ route('money-boxes.withdraw.create', $moneyBox) }}" wire:navigate class="btn w-full justify-start gap-2.5">
+                                    <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-[#6B6862]" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="17" cy="14.5" r="1"/></svg>
+                                    Withdraw {{ $sym }}{{ number_format($moneyBox->getAvailableBalance(), 2) }}
+                                </a>
+                            @endif
                         </div>
-                        <div class="divider"></div>
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <div class="text-[13px] font-medium text-[#15140F]">Accepting contributions</div>
-                                <div class="tiny">{{ $moneyBox->canAcceptContributions() ? 'Open' : 'Closed' }}</div>
-                            </div>
-                            <span class="pill {{ $moneyBox->canAcceptContributions() ? 'pill-ok' : 'pill-danger' }}">
-                                <span class="pill-dot"></span>{{ $moneyBox->canAcceptContributions() ? 'Open' : 'Closed' }}
-                            </span>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="text-[12.5px] text-[#6B6862] mt-1">
-                            To change visibility or contribution rules,
-                            <a href="{{ route('money-boxes.edit', $moneyBox) }}" class="text-primary-600 hover:underline">edit this box</a>.
+                    </div>
+
+                    <div class="card border border-red-100">
+                        <div class="card-head"><div class="card-title text-red-700">Danger zone</div></div>
+                        <div class="card-body flex flex-col gap-2">
+                            <p class="tiny mb-1">These actions affect your box's availability. Proceed with care.</p>
+                            <a href="{{ route('money-boxes.edit', $moneyBox) }}" wire:navigate
+                               class="btn w-full justify-start gap-2.5 text-red-600 border-red-200 hover:bg-red-50">
+                                <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                                {{ $moneyBox->is_active ? 'Pause contributions' : 'Re-open contributions' }}
+                            </a>
+                            <a href="{{ route('money-boxes.edit', $moneyBox) }}" wire:navigate
+                               class="btn w-full justify-start gap-2.5 text-red-600 border-red-200 hover:bg-red-50">
+                                <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+                                Archive this box
+                            </a>
                         </div>
                     </div>
                 </div>
