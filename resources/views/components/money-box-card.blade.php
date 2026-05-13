@@ -1,96 +1,82 @@
 @props(['moneyBox'])
 
-<a href="{{ route('box.show', $moneyBox->slug) }}" class="block h-full">
-    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden h-full flex flex-col">
-        <!-- Main Image -->
-        <div class="w-full h-48 bg-gray-100 overflow-hidden flex-shrink-0">
+@php
+    $covers = ['cover-emerald','cover-amber','cover-slate','cover-rose','cover-violet'];
+    $cover  = $covers[crc32($moneyBox->id) % count($covers)];
+    $sym    = $moneyBox->user?->country?->currency_symbol ?? '₵';
+    $pct    = $moneyBox->goal_amount > 0
+        ? min(100, round(($moneyBox->total_contributions / $moneyBox->goal_amount) * 100))
+        : 0;
+@endphp
+
+<a href="{{ route('box.show', $moneyBox->slug) }}"
+   class="card block hover:shadow-[0_1px_0_rgba(20,18,12,.04),0_8px_24px_-8px_rgba(20,18,12,.10)] transition-shadow duration-150 overflow-hidden h-full">
+
+    {{-- Cover --}}
+    <div class="p-3.5 pb-0">
+        <div class="{{ $cover }} h-[90px] rounded-[6px] relative overflow-hidden">
             @if($moneyBox->hasMedia('main'))
-                <img
-                    src="{{ $moneyBox->getMainImageUrl() }}"
-                    alt="{{ $moneyBox->title }}"
-                    class="w-full h-full object-cover"
-                />
-            @else
-                <!-- Placeholder for no image -->
-                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-                    <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                    </svg>
-                </div>
+                <img src="{{ $moneyBox->getMainImageUrl() }}" alt="" class="absolute inset-0 w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+            @endif
+            <div class="absolute inset-0 grid place-items-center text-white/90 font-serif text-[28px] tracking-wide">
+                {{ substr($moneyBox->title, 0, 1) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="p-4">
+        {{-- Badges --}}
+        <div class="flex items-center gap-1.5 mb-2">
+            <span class="pill {{ $moneyBox->visibility->value === 'public' ? 'pill-info' : 'pill-muted' }}">
+                <span class="pill-dot"></span>
+                {{ ucfirst($moneyBox->visibility->value) }}
+            </span>
+            @if($moneyBox->category)
+                <span class="pill pill-muted">
+                    {{ $moneyBox->category->icon }} {{ $moneyBox->category->name }}
+                </span>
             @endif
         </div>
 
-        <div class="flex-1 flex flex-col">
-            <!-- Category Badge -->
-            @if($moneyBox->category)
-                <div class="px-4 pt-4">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800">
-                        {{ $moneyBox->category->icon }} {{ $moneyBox->category->name }}
-                    </span>
-                </div>
-            @endif
+        <div class="text-[15px] font-semibold text-[#15140F] tracking-tight mb-0.5 leading-snug line-clamp-2">
+            {{ $moneyBox->title }}
+        </div>
+        <div class="tiny mb-3">
+            by {{ $moneyBox->user->name }} · {{ $moneyBox->contribution_count }} {{ Str::plural('contributor', $moneyBox->contribution_count) }}
+        </div>
 
-            <div class="p-4 flex-1 flex flex-col">
-            <!-- Title -->
-            <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                {{ $moneyBox->title }}
-            </h3>
-
-            <!-- Description -->
-            @if($moneyBox->description)
-                <p class="text-gray-600 text-sm mb-4 line-clamp-3">
-                    {{ $moneyBox->description }}
-                </p>
-            @endif
-
-            <!-- Progress Bar -->
-            @if($moneyBox->goal_amount)
-                <div class="mb-3">
-                    <div class="flex justify-between text-sm mb-1">
-                        <span class="text-gray-600">Progress</span>
-                        <span class="font-medium text-gray-900">{{ number_format($moneyBox->getProgressPercentage(), 1) }}%</span>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                            class="bg-primary-600 h-2 rounded-full transition-all"
-                            style="width: {{ min(100, $moneyBox->getProgressPercentage()) }}%"
-                        ></div>
-                    </div>
+        {{-- Progress --}}
+        @if($moneyBox->goal_amount)
+            <div class="flex items-baseline justify-between mb-1.5">
+                <div class="text-[13px] font-semibold text-[#15140F] tnum">
+                    {{ $sym }}{{ number_format($moneyBox->total_contributions, 2) }}
+                    <span class="muted font-normal text-[12px]">of {{ $sym }}{{ number_format($moneyBox->goal_amount, 2) }}</span>
                 </div>
-            @endif
-
-            <!-- Stats -->
-            <div class="flex items-center justify-between pt-3 border-t border-gray-200">
-                <div>
-                    <div class="text-2xl font-bold text-gray-900">
-                        {{ $moneyBox->formatAmount($moneyBox->total_contributions) }}
-                    </div>
-                    @if($moneyBox->goal_amount)
-                        <div class="text-sm text-gray-500">
-                            of {{ $moneyBox->formatAmount($moneyBox->goal_amount) }}
-                        </div>
-                    @endif
-                </div>
-                <div class="text-right">
-                    <div class="text-lg font-semibold text-gray-900">
-                        {{ $moneyBox->contribution_count }}
-                    </div>
-                    <div class="text-sm text-gray-500">
-                        {{ Str::plural('contribution', $moneyBox->contribution_count) }}
-                    </div>
-                </div>
+                <div class="tiny tnum">{{ $pct }}%</div>
             </div>
+            <div class="progress-track">
+                <div class="progress-fill" style="width: {{ $pct }}%"></div>
+            </div>
+        @else
+            <div class="text-[13px] font-semibold text-[#15140F] tnum">
+                {{ $sym }}{{ number_format($moneyBox->total_contributions, 2) }}
+                <span class="muted font-normal text-[12px]">raised</span>
+            </div>
+        @endif
 
-            <!-- Creator -->
-            <div class="mt-3 pt-3 border-t border-gray-200">
-                <div class="flex items-center text-sm text-gray-500">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    by {{ $moneyBox->user->name }}
-                </div>
-            </div>
-            </div>
+        <div class="flex items-center justify-between mt-3">
+            <span class="tiny">
+                @if($moneyBox->end_date)
+                    Ends {{ $moneyBox->end_date->format('M j, Y') }}
+                @else
+                    Ongoing
+                @endif
+            </span>
+            <span class="text-[12px] font-medium text-primary-600 flex items-center gap-1">
+                Contribute
+                <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </span>
         </div>
     </div>
 </a>
