@@ -3,8 +3,8 @@
 
         {{-- Header --}}
         <div class="mb-6">
-            <h1 class="page-title" style="font-size:1.875rem;">Edit box</h1>
-            <p class="tiny mt-1.5">Update your money box settings</p>
+            <h1 class="page-title" style="font-size:1.875rem;">Edit piggy box</h1>
+            <p class="tiny mt-1.5">Update your piggy box settings</p>
         </div>
 
         <form method="POST" action="{{ route('money-boxes.update', $moneyBox) }}" enctype="multipart/form-data" class="space-y-4">

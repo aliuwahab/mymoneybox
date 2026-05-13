@@ -34,7 +34,7 @@
 <div class="wrap">
   <div class="header">
     <span class="logo-mark">M</span>
-    <span class="logo-name">MyMoneyBox</span>
+    <span class="logo-name">MyPiggyBox</span>
   </div>
 
   <div class="body">

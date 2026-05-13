@@ -9,8 +9,8 @@
                     Dashboard
                 </a>
             </div>
-            <h1 class="page-title" style="font-size:1.875rem;">Create a box</h1>
-            <p class="tiny mt-1.5">Set up a new money box to collect contributions from anyone.</p>
+            <h1 class="page-title" style="font-size:1.875rem;">Create a piggy box</h1>
+            <p class="tiny mt-1.5">Set up a new piggy box to collect contributions from anyone.</p>
         </div>
 
         @if($errors->any())
@@ -142,7 +142,7 @@
             <div class="flex items-center justify-end gap-3 pt-1">
                 <a href="{{ route('dashboard') }}" wire:navigate class="btn">Cancel</a>
                 <button type="submit" class="btn-primary">
-                    Create box
+                    Create piggy box
                 </button>
             </div>
         </form>

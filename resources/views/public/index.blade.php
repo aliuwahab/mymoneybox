@@ -2,7 +2,7 @@
     {{-- Header --}}
     <div class="bg-white border-b border-[#E6E3DC]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-            <h1 class="page-title" style="font-size:1.875rem;">Discover money boxes</h1>
+            <h1 class="page-title" style="font-size:1.875rem;">Discover piggy boxes</h1>
             <p class="tiny mt-1.5">Support causes you care about</p>
         </div>
     </div>
@@ -11,7 +11,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
         <form method="GET" action="{{ route('browse') }}" class="flex flex-col sm:flex-row gap-3">
             <div class="flex-1">
-                <input type="text" name="search" placeholder="Search money boxes…" value="{{ request('search') }}" />
+                <input type="text" name="search" placeholder="Search piggy boxes…" value="{{ request('search') }}" />
             </div>
             <div class="sm:w-52">
                 <select name="category">

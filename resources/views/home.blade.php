@@ -338,7 +338,7 @@
     <div class="wrap nav-inner">
         <a href="{{ route('home') }}" class="brand">
             <span class="brand-mark">M</span>
-            <span>MyMoneyBox</span>
+            <span>MyPiggyBox</span>
         </a>
         <div class="nav-links">
             <a href="#features">Features</a>
@@ -365,7 +365,7 @@
         <div>
             <span class="eyebrow"><span class="dot"></span> New · QR contributions in 3 taps</span>
             <h1 class="h1">Collect for what matters, <em>beautifully</em>.</h1>
-            <p class="lead">MyMoneyBox is the modern way to gather contributions for weddings, medical care, scholarships and team causes — with a link, a QR code, and zero awkwardness.</p>
+            <p class="lead">MyPiggyBox is the modern way to gather contributions for weddings, medical care, scholarships and team causes — with a link, a QR code, and zero awkwardness.</p>
             <div class="hero-cta">
                 <a class="btn primary lg" href="{{ route('register') }}">
                     Start a box — free
@@ -462,7 +462,7 @@
     <div class="wrap">
         <div class="section-head">
             <div>
-                <span class="kicker">Why MyMoneyBox</span>
+                <span class="kicker">Why MyPiggyBox</span>
                 <h2 class="section-title">Built for clarity. Designed for trust.</h2>
             </div>
             <p class="section-sub">Every detail — from contribution rules to receipts — is engineered to remove friction so giving feels effortless on both sides.</p>
@@ -612,7 +612,7 @@
                 </div>
             </div>
             <div class="quote-aside">
-                <div class="qstat"><div class="num">₵4.2M</div><div class="lab">Contributed to date across all MyMoneyBox communities</div></div>
+                <div class="qstat"><div class="num">₵4.2M</div><div class="lab">Contributed to date across all MyPiggyBox campaigns</div></div>
                 <div class="qstat"><div class="num">12k+</div><div class="lab">Active boxes — weddings, medical, education, more</div></div>
                 <div class="qstat"><div class="num">2.4×</div><div class="lab">More raised vs. ad-hoc bank transfers, on average</div></div>
                 <div class="qstat"><div class="num">48s</div><div class="lab">Median time to set up your first box from sign-up</div></div>
@@ -731,7 +731,7 @@
         <p>It takes about a minute. No credit card, no commitment. Just a clean link, a QR code, and somewhere for the love to land.</p>
         <div class="btn-row" style="justify-content:center">
             <a class="btn primary lg" href="{{ route('register') }}">
-                Create a money box
+                Create a piggy box
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </a>
             <a class="btn lg" href="{{ route('browse') }}">Browse boxes</a>
@@ -744,7 +744,7 @@
     <div class="wrap">
         <div class="foot-grid">
             <div>
-                <a href="{{ route('home') }}" class="brand"><span class="brand-mark">M</span><span>MyMoneyBox</span></a>
+                <a href="{{ route('home') }}" class="brand"><span class="brand-mark">M</span><span>MyPiggyBox</span></a>
                 <p class="foot-tagline">Collect for what matters — beautifully, transparently, together.</p>
             </div>
             <div>

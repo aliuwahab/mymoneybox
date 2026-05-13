@@ -36,13 +36,13 @@
 <div class="wrap">
   <div class="header">
     <span class="logo-mark">M</span>
-    <span class="logo-name">MyMoneyBox</span>
+    <span class="logo-name">MyPiggyBox</span>
   </div>
 
   <div class="hero">
     <div class="hero-tag">🎉 Box live</div>
     <h2>Your box is ready to collect!</h2>
-    <p>Hi {{ explode(' ', $moneyBox->user->name)[0] }}, your money box has been created and is ready to share.</p>
+    <p>Hi {{ explode(' ', $moneyBox->user->name)[0] }}, your piggy box has been created and is ready to share.</p>
 
     <div class="box-card">
       <div class="box-name">{{ $moneyBox->title }}</div>

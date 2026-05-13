@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ $moneyBox->title }} · MyMoneyBox</title>
+    <title>{{ $moneyBox->title }} · MyPiggyBox</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -234,7 +234,7 @@
         <span class="text-[11px] text-[#9C998F]">Secured by</span>
         <a href="{{ route('home') }}" target="_blank"
            class="text-[11px] font-semibold text-[#15140F] hover:text-[#1B6B4E] transition-colors">
-            MyMoneyBox
+            MyPiggyBox
         </a>
     </div>
 

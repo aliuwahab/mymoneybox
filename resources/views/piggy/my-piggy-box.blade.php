@@ -32,7 +32,7 @@
         {{-- Page header --}}
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
-                <h1 class="page-title" style="font-size:1.875rem;">My Piggy</h1>
+                <h1 class="page-title" style="font-size:1.875rem;">Personal Piggy Box</h1>
                 <p class="text-[13px] text-[#6B6862] mt-1">Your personal gift collection box</p>
             </div>
             <div class="flex items-center gap-2 flex-none flex-wrap">

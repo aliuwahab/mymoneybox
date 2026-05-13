@@ -5,8 +5,8 @@
 
         {{-- Page header --}}
         <div class="mb-8">
-            <h1 class="page-title" style="font-size:1.875rem;">Create a box</h1>
-            <p class="tiny mt-1.5">Set up a new money box to collect contributions</p>
+            <h1 class="page-title" style="font-size:1.875rem;">Create a piggy box</h1>
+            <p class="tiny mt-1.5">Set up a new piggy box to collect contributions</p>
         </div>
 
         {{-- Step indicator --}}
@@ -225,7 +225,7 @@
                                     x-show="currentStep === 3"
                                     :disabled="isSubmitting"
                                     class="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
-                                <span x-show="!isSubmitting">Create box</span>
+                                <span x-show="!isSubmitting">Create piggy box</span>
                                 <span x-show="isSubmitting">Creating…</span>
                             </button>
 
