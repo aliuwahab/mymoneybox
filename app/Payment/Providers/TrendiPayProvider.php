@@ -248,7 +248,16 @@ class TrendiPayProvider implements PaymentProviderInterface
                 ];
             }
 
-            Log::warning("TrendiPay Disbursement Error", ["response" => $result, 'requestUrl' => $url]);
+            Log::warning("TrendiPay Disbursement Error", [
+                'response'   => $result,
+                'requestUrl' => $url,
+                'curl' => sprintf(
+                    "curl --location '%s' \\\n  --header 'Authorization: Bearer %s' \\\n  --header 'Accept: application/json' \\\n  --header 'Content-Type: application/json' \\\n  --data '%s'",
+                    $url,
+                    $this->merchantExternalId,
+                    json_encode($payload, JSON_PRETTY_PRINT)
+                ),
+            ]);
 
             return [
                 'success' => false,
