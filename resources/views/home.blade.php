@@ -205,8 +205,8 @@
         /* LOGOS */
         .logos { padding: 50px 0 40px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--bg-2); }
         .logos-label { text-align: center; color: var(--fg-3); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 28px; }
-        .logos-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 32px; align-items: center; justify-items: center; color: var(--fg-2); }
-        .logo { font-family: 'Instrument Serif', serif; font-size: 22px; letter-spacing: -0.01em; opacity: 0.6; transition: opacity .15s; }
+        .logos-row { display: grid; grid-template-columns: repeat(var(--trusted-cols, 6), minmax(0, 1fr)); gap: 20px 32px; align-items: center; justify-items: center; color: var(--fg-2); }
+        .logo { font-family: 'Instrument Serif', serif; font-size: 22px; letter-spacing: 0; opacity: 0.6; transition: opacity .15s; text-align: center; overflow-wrap: anywhere; }
         .logo.alt { font-family: 'Inter'; font-weight: 600; letter-spacing: -0.02em; font-size: 18px; }
         .logo.mono { font-family: 'JetBrains Mono'; font-size: 14px; letter-spacing: 0.02em; font-weight: 500; }
         .logo:hover { opacity: 0.95; }
@@ -287,7 +287,7 @@
         .qstat .lab { margin-top: 10px; font-size: 12.5px; color: rgba(245,241,234,0.7); line-height: 1.45; }
 
         /* PRICING */
-        .pricing { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: stretch; }
+        .pricing { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: stretch; max-width: 860px; margin: 0 auto; }
         .plan { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px 28px; display: flex; flex-direction: column; }
         .plan.featured { background: var(--fg); color: var(--bg); border-color: var(--fg); position: relative; box-shadow: var(--shadow-2); }
         .plan.featured p { color: rgba(255,255,255,0.7); }
@@ -450,7 +450,7 @@
             .feat.f-wide, .feat.f-narrow, .feat.f-third { grid-column: span 12; }
             .steps, .pricing { grid-template-columns: 1fr; }
             .foot-grid { grid-template-columns: 1fr 1fr; }
-            .logos-row { grid-template-columns: repeat(3, 1fr); }
+            .logos-row { grid-template-columns: repeat(var(--trusted-tablet-cols, 3), minmax(0, 1fr)); }
             .featured { grid-template-columns: 1fr; }
             .featured::before { display: none; }
             .featured-cover { min-height: 340px; }
@@ -459,6 +459,7 @@
         }
         @media (max-width: 640px) {
             .nav-links { display: none; }
+            .logos-row { grid-template-columns: repeat(var(--trusted-mobile-cols, 2), minmax(0, 1fr)); }
             .wrap { padding: 0 20px; }
             .hero { padding: 56px 0 44px; }
             .visual { height: 430px; }
@@ -588,20 +589,21 @@
     </div>
 </section>
 
-<!-- TRUST LOGOS -->
-<section class="logos">
-    <div class="wrap">
-        <div class="logos-label">Trusted by communities, families, and teams across West Africa</div>
-        <div class="logos-row">
-            <span class="logo">Akoma Foundation</span>
-            <span class="logo alt">Sankofa Health</span>
-            <span class="logo">Asanteman</span>
-            <span class="logo mono">PIVOT.LABS</span>
-            <span class="logo alt">Otumfuo Scholars</span>
-            <span class="logo">Volta Co-op</span>
+@php($trustedLogos = $trustedLogos ?? collect())
+
+@if($trustedLogos->isNotEmpty())
+    <!-- TRUST LOGOS -->
+    <section class="logos">
+        <div class="wrap">
+            <div class="logos-label">Trusted by communities, families, and teams across West Africa</div>
+            <div class="logos-row" style="--trusted-cols: {{ min(max($trustedLogos->count(), 1), 6) }}; --trusted-tablet-cols: {{ min(max($trustedLogos->count(), 1), 3) }}; --trusted-mobile-cols: {{ min(max($trustedLogos->count(), 1), 2) }};">
+                @foreach($trustedLogos as $trustedLogo)
+                    <span class="logo">{{ $trustedLogo->name }}</span>
+                @endforeach
+            </div>
         </div>
-    </div>
-</section>
+    </section>
+@endif
 
 <!-- FEATURED CAMPAIGN -->
 <livewire:featured-campaign />
@@ -795,34 +797,22 @@
             </div>
 
             <div class="plan featured">
-                <div class="plan-name">Most popular</div>
-                <h3>Community</h3>
-                <p>For organisations, congregations, and recurring causes.</p>
-                <div class="price"><span class="price-num">1.9%</span><span class="price-unit" style="color:rgba(255,255,255,0.6)">+ ₵1 per contribution</span></div>
+                <div class="plan-name">Custom</div>
+                <h3>Community &amp; organisations</h3>
+                <p>For organisations, congregations, NGOs, and recurring causes that need custom setup.</p>
+                <div class="price"><span class="price-num">Custom</span></div>
                 <ul>
                     <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Everything in Starter</li>
                     <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Custom domain &amp; branding</li>
                     <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Multi-admin teams</li>
                     <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Advanced analytics</li>
+                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Embeddable website widget</li>
                     <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Priority support</li>
-                </ul>
-                <a class="btn primary" style="justify-content:center; width:100%; background:#fff; color:var(--fg); border-color:#fff" href="{{ route('register') }}">Start free 30-day trial</a>
-                <div class="label" style="margin-top:12px">₵149 / month after trial</div>
-            </div>
-
-            <div class="plan">
-                <div class="plan-name">Enterprise</div>
-                <h3>Foundation</h3>
-                <p>For NGOs, large institutions, and bespoke needs.</p>
-                <div class="price"><span class="price-num">Custom</span></div>
-                <ul>
                     <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Volume pricing</li>
-                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> SSO &amp; SAML</li>
-                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Dedicated account manager</li>
-                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Custom integrations &amp; API</li>
+                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> SSO, API, and custom integrations</li>
                 </ul>
-                <a class="btn" style="justify-content:center; width:100%" href="{{ route('about') }}">Talk to sales</a>
-                <div class="label" style="margin-top:12px">SLAs available</div>
+                <a class="btn primary" style="justify-content:center; width:100%; background:#fff; color:var(--fg); border-color:#fff" href="{{ route('contact') }}">Talk to sales</a>
+                <div class="label" style="margin-top:12px">Tailored pricing and SLAs available</div>
             </div>
         </div>
     </div>
@@ -835,7 +825,7 @@
             <div>
                 <span class="kicker">Common questions</span>
                 <h2 class="section-title" style="margin-top:12px">Everything you'd want to ask, before signing up.</h2>
-                <p class="section-sub" style="margin-top:18px">Still curious? Reach our team at <a style="color:var(--accent); font-weight:500" href="mailto:hello@mypiggybox.com">hello@mypiggybox.com</a> — we usually reply within an hour.</p>
+                <p class="section-sub" style="margin-top:18px">Still curious? Reach our team at <a style="color:var(--accent); font-weight:500" href="{{ route('contact') }}">sales@mypiggybox.com</a> — we usually reply quickly.</p>
             </div>
             <div class="faq-list">
                 <details class="faq-item" open>
@@ -866,7 +856,7 @@
                     <summary>Do you charge a monthly subscription?
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
                     </summary>
-                    <p>No. The Starter plan is entirely usage-based — you only pay a small fee per successful contribution. Community and Foundation tiers add monthly features for teams.</p>
+                    <p>No. Personal is entirely usage-based, so you only pay a small fee per successful contribution. Custom plans are tailored for teams and organisations that need advanced setup.</p>
                 </details>
             </div>
         </div>
@@ -921,9 +911,9 @@
                 <h6>Company</h6>
                 <ul>
                     <li><a href="{{ route('about') }}">About</a></li>
-                    <li><a href="#">Careers</a></li>
-                    <li><a href="#">Press</a></li>
-                    <li><a href="mailto:hello@mypiggybox.com">Contact</a></li>
+                    <li><a href="{{ route('careers') }}">Careers</a></li>
+                    <li><a href="{{ route('press') }}">Press</a></li>
+                    <li><a href="{{ route('contact') }}">Contact</a></li>
                 </ul>
             </div>
             <div>
@@ -931,8 +921,8 @@
                 <ul>
                     <li><a href="{{ route('privacy') }}">Privacy</a></li>
                     <li><a href="{{ route('terms') }}">Terms</a></li>
-                    <li><a href="#">Security</a></li>
-                    <li><a href="#">Status</a></li>
+                    <li><a href="{{ route('security') }}">Security</a></li>
+                    <li><a href="{{ route('status') }}">Status</a></li>
                 </ul>
             </div>
         </div>
@@ -941,7 +931,7 @@
             <div class="legal">
                 <a href="{{ route('privacy') }}">Privacy</a>
                 <a href="{{ route('terms') }}">Terms</a>
-                <a href="#">Cookies</a>
+                <a href="{{ route('cookies') }}">Cookies</a>
             </div>
         </div>
     </div>

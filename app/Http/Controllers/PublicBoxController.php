@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\MoneyBox;
+use App\Models\TrustedLogo;
 use Illuminate\Http\Request;
 
 class PublicBoxController extends Controller
@@ -22,7 +23,11 @@ class PublicBoxController extends Controller
             ->limit(6)
             ->get();
 
-        return view('home', compact('featuredMoneyBoxes'));
+        $trustedLogos = TrustedLogo::active()
+            ->ordered()
+            ->get();
+
+        return view('home', compact('featuredMoneyBoxes', 'trustedLogos'));
     }
 
     /**
