@@ -19,7 +19,9 @@
 
     // Quick pick first active box for quick action link
     $firstActiveBox = $user->moneyBoxes()->where('is_active', true)->first();
-    $availableBalance = $user->moneyBoxes()->get()->sum(fn($b) => $b->getAvailableBalance());
+    $userMoneyBoxes = $user->moneyBoxes()->get();
+    $availableBalance = $userMoneyBoxes->sum(fn($b) => $b->getAvailableBalance());
+    $withdrawBox = $userMoneyBoxes->first(fn($b) => $b->getAvailableBalance() > 0) ?? $firstActiveBox ?? $userMoneyBoxes->first();
 
     // Weekly bar chart data (last 7 days)
     $boxIds = $user->moneyBoxes->pluck('id');
@@ -242,8 +244,6 @@
                 </a>
                 @endif
 
-                @if($availableBalance >= config('withdrawal.min_amount', 10) && auth()->user()->isVerified() && auth()->user()->withdrawalAccounts()->active()->count() > 0)
-                @php $withdrawBox = $user->moneyBoxes()->get()->first(fn($b) => $b->getAvailableBalance() > 0); @endphp
                 @if($withdrawBox)
                 <a href="{{ route('money-boxes.withdraw.create', $withdrawBox) }}" wire:navigate
                    class="flex items-center gap-3 p-2.5 rounded-[8px] border border-[#E6E3DC] bg-white hover:bg-[#FBFAF6] transition-colors text-left">
@@ -256,7 +256,6 @@
                     </div>
                     <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-[#9C998F]" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                 </a>
-                @endif
                 @endif
 
                 <a href="{{ route('browse') }}" wire:navigate

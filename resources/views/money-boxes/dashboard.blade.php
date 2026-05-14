@@ -6,6 +6,7 @@
         $activeCount   = $moneyBoxes->where('is_active', true)->count();
         $avgGift       = $totalContribs > 0 ? round($totalRaised / $totalContribs, 2) : 0;
         $recent        = $moneyBoxes->pluck('contributions')->flatten()->sortByDesc('created_at')->take(6);
+        $withdrawBox   = $moneyBoxes->first(fn($box) => $box->getAvailableBalance() > 0) ?? $moneyBoxes->first();
     @endphp
 
     <div class="page-wrap max-w-[1280px]">
@@ -149,7 +150,9 @@
                         <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-[#9C998F]" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                     </a>
 
-                    <div class="group flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[#E6E3DC] bg-white hover:bg-[#FBFAF6] transition text-left">
+                    @if($withdrawBox)
+                    <a href="{{ route('money-boxes.withdraw.create', $withdrawBox) }}" wire:navigate
+                       class="group flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[#E6E3DC] bg-white hover:bg-[#FBFAF6] transition text-left">
                         <div class="w-8 h-8 rounded-[7px] bg-primary-50 text-primary-600 grid place-items-center flex-none">
                             <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="17" cy="14.5" r="1"/></svg>
                         </div>
@@ -158,7 +161,8 @@
                             <div class="tiny">{{ $sym }}{{ number_format($totalRaised, 2) }} across your PiggyBoxes</div>
                         </div>
                         <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-[#9C998F]" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-                    </div>
+                    </a>
+                    @endif
 
                     <a href="{{ route('money-boxes.index') }}" class="group flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[#E6E3DC] bg-white hover:bg-[#FBFAF6] transition text-left">
                         <div class="w-8 h-8 rounded-[7px] bg-primary-50 text-primary-600 grid place-items-center flex-none">
