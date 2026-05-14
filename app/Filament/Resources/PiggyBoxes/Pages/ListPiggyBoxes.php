@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\PiggyBoxes\Pages;
 
 use App\Filament\Resources\PiggyBoxes\PiggyBoxResource;
-use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListPiggyBoxes extends ListRecords
@@ -12,8 +11,6 @@ class ListPiggyBoxes extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [
-            CreateAction::make(),
-        ];
+        return [];
     }
 }

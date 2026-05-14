@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\PiggyBoxes;
 
-use App\Filament\Resources\PiggyBoxes\Pages\CreatePiggyBox;
 use App\Filament\Resources\PiggyBoxes\Pages\EditPiggyBox;
 use App\Filament\Resources\PiggyBoxes\Pages\ListPiggyBoxes;
 use App\Filament\Resources\PiggyBoxes\Pages\ViewPiggyBox;
@@ -61,7 +60,6 @@ class PiggyBoxResource extends Resource
     {
         return [
             'index' => ListPiggyBoxes::route('/'),
-            'create' => CreatePiggyBox::route('/create'),
             'view' => ViewPiggyBox::route('/{record}'),
             'edit' => EditPiggyBox::route('/{record}/edit'),
         ];
