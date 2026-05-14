@@ -114,7 +114,7 @@
                         @endif
 
                         {{-- Stats row --}}
-                        <div style="display:flex;gap:18px;margin-top:12px;">
+                            <div class="pub-stats-row" style="display:flex;gap:18px;margin-top:12px;">
                             <div>
                                 <div class="tnum" style="font-weight:600;color:#15140F;font-size:14px;">{{ number_format($moneyBox->contribution_count) }}</div>
                                 <div class="tiny">{{ Str::plural('contributor', $moneyBox->contribution_count) }}</div>
@@ -338,7 +338,7 @@
 
                 {{-- QR / share card (flat, panel bg per design) --}}
                 <div class="card" style="background:#FFFFFF;box-shadow:none;">
-                    <div class="card-body" style="display:flex;gap:14px;align-items:center;">
+                    <div class="card-body qr-share-body" style="display:flex;gap:14px;align-items:center;">
                         @if($moneyBox->hasQrCode())
                             <img src="{{ $moneyBox->getQrCodeUrl() }}" alt="QR Code"
                                  style="width:84px;height:84px;border-radius:6px;border:1px solid #E6E3DC;flex:none;background:#fff;">
@@ -504,11 +504,15 @@
                 grid-template-columns: 1fr;
                 padding: 20px;
             }
+            .pub-left,
+            .pub-right { min-width: 0; }
             .grid-2-equal { grid-template-columns: 1fr; }
+            .pub-stats-row { flex-wrap: wrap; }
         }
 
         /* Small mobile: edge-to-edge */
         @media (max-width: 600px) {
+            .pub-left h1 { overflow-wrap: anywhere; }
             .pub-shell {
                 border-radius: 0;
                 border-left: 0;
@@ -516,6 +520,25 @@
                 margin-left: -1rem;
                 margin-right: -1rem;
                 padding: 16px;
+            }
+            .pub-presets {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .pub-presets .btn {
+                width: 100%;
+            }
+            .pub-cover {
+                height: 180px;
+            }
+            .qr-share-body {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+            .qr-share-body img,
+            .qr-share-body .qr-placeholder {
+                width: 72px !important;
+                height: 72px !important;
             }
         }
     </style>

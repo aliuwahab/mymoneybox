@@ -42,6 +42,7 @@
                 padding: 36px 18px 72px;
                 font-size: 14px;
                 line-height: 1.5;
+                overflow-x: hidden;
             }
 
             .wallet-public * { box-sizing: border-box; }
@@ -75,6 +76,7 @@
                 color: var(--fg-2);
                 font-size: 13.5px;
                 margin-top: 6px;
+                overflow-wrap: anywhere;
             }
 
             .wallet-public .mono {
@@ -91,6 +93,7 @@
                 display: grid;
                 grid-template-columns: minmax(0, 1.2fr) minmax(300px, 1fr);
                 gap: 24px;
+                min-width: 0;
             }
 
             .wallet-public .card {
@@ -123,6 +126,7 @@
                 align-items: center;
                 justify-content: space-between;
                 gap: 12px;
+                min-width: 0;
             }
 
             .wallet-public .muted { color: var(--fg-2); }
@@ -403,10 +407,19 @@
             @media (max-width: 640px) {
                 .wallet-public { padding: 24px 12px 56px; }
                 .wallet-public .pub-shell { padding: 16px; }
-                .wallet-public .page-head { flex-direction: column; align-items: flex-start; }
+                .wallet-public .page-head { flex-direction: column; align-items: flex-start; gap: 14px; }
                 .wallet-public .page-title { font-size: 32px; }
-                .wallet-public .grid-2-equal,
+                .wallet-public .page-head .btn { width: 100%; }
+                .wallet-public .grid-2-equal { grid-template-columns: 1fr; }
                 .wallet-public .amount-grid { grid-template-columns: 1fr 1fr; }
+                .wallet-public .between { align-items: flex-start; flex-wrap: wrap; }
+                .wallet-public .card-body.row { align-items: flex-start; }
+                .wallet-public .wallet-hero { height: 180px; }
+            }
+
+            @media (max-width: 380px) {
+                .wallet-public .amount-grid { grid-template-columns: 1fr; }
+                .wallet-public .card-body.row { flex-direction: column; }
             }
         </style>
 
