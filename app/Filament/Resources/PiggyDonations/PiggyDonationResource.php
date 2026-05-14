@@ -25,6 +25,12 @@ class PiggyDonationResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Piggy Wallets & Gifts';
 
+    protected static ?string $navigationLabel = 'Piggy Wallet Gifts';
+
+    protected static ?string $modelLabel = 'Piggy Wallet Gift';
+
+    protected static ?string $pluralModelLabel = 'Piggy Wallet Gifts';
+
     protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'donor_name';

@@ -24,7 +24,7 @@ class CreatePiggyBoxForUser
         // Create Piggy Wallet for user
         return PiggyBox::create([
             'user_id' => $user->id,
-            'title' => "My Piggy Wallet",
+            'title' => "{$user->name} Piggy Wallet",
             'description' => "Send me a gift!",
             'currency_code' => $user->country->currency_code ?? 'USD',
             'is_active' => true,

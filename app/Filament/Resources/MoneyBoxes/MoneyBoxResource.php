@@ -27,6 +27,12 @@ class MoneyBoxResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'PiggyBoxes & Contributions';
 
+    protected static ?string $navigationLabel = 'PiggyBoxes';
+
+    protected static ?string $modelLabel = 'PiggyBox';
+
+    protected static ?string $pluralModelLabel = 'PiggyBoxes';
+
     protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'title';
