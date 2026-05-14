@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Log;
 class TrendiPayProvider implements PaymentProviderInterface
 {
     protected string $merchantExternalId; // Used as Bearer token
-    protected string $checkoutTerminalId; // Used in payload
+    protected string $checkoutTerminalId; // Used for payment link / checkout flow
+    protected string $apiTerminalId;      // Used for disbursements
     protected string $checkoutBaseUrl;
 
     public function __construct()
@@ -17,7 +18,8 @@ class TrendiPayProvider implements PaymentProviderInterface
         // According to docs: Use Merchant External ID as Bearer token, NOT the API key
         $this->merchantExternalId = config('payment.trendipay.merchant_external_id');
         $this->checkoutTerminalId = config('payment.trendipay.checkout_terminal_id');
-        $this->checkoutBaseUrl = config('payment.trendipay.checkout_base_url', 'https://test-api.bsl.com.gh');
+        $this->apiTerminalId      = config('payment.trendipay.api_terminal_id');
+        $this->checkoutBaseUrl    = config('payment.trendipay.checkout_base_url', 'https://test-api.bsl.com.gh');
     }
 
     public function initializePayment(array $data): array
@@ -218,10 +220,8 @@ class TrendiPayProvider implements PaymentProviderInterface
                 'callbackUrl' => $data['callback_url'] ?? route('trendipay.webhook'),
             ];
 
-            // Use the API base URL (not checkout) for disbursements
-            // Endpoint: /v1/terminals/{terminalExternalId}/disbursements
             $apiBaseUrl = config('payment.trendipay.api_base_url', $this->checkoutBaseUrl);
-            $url = "{$apiBaseUrl}/v1/terminals/{$this->checkoutTerminalId}/disbursements";
+            $url = "{$apiBaseUrl}/v1/terminals/{$this->apiTerminalId}/disbursements";
 
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->merchantExternalId,
@@ -241,7 +241,7 @@ class TrendiPayProvider implements PaymentProviderInterface
             if ($response->successful() && isset($result['success']) && $result['success'] === true) {
                 return [
                     'success' => true,
-                    'transaction_reference' => $result['data']['transactionId'] ?? $result['data']['reference'] ?? $data['reference'],
+                    'transaction_reference' => $result['data']['externalId'] ?? $result['data']['reference'] ?? $data['reference'],
                     'status' => 'processing',
                     'provider' => 'trendipay',
                     'raw_data' => $result,
