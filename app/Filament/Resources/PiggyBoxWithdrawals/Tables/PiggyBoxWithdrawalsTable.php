@@ -29,7 +29,7 @@ class PiggyBoxWithdrawalsTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('piggyBox.title')
-                    ->label('Piggy Box')
+                    ->label('Piggy Wallet')
                     ->limit(25)
                     ->searchable(),
                 TextColumn::make('amount')

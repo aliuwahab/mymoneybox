@@ -9,7 +9,7 @@ class CreatePiggyBoxForUser
 {
     public function execute(User $user): PiggyBox
     {
-        // Check if user already has a piggy box
+        // Check if user already has a Piggy Wallet
         if ($user->piggyBox) {
             return $user->piggyBox;
         }
@@ -21,10 +21,10 @@ class CreatePiggyBoxForUser
             ]);
         }
 
-        // Create piggy box for user
+        // Create Piggy Wallet for user
         return PiggyBox::create([
             'user_id' => $user->id,
-            'title' => "My Piggy Box",
+            'title' => "My Piggy Wallet",
             'description' => "Send me a gift!",
             'currency_code' => $user->country->currency_code ?? 'USD',
             'is_active' => true,

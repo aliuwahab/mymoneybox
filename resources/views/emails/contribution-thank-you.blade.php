@@ -47,7 +47,7 @@
     </div>
 
     <div class="box-card">
-      <div class="box-label">Box</div>
+      <div class="box-label">PiggyBox</div>
       <div class="box-title">{{ $moneyBox->title }}</div>
       @if($moneyBox->description)
         <p style="font-size:13px;color:#6B6862;margin:6px 0 0;">{{ Str::limit($moneyBox->description, 120) }}</p>
@@ -61,9 +61,9 @@
       </div>
     @endif
 
-    <p>The box owner has been notified. If you have any questions about your contribution, please reference <strong>{{ $contribution->payment_reference }}</strong>.</p>
+    <p>The PiggyBox owner has been notified. If you have any questions about your contribution, please reference <strong>{{ $contribution->payment_reference }}</strong>.</p>
 
-    <a href="{{ route('box.show', $moneyBox->slug) }}" class="cta">View the box →</a>
+    <a href="{{ route('box.show', $moneyBox->slug) }}" class="cta">View the PiggyBox →</a>
   </div>
 
   <div class="footer">

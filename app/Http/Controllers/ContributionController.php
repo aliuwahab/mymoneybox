@@ -35,7 +35,7 @@ class ContributionController extends Controller
         ]);
 
         if (!$moneyBox->validateContributionAmount($validated['amount'])) {
-            return back()->with('error', 'Invalid contribution amount based on the box rules.');
+            return back()->with('error', 'Invalid contribution amount based on the PiggyBox rules.');
         }
 
         $reference = 'contrib_' . uniqid();

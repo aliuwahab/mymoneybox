@@ -19,7 +19,7 @@ class PiggyDonationsTable
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('piggyBox.title')
-                    ->label('Piggy Box')
+                    ->label('Piggy Wallet')
                     ->limit(25)
                     ->searchable(),
                 TextColumn::make('donor_name')

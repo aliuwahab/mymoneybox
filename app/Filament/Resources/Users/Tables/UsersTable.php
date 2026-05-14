@@ -50,7 +50,7 @@ class UsersTable
                     ->toggleable(),
                 TextColumn::make('moneyBoxes_count')
                     ->counts('moneyBoxes')
-                    ->label('Money Boxes')
+                    ->label('PiggyBoxes')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

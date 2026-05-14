@@ -20,7 +20,7 @@
                     </div>
                 </div>
 
-                <!-- Piggy Box Stats -->
+                <!-- Piggy Wallet Stats -->
                 <div class="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
                     <div>
                         <div class="text-2xl font-bold text-gray-900">

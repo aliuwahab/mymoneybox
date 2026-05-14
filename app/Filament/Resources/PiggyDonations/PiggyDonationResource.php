@@ -23,7 +23,7 @@ class PiggyDonationResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-currency-dollar';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Piggy Boxes & Donations';
+    protected static string|UnitEnum|null $navigationGroup = 'Piggy Wallets & Gifts';
 
     protected static ?int $navigationSort = 2;
 

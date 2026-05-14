@@ -9,8 +9,8 @@
                     Dashboard
                 </a>
             </div>
-            <h1 class="page-title" style="font-size:1.875rem;">Create a piggy box</h1>
-            <p class="tiny mt-1.5">Set up a new piggy box to collect contributions from anyone.</p>
+            <h1 class="page-title" style="font-size:1.875rem;">Create a PiggyBox</h1>
+            <p class="tiny mt-1.5">Set up a new PiggyBox to collect contributions from anyone.</p>
         </div>
 
         @if($errors->any())
@@ -37,7 +37,7 @@
                     </div>
                     <div class="grid gap-1.5">
                         <label class="text-[13px] font-medium" for="description">Description</label>
-                        <textarea name="description" id="description" rows="4" placeholder="Tell people about this box…">{{ old('description') }}</textarea>
+                        <textarea name="description" id="description" rows="4" placeholder="Tell people about this PiggyBox…">{{ old('description') }}</textarea>
                         @error('description')<p class="text-[11.5px] text-red-600 mt-0.5">{{ $message }}</p>@enderror
                     </div>
                     <div class="grid gap-1.5">
@@ -142,7 +142,7 @@
             <div class="flex items-center justify-end gap-3 pt-1">
                 <a href="{{ route('dashboard') }}" wire:navigate class="btn">Cancel</a>
                 <button type="submit" class="btn-primary">
-                    Create piggy box
+                    Create PiggyBox
                 </button>
             </div>
         </form>

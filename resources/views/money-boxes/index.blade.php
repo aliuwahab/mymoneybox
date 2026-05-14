@@ -9,7 +9,7 @@
         {{-- Page header --}}
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-6 mb-6">
             <div>
-                <h1 class="page-title">Your piggy boxes</h1>
+                <h1 class="page-title">Your PiggyBoxes</h1>
                 <p class="text-[13.5px] text-[#6B6862] mt-1.5">
                     {{ $moneyBoxes->total() }} total ·
                     {{ $moneyBoxes->getCollection()->where('is_active', true)->count() }} active
@@ -18,7 +18,7 @@
             <div class="flex items-center gap-2">
                 <a href="{{ route('money-boxes.create') }}" class="btn btn-primary">
                     <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-                    New piggy box
+                    New PiggyBox
                 </a>
             </div>
         </div>
@@ -127,11 +127,11 @@
                 <div class="w-12 h-12 rounded-xl bg-primary-50 text-primary-600 grid place-items-center mx-auto mb-4">
                     <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="M3 7.5 12 12l9-4.5"/><path d="M12 12v9"/></svg>
                 </div>
-                <h3 class="text-[15px] font-semibold text-[#15140F] mb-1">No piggy boxes</h3>
-                <p class="tiny mb-5">Get started by creating your first piggy box.</p>
+                <h3 class="text-[15px] font-semibold text-[#15140F] mb-1">No PiggyBoxes yet</h3>
+                <p class="tiny mb-5">Get started by creating your first PiggyBox.</p>
                 <a href="{{ route('money-boxes.create') }}" class="btn btn-primary">
                     <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-                    Create a piggy box
+                    Create a PiggyBox
                 </a>
             </div>
         @endif

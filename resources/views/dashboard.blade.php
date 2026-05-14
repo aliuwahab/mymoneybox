@@ -4,13 +4,13 @@
     $sym  = $user->country?->currency_symbol ?? '₵';
     $firstName = explode(' ', $user->name)[0];
 
-    // Aggregate stats across all user's piggy boxes
+    // Aggregate stats across all user's PiggyBoxes
     $totalRaised       = $user->moneyBoxes()->sum('total_contributions');
     $totalContributors = $user->moneyBoxes()->sum('contribution_count');
     $activeBoxes       = $user->moneyBoxes()->where('is_active', true)->count();
     $avgGift           = $totalContributors > 0 ? $totalRaised / $totalContributors : 0;
 
-    // Recent contributions across all boxes
+    // Recent contributions across all PiggyBoxes
     $recentContribs = \App\Models\Contribution::whereIn('money_box_id', $user->moneyBoxes->pluck('id'))
         ->with(['moneyBox'])
         ->latest()
@@ -46,7 +46,7 @@
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
         <div>
             <h1 class="page-title">Good {{ now()->hour < 12 ? 'morning' : (now()->hour < 18 ? 'afternoon' : 'evening') }}, {{ $firstName }}.</h1>
-            <p class="text-[13.5px] text-[#6B6862] mt-1.5">Here's what's happening across your piggy boxes this week.</p>
+            <p class="text-[13.5px] text-[#6B6862] mt-1.5">Here's what's happening across your PiggyBoxes this week.</p>
         </div>
         <div class="flex items-center gap-2">
             <button class="btn">
@@ -55,7 +55,7 @@
             </button>
             <a href="{{ route('money-boxes.create') }}" wire:navigate class="btn btn-primary">
                 <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-                New box
+                New PiggyBox
             </a>
         </div>
     </div>
@@ -65,7 +65,7 @@
         <div class="stat-card">
             <div class="stat-label">Total raised</div>
             <div class="stat-value">{{ $sym }}{{ number_format($totalRaised, 2) }}</div>
-            <div class="stat-delta text-[#6B6862]">across all boxes</div>
+            <div class="stat-delta text-[#6B6862]">across all PiggyBoxes</div>
         </div>
         <div class="stat-card">
             <div class="stat-label">Contributors</div>
@@ -73,7 +73,7 @@
             <div class="stat-delta text-[#6B6862]">total contributions</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Active boxes</div>
+            <div class="stat-label">Active PiggyBoxes</div>
             <div class="stat-value tnum">{{ $activeBoxes }}</div>
             <div class="stat-delta text-[#6B6862]">{{ $user->moneyBoxes()->count() }} total created</div>
         </div>
@@ -146,7 +146,7 @@
                     </div>
                 @else
                     <div class="text-center py-6 w-full">
-                        <div class="tiny">No goals set on any boxes yet.</div>
+                        <div class="tiny">No goals set on any PiggyBoxes yet.</div>
                     </div>
                 @endif
             </div>
@@ -170,7 +170,7 @@
                     <table class="data-table">
                         <thead><tr>
                             <th>Contributor</th>
-                            <th>Box</th>
+                            <th>PiggyBox</th>
                             <th>Method</th>
                             <th class="text-right">Amount</th>
                             <th>When</th>
@@ -207,7 +207,7 @@
                     <div class="w-10 h-10 rounded-xl bg-[#F3F1EB] grid place-items-center mx-auto mb-3">
                         <svg viewBox="0 0 24 24" class="w-5 h-5 text-[#9C998F]" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M21.5 20c0-3-1.7-5.2-4.5-5.8"/></svg>
                     </div>
-                    <p class="text-[13px] text-[#6B6862]">No contributions yet. Share your box to get started.</p>
+                    <p class="text-[13px] text-[#6B6862]">No contributions yet. Share your PiggyBox to get started.</p>
                 </div>
             @endif
         </div>
@@ -222,7 +222,7 @@
                         <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="text-[13px] font-medium text-[#15140F]">Create a piggy box</div>
+                        <div class="text-[13px] font-medium text-[#15140F]">Create a PiggyBox</div>
                         <div class="tiny">Wedding, medical, project — 60 seconds</div>
                     </div>
                     <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-[#9C998F]" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
@@ -235,7 +235,7 @@
                         <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M8.6 13.5 15.4 17"/><path d="M15.4 7 8.6 10.5"/></svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="text-[13px] font-medium text-[#15140F]">Share your active box</div>
+                        <div class="text-[13px] font-medium text-[#15140F]">Share your active PiggyBox</div>
                         <div class="tiny">QR code, WhatsApp, link</div>
                     </div>
                     <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-[#9C998F]" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
@@ -265,8 +265,8 @@
                         <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a13 13 0 0 1 0 18"/><path d="M12 3a13 13 0 0 0 0 18"/></svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="text-[13px] font-medium text-[#15140F]">Browse piggy boxes</div>
-                        <div class="tiny">Discover and support piggy boxes</div>
+                        <div class="text-[13px] font-medium text-[#15140F]">Browse PiggyBoxes</div>
+                        <div class="tiny">Discover and support PiggyBoxes</div>
                     </div>
                     <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-[#9C998F]" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                 </a>
@@ -288,13 +288,13 @@
         </div>
     </div>
 
-    {{-- Active boxes preview --}}
+    {{-- Active PiggyBoxes preview --}}
     @if($user->moneyBoxes()->where('is_active', true)->count() > 0)
     <div class="card">
         <div class="card-head">
-            <div class="card-title">Your active boxes</div>
+            <div class="card-title">Your active PiggyBoxes</div>
             <a href="{{ route('money-boxes.index') }}" wire:navigate class="btn btn-ghost btn-sm text-[#6B6862]">
-                All boxes <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                All PiggyBoxes <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
             </a>
         </div>
         @php
@@ -304,7 +304,7 @@
         <div class="overflow-x-auto">
             <table class="data-table">
                 <thead><tr>
-                    <th>Box</th>
+                    <th>PiggyBox</th>
                     <th class="text-right">Raised</th>
                     <th class="text-right">Contributors</th>
                     <th>Progress</th>

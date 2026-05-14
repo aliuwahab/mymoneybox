@@ -98,14 +98,14 @@
                         <span class="text-[14.5px] font-semibold text-[#FAFAF7]">{{ config('app.name') }}</span>
                     </div>
                     <p class="text-[13px] leading-relaxed max-w-xs">
-                        Create and share piggy boxes for any occasion. Collect contributions easily and securely.
+                        Create and share PiggyBoxes for any occasion. Collect contributions easily and securely.
                     </p>
                 </div>
 
                 <div>
                     <h3 class="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#6B6862] mb-4">Platform</h3>
                     <ul class="space-y-2.5 text-[13px]">
-                        <li><a href="{{ route('browse') }}" class="hover:text-[#FAFAF7] transition-colors duration-100">Browse Boxes</a></li>
+                        <li><a href="{{ route('browse') }}" class="hover:text-[#FAFAF7] transition-colors duration-100">Browse PiggyBoxes</a></li>
                         <li><a href="{{ route('register') }}" class="hover:text-[#FAFAF7] transition-colors duration-100">Create Account</a></li>
                         <li><a href="{{ route('about') }}" class="hover:text-[#FAFAF7] transition-colors duration-100">About Us</a></li>
                     </ul>

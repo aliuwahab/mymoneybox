@@ -9,7 +9,7 @@
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
         <div>
             <h1 class="page-title">Contributors</h1>
-            <p class="text-[13.5px] text-[#6B6862] mt-1.5">Everyone who has contributed across your piggy boxes</p>
+            <p class="text-[13.5px] text-[#6B6862] mt-1.5">Everyone who has contributed across your PiggyBoxes</p>
         </div>
         <div class="flex items-center gap-2">
             <button class="btn">
@@ -30,7 +30,7 @@
             <div class="stat-value tnum">{{ number_format($totalContributors) }}</div>
             <div class="stat-delta text-primary-600">
                 <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
-                Across all boxes
+                Across all PiggyBoxes
             </div>
         </div>
         <div class="stat-card">
@@ -62,7 +62,7 @@
                 <table class="data-table">
                     <thead><tr>
                         <th>Contributor</th>
-                        <th>Boxes</th>
+                        <th>PiggyBoxes</th>
                         <th class="num">Contributions</th>
                         <th class="num">Total</th>
                         <th>Last</th>
@@ -87,7 +87,7 @@
                                         </span>
                                     </div>
                                 </td>
-                                <td class="muted">{{ $c->boxes_count }} {{ Str::plural('box', $c->boxes_count) }}</td>
+                                <td class="muted">{{ $c->boxes_count }} {{ Str::plural('PiggyBox', $c->boxes_count) }}</td>
                                 <td class="num tnum">{{ $c->contributions_count }}</td>
                                 <td class="num tnum font-semibold text-[#15140F]">{{ $sym }}{{ number_format($c->total_amount, 2) }}</td>
                                 <td class="muted text-[12px]">{{ \Carbon\Carbon::parse($c->last_contributed_at)->diffForHumans() }}</td>
@@ -107,7 +107,7 @@
                     <svg viewBox="0 0 24 24" class="w-6 h-6 text-[#9C998F]" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M21.5 20c0-3-1.7-5.2-4.5-5.8"/></svg>
                 </div>
                 <h3 class="text-[14px] font-semibold text-[#15140F] mb-1">No contributors yet</h3>
-                <p class="tiny">Share your piggy boxes to start receiving contributions.</p>
+                <p class="tiny">Share your PiggyBoxes to start receiving contributions.</p>
             </div>
         @endif
     </div>

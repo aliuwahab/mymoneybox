@@ -80,7 +80,7 @@ class MoneyBoxForm
                     ->maxValue(100)
                     ->step(0.01)
                     ->placeholder(config('withdrawal.fee_percentage', 2.5))
-                    ->helperText('Leave blank to use the global default (' . config('withdrawal.fee_percentage', 2.5) . '%). Set a custom percentage (e.g. 0 for fee-free) to override for this box only.'),
+                    ->helperText('Leave blank to use the global default (' . config('withdrawal.fee_percentage', 2.5) . '%). Set a custom percentage (e.g. 0 for fee-free) to override for this PiggyBox only.'),
             ]);
     }
 }

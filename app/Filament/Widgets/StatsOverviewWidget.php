@@ -45,8 +45,8 @@ class StatsOverviewWidget extends BaseWidget
                 ->icon('heroicon-o-users')
                 ->color('primary'),
 
-            Stat::make('Active Money Boxes', number_format(MoneyBox::where('is_active', true)->count()))
-                ->description('Live fundraising boxes')
+            Stat::make('Active PiggyBoxes', number_format(MoneyBox::where('is_active', true)->count()))
+                ->description('Live fundraising PiggyBoxes')
                 ->icon('heroicon-o-gift')
                 ->color('success'),
 

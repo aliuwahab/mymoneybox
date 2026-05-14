@@ -3,8 +3,8 @@
 
         {{-- Header --}}
         <div class="mb-6">
-            <h1 class="page-title" style="font-size:1.875rem;">Edit piggy box</h1>
-            <p class="tiny mt-1.5">Update your piggy box settings</p>
+            <h1 class="page-title" style="font-size:1.875rem;">Edit PiggyBox</h1>
+            <p class="tiny mt-1.5">Update your PiggyBox settings</p>
         </div>
 
         <form method="POST" action="{{ route('money-boxes.update', $moneyBox) }}" enctype="multipart/form-data" class="space-y-4">
@@ -123,7 +123,7 @@
                                class="rounded border-[#D9D6CE] text-primary-600"
                                {{ old('is_ongoing', $moneyBox->is_ongoing) ? 'checked' : '' }}
                                onchange="toggleEndDate()" />
-                        <label for="is_ongoing" class="text-[13px] text-[#15140F]">This box is ongoing (no end date)</label>
+                        <label for="is_ongoing" class="text-[13px] text-[#15140F]">This PiggyBox is ongoing (no end date)</label>
                     </div>
 
                     <div id="end_date_field" class="grid gap-1.5">
@@ -196,15 +196,15 @@
                     <div class="relative group">
                         <button type="button" disabled class="btn opacity-40 cursor-not-allowed">Delete</button>
                         <div class="absolute bottom-full left-0 mb-2 hidden group-hover:block w-60 p-2.5 bg-[#15140F] text-white text-[11.5px] rounded-[6px] shadow-lg z-10">
-                            This box has {{ $moneyBox->contribution_count }} {{ Str::plural('contribution', $moneyBox->contribution_count) }} and cannot be deleted.
+                            This PiggyBox has {{ $moneyBox->contribution_count }} {{ Str::plural('contribution', $moneyBox->contribution_count) }} and cannot be deleted.
                         </div>
                     </div>
                 @else
                     <button
                         type="button"
-                        onclick="confirmDelete(() => document.getElementById('delete-form').submit(), { title: 'Delete box?', text: 'All contributions and data will be permanently deleted!', confirmText: 'Yes, delete it!' })"
+                        onclick="confirmDelete(() => document.getElementById('delete-form').submit(), { title: 'Delete PiggyBox?', text: 'All contributions and data will be permanently deleted!', confirmText: 'Yes, delete it!' })"
                         class="btn bg-red-50 border-red-200 text-red-700 hover:bg-red-100 hover:border-red-300">
-                        Delete box
+                        Delete PiggyBox
                     </button>
                 @endif
 

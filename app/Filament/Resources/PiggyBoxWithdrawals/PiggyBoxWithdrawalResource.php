@@ -23,7 +23,7 @@ class PiggyBoxWithdrawalResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    protected static ?string $navigationLabel = 'Piggy Box Withdrawals';
+    protected static ?string $navigationLabel = 'Piggy Wallet Withdrawals';
 
     protected static ?string $recordTitleAttribute = 'reference';
 

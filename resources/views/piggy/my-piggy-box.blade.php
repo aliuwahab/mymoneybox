@@ -1,4 +1,4 @@
-<x-layouts.app :title="'My Piggy'">
+<x-layouts.app :title="'My Piggy Wallet'">
     @php
         $sym      = auth()->user()->country?->currency_symbol ?? '₵';
         $balance  = $piggyBox->getAvailableBalance();
@@ -24,7 +24,7 @@
                      .then(() => { this.codeCopied = true; setTimeout(() => this.codeCopied = false, 2000); });
              },
              whatsapp() {
-                 const msg = `🎁 ${this.userName} is collecting gifts!\n\nMy Piggy Code: ${this.piggyCode}\n\nOr use this link: ${this.shareUrl}`;
+                 const msg = `🎁 ${this.userName} is collecting gifts!\n\nMy Piggy Wallet Code: ${this.piggyCode}\n\nOr use this link: ${this.shareUrl}`;
                  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
              }
          }">
@@ -32,8 +32,8 @@
         {{-- Page header --}}
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
-                <h1 class="page-title" style="font-size:1.875rem;">Personal Piggy Box</h1>
-                <p class="text-[13px] text-[#6B6862] mt-1">Your personal gift collection box</p>
+                <h1 class="page-title" style="font-size:1.875rem;">Piggy Wallet</h1>
+                <p class="text-[13px] text-[#6B6862] mt-1">Your personal gift wallet</p>
             </div>
             <div class="flex items-center gap-2 flex-none flex-wrap">
                 @if($canWd)
@@ -99,7 +99,7 @@
                 {{-- Share card --}}
                 <div class="card">
                     <div class="card-head">
-                        <h2 class="card-title">Share your piggy</h2>
+                        <h2 class="card-title">Share your Piggy Wallet</h2>
                     </div>
                     <div class="card-body space-y-3">
 
@@ -189,7 +189,7 @@
                         <div class="card-body text-center py-10">
                             <div class="text-[40px] mb-3">🎁</div>
                             <div class="text-[14px] font-medium text-[#15140F] mb-1">No gifts yet</div>
-                            <p class="tiny mb-4">Share your piggy code or link to start receiving gifts from friends.</p>
+                            <p class="tiny mb-4">Share your Piggy Wallet code or link to start receiving gifts from friends.</p>
                             <button @click="whatsapp()" class="btn btn-sm">Share via WhatsApp</button>
                         </div>
                     @endif

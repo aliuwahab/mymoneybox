@@ -63,7 +63,7 @@
                             />
                             <div class="space-y-3">
                                 <p class="text-[13px] text-[#6B6862] leading-relaxed">
-                                    Download and share this QR code. Anyone who scans it can contribute to your box.
+                                    Download and share this QR code. Anyone who scans it can contribute to your PiggyBox.
                                 </p>
                                 <div class="flex flex-col gap-2">
                                     <a href="{{ route('money-boxes.download-qr', $moneyBox) }}" class="btn" wire:navigate>

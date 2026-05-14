@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Your box is live!</title>
+<title>Your PiggyBox is live!</title>
 <style>
   body { margin: 0; padding: 0; background: #F3F1EB; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
   .wrap { max-width: 560px; margin: 40px auto; background: #FFFFFF; border-radius: 12px; overflow: hidden; border: 1px solid #E6E3DC; }
@@ -40,9 +40,9 @@
   </div>
 
   <div class="hero">
-    <div class="hero-tag">🎉 Box live</div>
-    <h2>Your box is ready to collect!</h2>
-    <p>Hi {{ explode(' ', $moneyBox->user->name)[0] }}, your piggy box has been created and is ready to share.</p>
+    <div class="hero-tag">🎉 PiggyBox live</div>
+    <h2>Your PiggyBox is ready to collect!</h2>
+    <p>Hi {{ explode(' ', $moneyBox->user->name)[0] }}, your PiggyBox has been created and is ready to share.</p>
 
     <div class="box-card">
       <div class="box-name">{{ $moneyBox->title }}</div>
@@ -68,7 +68,7 @@
       <div class="step-num">1</div>
       <div>
         <div class="step-title">Share your link</div>
-        <div class="step-desc">Send your box link to friends, family, or supporters via WhatsApp, social media, or email.</div>
+        <div class="step-desc">Send your PiggyBox link to friends, family, or supporters via WhatsApp, social media, or email.</div>
       </div>
     </div>
 
@@ -89,18 +89,18 @@
     </div>
 
     <div class="link-box">
-      <div style="margin-bottom:4px;color:#9C998F;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;">Your box link</div>
+      <div style="margin-bottom:4px;color:#9C998F;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;">Your PiggyBox link</div>
       <a href="{{ route('box.show', $moneyBox->slug) }}">{{ route('box.show', $moneyBox->slug) }}</a>
     </div>
 
     <div class="cta-row">
-      <a href="{{ route('money-boxes.show', $moneyBox) }}" class="cta">Manage box →</a>
+      <a href="{{ route('money-boxes.show', $moneyBox) }}" class="cta">Manage PiggyBox →</a>
       <a href="{{ route('money-boxes.share', $moneyBox) }}" class="cta-outline">Share &amp; QR code</a>
     </div>
   </div>
 
   <div class="footer">
-    <p>You're receiving this because you created a box on <a href="{{ config('app.url') }}">{{ config('app.name') }}</a>. <a href="{{ route('profile.edit') }}">Manage notifications</a></p>
+    <p>You're receiving this because you created a PiggyBox on <a href="{{ config('app.url') }}">{{ config('app.name') }}</a>. <a href="{{ route('profile.edit') }}">Manage notifications</a></p>
   </div>
 </div>
 </body>

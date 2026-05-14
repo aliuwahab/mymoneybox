@@ -70,7 +70,7 @@ class PiggyBoxWithdrawalForm extends Component
         $piggyBox = auth()->user()->piggyBox;
 
         if (!$piggyBox) {
-            $this->addError('amount', 'No piggy box found.');
+            $this->addError('amount', 'No Piggy Wallet found.');
             return;
         }
 

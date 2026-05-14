@@ -13,7 +13,7 @@ class PiggyDonationInfolist
         return $schema
             ->components([
                 TextEntry::make('piggyBox.title')
-                    ->label('Piggy box'),
+                    ->label('Piggy Wallet'),
                 TextEntry::make('donor_name'),
                 TextEntry::make('donor_email'),
                 TextEntry::make('donor_phone')

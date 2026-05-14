@@ -90,7 +90,7 @@ class MoneyBoxesTable
                     ->requiresConfirmation()
                     ->action(function ($record) {
                         $record->update(['is_active' => false]);
-                        Notification::make()->warning()->title('Box deactivated')->send();
+                        Notification::make()->warning()->title('PiggyBox deactivated')->send();
                     })
                     ->visible(fn ($record) => $record->is_active && !$record->trashed()),
                 Action::make('activate')
@@ -99,7 +99,7 @@ class MoneyBoxesTable
                     ->requiresConfirmation()
                     ->action(function ($record) {
                         $record->update(['is_active' => true]);
-                        Notification::make()->success()->title('Box activated')->send();
+                        Notification::make()->success()->title('PiggyBox activated')->send();
                     })
                     ->visible(fn ($record) => !$record->is_active && !$record->trashed()),
             ])

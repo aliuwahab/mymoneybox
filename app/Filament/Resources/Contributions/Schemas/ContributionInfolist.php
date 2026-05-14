@@ -14,7 +14,7 @@ class ContributionInfolist
         return $schema
             ->components([
                 TextEntry::make('moneyBox.title')
-                    ->label('Money box'),
+                    ->label('PiggyBox'),
                 TextEntry::make('contributor_name')
                     ->placeholder('-'),
                 TextEntry::make('contributor_email')
