@@ -132,25 +132,28 @@ class PiggyBoxController extends Controller
         $reference = $request->query('reference');
 
         if (!$reference) {
-            return redirect()->route('home')->with('error', 'Invalid payment reference.');
+            return redirect()->route('piggy.lookup')->with('error', 'Invalid payment reference.');
         }
+
+        $donation = PiggyDonation::where('payment_reference', $reference)
+            ->with('piggyBox.user')
+            ->first();
+
+        if (!$donation || !$donation->piggyBox?->user) {
+            return redirect()->route('piggy.lookup')->with('error', 'Donation not found.');
+        }
+
+        $walletUrl = route('piggy.show', $donation->piggyBox->user->piggy_code);
 
         // Verify payment
         $verification = $this->paymentManager->verifyPayment($reference);
 
         if (!$verification['success']) {
-            return redirect()->route('home')->with('error', 'Payment verification failed.');
-        }
-
-        // Find and update donation
-        $donation = PiggyDonation::where('payment_reference', $reference)->first();
-
-        if (!$donation) {
-            return redirect()->route('home')->with('error', 'Donation not found.');
+            return redirect($walletUrl)->with('error', 'Payment verification failed.');
         }
 
         if ($donation->payment_status === PaymentStatus::Completed) {
-            return redirect()->route('home')
+            return redirect($walletUrl)
                 ->with('success', 'Thank you for your gift!');
         }
 
@@ -164,7 +167,7 @@ class PiggyBoxController extends Controller
         $piggyBox->increment('total_received', $donation->amount);
         $piggyBox->increment('donation_count');
 
-        return redirect()->route('home')
+        return redirect($walletUrl)
             ->with('success', 'Thank you for your gift to ' . $piggyBox->user->name . '!');
     }
 
