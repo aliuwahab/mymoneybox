@@ -429,26 +429,14 @@
             align-items: start;
         }
         .pub-right {
-            position: sticky;
-            top: 84px;
             align-self: start;
-            max-height: calc(100vh - 100px);
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(0,0,0,.1) transparent;
         }
-        .pub-right::-webkit-scrollbar { width: 4px; }
-        .pub-right::-webkit-scrollbar-thumb { background: rgba(0,0,0,.1); border-radius: 4px; }
-        .pub-right::-webkit-scrollbar-track { background: transparent; }
 
         /* Mobile: single column, right col drops below */
         @media (max-width: 768px) {
             .pub-shell {
                 grid-template-columns: 1fr;
                 padding: 20px !important;
-            }
-            .pub-right {
-                position: static;
             }
         }
 
