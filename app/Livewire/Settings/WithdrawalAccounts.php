@@ -48,9 +48,21 @@ class WithdrawalAccounts extends Component
         'bankBranch' => 'bank branch',
     ];
 
+    public function mount()
+    {
+        if (request()->boolean('add')) {
+            $this->showAddForm();
+        }
+    }
+
     public function showAddForm()
     {
-        $this->authorize('create', WithdrawalAccount::class);
+        if (! auth()->user()->can('create', WithdrawalAccount::class)) {
+            session()->flash('error', 'Please submit ID verification before adding a withdrawal account.');
+            $this->redirectRoute('settings.verification', navigate: true);
+
+            return;
+        }
         
         $this->resetForm();
         $this->showForm = true;

@@ -36,16 +36,22 @@
                 @else
                     {{-- Add Account Button --}}
                     @if(!$showForm && $accounts->count() < 5)
-                        <div class="flex justify-end mb-6">
-                            <flux:button wire:click="showAddForm" variant="primary">
+                        <div class="flex justify-end mb-6" wire:key="withdrawal-account-add-action">
+                            <a
+                                href="{{ route('settings.withdrawal-accounts', ['add' => 1]) }}"
+                                wire:click.prevent="showAddForm"
+                                wire:loading.class="opacity-75 pointer-events-none"
+                                wire:target="showAddForm"
+                                class="btn btn-primary"
+                            >
                                 Add Withdrawal Account
-                            </flux:button>
+                            </a>
                         </div>
                     @endif
 
                     {{-- Add/Edit Form --}}
                     @if($showForm)
-                        <div class="bg-white rounded-lg shadow-lg p-6 mb-6 border-2 border-green-500">
+                        <div class="bg-white rounded-lg shadow-lg p-6 mb-6 border-2 border-green-500" wire:key="withdrawal-account-form">
                             <flux:heading size="lg" class="mb-4">
                                 {{ $editingId ? 'Edit Withdrawal Account' : 'Add Withdrawal Account' }}
                             </flux:heading>
@@ -91,10 +97,16 @@
                                 @endif
 
                                 <div class="flex justify-end space-x-3 pt-4">
-                                    <flux:button type="button" wire:click="cancel" variant="ghost">Cancel</flux:button>
-                                    <flux:button type="submit" variant="primary">
-                                        {{ $editingId ? 'Update Account' : 'Add Account' }}
-                                    </flux:button>
+                                    <button type="button" wire:click.prevent="cancel" class="btn btn-ghost">Cancel</button>
+                                    <button
+                                        type="submit"
+                                        wire:loading.attr="disabled"
+                                        wire:target="save"
+                                        class="btn btn-primary"
+                                    >
+                                        <span wire:loading.remove wire:target="save">{{ $editingId ? 'Update Account' : 'Add Account' }}</span>
+                                        <span wire:loading wire:target="save">{{ $editingId ? 'Updating...' : 'Adding...' }}</span>
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -235,7 +247,7 @@
                             </div>
                         </div>
                     @else
-                        <div class="bg-white rounded-lg shadow p-12 text-center">
+                        <div class="bg-white rounded-lg shadow p-12 text-center" wire:key="withdrawal-account-empty-state">
                             <div class="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                                 <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -243,9 +255,15 @@
                             </div>
                             <flux:heading size="lg" class="mb-2">No Withdrawal Accounts</flux:heading>
                             <p class="text-gray-600 mb-6">Add a bank account or mobile money account to receive withdrawals</p>
-                            <flux:button wire:click="showAddForm" variant="primary">
+                            <a
+                                href="{{ route('settings.withdrawal-accounts', ['add' => 1]) }}"
+                                wire:click.prevent="showAddForm"
+                                wire:loading.class="opacity-75 pointer-events-none"
+                                wire:target="showAddForm"
+                                class="btn btn-primary"
+                            >
                                 Add Your First Account
-                            </flux:button>
+                            </a>
                         </div>
                     @endif
                 @endif
