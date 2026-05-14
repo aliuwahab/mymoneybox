@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Contributions\Schemas;
 
 use App\Enums\PaymentStatus;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -43,7 +44,7 @@ class ContributionForm
                 Textarea::make('user_agent')
                     ->columnSpanFull(),
                 TextInput::make('transaction_rrn'),
-                Textarea::make('payment_metadata')
+                KeyValue::make('payment_metadata')
                     ->columnSpanFull(),
             ]);
     }

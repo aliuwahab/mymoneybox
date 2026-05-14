@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Contributions\Schemas;
 
 use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
@@ -49,7 +50,7 @@ class ContributionInfolist
                     ->placeholder('-'),
                 TextEntry::make('transaction_rrn')
                     ->placeholder('-'),
-                TextEntry::make('payment_metadata')
+                KeyValueEntry::make('payment_metadata')
                     ->placeholder('-')
                     ->columnSpanFull(),
             ]);
