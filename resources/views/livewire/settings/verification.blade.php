@@ -11,6 +11,12 @@
         </div>
     @endif
 
+    @if (session('error'))
+        <div class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+            {{ session('error') }}
+        </div>
+    @endif
+
     @if($currentVerification && $currentVerification->isValid())
         <!-- Verified Status -->
         <div class="bg-green-50 border-2 border-green-200 rounded-lg p-6 mb-6">

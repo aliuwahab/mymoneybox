@@ -231,6 +231,24 @@
             </button>
         </div>
 
+        @if(session('success') || session('error'))
+            <div
+                x-data="{ show: true }"
+                x-init="setTimeout(() => show = false, 4200)"
+                x-show="show"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 -translate-y-1"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-end="opacity-0 -translate-y-1"
+                x-cloak
+                class="fixed right-4 top-16 z-50 max-w-[calc(100vw-2rem)] sm:max-w-sm rounded-[8px] border px-4 py-3 text-[13px] shadow-[0_18px_50px_-24px_rgba(20,18,12,.42)] {{ session('error') ? 'border-red-200 bg-red-50 text-red-800' : 'border-primary-200 bg-primary-50 text-primary-800' }}"
+                role="status"
+            >
+                {{ session('error') ?: session('success') }}
+            </div>
+        @endif
+
         {{ $slot }}
 
         @fluxScripts
