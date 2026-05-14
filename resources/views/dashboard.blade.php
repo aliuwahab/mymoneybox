@@ -258,6 +258,18 @@
                 </a>
                 @endif
 
+                <a href="{{ route('withdrawals.index') }}" wire:navigate
+                   class="flex items-center gap-3 p-2.5 rounded-[8px] border border-[#E6E3DC] bg-white hover:bg-[#FBFAF6] transition-colors text-left">
+                    <div class="w-8 h-8 rounded-[7px] bg-[#E6F1EB] text-[#1B6B4E] grid place-items-center flex-none">
+                        <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-[13px] font-medium text-[#15140F]">View withdrawal requests</div>
+                        <div class="tiny">Track status, payouts, and comments</div>
+                    </div>
+                    <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-[#9C998F]" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </a>
+
                 <a href="{{ route('browse') }}" wire:navigate
                    class="flex items-center gap-3 p-2.5 rounded-[8px] border border-[#E6E3DC] bg-white hover:bg-[#FBFAF6] transition-colors text-left">
                     <div class="w-8 h-8 rounded-[7px] bg-[#E6F1EB] text-[#1B6B4E] grid place-items-center flex-none">

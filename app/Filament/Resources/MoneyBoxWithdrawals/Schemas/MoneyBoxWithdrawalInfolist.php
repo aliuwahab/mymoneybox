@@ -110,6 +110,26 @@ class MoneyBoxWithdrawalInfolist
                             ->label('Requested At')
                             ->dateTime(),
                     ]),
+
+                Section::make('Comments')
+                    ->schema([
+                        TextEntry::make('notes_summary')
+                            ->label('')
+                            ->state(fn ($record) => $record->notes()
+                                ->with('user')
+                                ->oldest()
+                                ->get()
+                                ->map(fn ($note) => sprintf(
+                                    "%s by %s on %s\n%s",
+                                    $note->is_admin ? 'Admin comment' : 'Owner comment',
+                                    $note->user?->name ?? 'User',
+                                    $note->created_at->format('M d, Y g:ia'),
+                                    $note->note,
+                                ))
+                                ->implode("\n\n"))
+                            ->placeholder('No comments yet.')
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 }

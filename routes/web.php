@@ -6,6 +6,7 @@ use App\Http\Controllers\PiggyBoxController;
 use App\Http\Controllers\PiggyWebhookController;
 use App\Http\Controllers\PublicBoxController;
 use App\Http\Controllers\TrendiPayWebhookController;
+use App\Http\Controllers\UserWithdrawalController;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
@@ -60,6 +61,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Contributors & Analytics
     Route::get('/contributors', [MoneyBoxController::class, 'contributors'])->name('contributors.index');
     Route::get('/analytics', [MoneyBoxController::class, 'analytics'])->name('analytics.index');
+
+    // User Withdrawal History
+    Route::get('/withdrawals', [UserWithdrawalController::class, 'index'])->name('withdrawals.index');
+    Route::get('/withdrawals/{type}/{withdrawal}', [UserWithdrawalController::class, 'show'])->name('withdrawals.show');
+    Route::post('/withdrawals/{type}/{withdrawal}/notes', [UserWithdrawalController::class, 'storeNote'])->name('withdrawals.notes.store');
 
     // Piggy Box Resource Routes
     Route::resource('money-boxes', MoneyBoxController::class);

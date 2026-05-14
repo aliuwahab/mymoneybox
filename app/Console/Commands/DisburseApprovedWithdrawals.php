@@ -110,15 +110,10 @@ class DisburseApprovedWithdrawals extends Command
                 'account_number' => $account->account_number,
                 'account_name' => $account->account_name,
                 'account_type' => $account->account_type->value,
-                'network' => $account->network?->value ?? 'mtn',
+                'network' => $account->mobile_network?->value ?? 'mtn',
                 'sender_name' => config('app.name'),
                 'description' => "Withdrawal: {$withdrawal->reference}",
             ];
-
-            // Add bank code if bank account
-            if ($account->account_type->value === 'bank' && $account->bank_code) {
-                $transferData['bank_code'] = $account->bank_code;
-            }
 
             // Execute transfer
             $result = $provider->transferAmount($transferData);

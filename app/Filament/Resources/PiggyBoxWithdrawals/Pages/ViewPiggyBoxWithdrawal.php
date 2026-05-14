@@ -16,6 +16,24 @@ class ViewPiggyBoxWithdrawal extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('addNote')
+                ->label('Add Comment')
+                ->icon('heroicon-o-chat-bubble-left-right')
+                ->form([
+                    Textarea::make('note')
+                        ->label('Comment')
+                        ->required()
+                        ->rows(3),
+                ])
+                ->action(function (array $data) {
+                    $this->record->notes()->create([
+                        'user_id' => auth()->id(),
+                        'note' => $data['note'],
+                        'is_admin' => true,
+                    ]);
+                    Notification::make()->success()->title('Comment added')->send();
+                }),
+
             Action::make('approve')
                 ->icon('heroicon-o-check-circle')
                 ->color('success')

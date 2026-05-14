@@ -83,6 +83,16 @@
                 >
                     Analytics
                 </flux:navlist.item>
+
+                <flux:navlist.item
+                    icon="arrow-up-circle"
+                    :href="route('withdrawals.index')"
+                    :current="request()->routeIs('withdrawals.*')"
+                    wire:navigate
+                    class="mmb-nav-item"
+                >
+                    Withdrawals
+                </flux:navlist.item>
             </flux:navlist>
 
             {{-- Account nav --}}
@@ -200,6 +210,7 @@
                         request()->routeIs('money-boxes.statistics') => ['Workspace', 'My PiggyBoxes', 'Statistics'],
                         request()->routeIs('contributors.index') => ['Workspace', 'Contributors'],
                         request()->routeIs('analytics.index') => ['Workspace', 'Analytics'],
+                        request()->routeIs('withdrawals.*') => ['Workspace', 'Withdrawals'],
                         request()->routeIs('piggy.my-piggy-box') => ['Account', 'My Piggy Wallet'],
                         request()->routeIs('browse') => ['Account', 'Browse'],
                         request()->routeIs('profile.edit') || request()->routeIs('user-password.edit') || request()->routeIs('settings.*') || request()->routeIs('two-factor.show') || request()->routeIs('appearance.edit') => ['Account', 'Settings'],
