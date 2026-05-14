@@ -27,6 +27,12 @@ Route::get('/embed/box/{slug}', [PublicBoxController::class, 'embed'])
 Route::view('/about', 'pages.about')->name('about');
 Route::view('/terms', 'pages.terms')->name('terms');
 Route::view('/privacy', 'pages.privacy')->name('privacy');
+Route::view('/careers', 'pages.careers')->name('careers');
+Route::view('/press', 'pages.press')->name('press');
+Route::view('/contact', 'pages.contact')->name('contact');
+Route::view('/security', 'pages.security')->name('security');
+Route::view('/status', 'pages.status')->name('status');
+Route::view('/cookies', 'pages.cookies')->name('cookies');
 
 // Contribution Routes (Public)
 Route::post('/box/{slug}/contribute', [ContributionController::class, 'store'])->name('box.contribute');
