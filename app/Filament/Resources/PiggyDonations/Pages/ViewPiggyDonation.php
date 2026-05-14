@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\PiggyDonations\Pages;
 
 use App\Filament\Resources\PiggyDonations\PiggyDonationResource;
-use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewPiggyDonation extends ViewRecord
@@ -12,8 +11,6 @@ class ViewPiggyDonation extends ViewRecord
 
     protected function getHeaderActions(): array
     {
-        return [
-            EditAction::make(),
-        ];
+        return [];
     }
 }

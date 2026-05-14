@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\PiggyDonations;
 
-use App\Filament\Resources\PiggyDonations\Pages\CreatePiggyDonation;
-use App\Filament\Resources\PiggyDonations\Pages\EditPiggyDonation;
 use App\Filament\Resources\PiggyDonations\Pages\ListPiggyDonations;
 use App\Filament\Resources\PiggyDonations\Pages\ViewPiggyDonation;
 use App\Filament\Resources\PiggyDonations\Schemas\PiggyDonationForm;
@@ -61,9 +59,7 @@ class PiggyDonationResource extends Resource
     {
         return [
             'index' => ListPiggyDonations::route('/'),
-            'create' => CreatePiggyDonation::route('/create'),
             'view' => ViewPiggyDonation::route('/{record}'),
-            'edit' => EditPiggyDonation::route('/{record}/edit'),
         ];
     }
 }

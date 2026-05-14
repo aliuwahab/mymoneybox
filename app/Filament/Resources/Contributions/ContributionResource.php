@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Contributions;
 
-use App\Filament\Resources\Contributions\Pages\CreateContribution;
-use App\Filament\Resources\Contributions\Pages\EditContribution;
 use App\Filament\Resources\Contributions\Pages\ListContributions;
 use App\Filament\Resources\Contributions\Pages\ViewContribution;
 use App\Filament\Resources\Contributions\Schemas\ContributionForm;
@@ -55,9 +53,7 @@ class ContributionResource extends Resource
     {
         return [
             'index' => ListContributions::route('/'),
-            'create' => CreateContribution::route('/create'),
             'view' => ViewContribution::route('/{record}'),
-            'edit' => EditContribution::route('/{record}/edit'),
         ];
     }
 }
