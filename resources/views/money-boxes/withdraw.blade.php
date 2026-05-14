@@ -119,6 +119,9 @@
                                 <span>You'll receive</span>
                                 <span class="tnum text-primary-700" x-text="fmt(net)"></span>
                             </div>
+                            <p class="tiny pt-1">
+                                The full withdrawal amount is deducted from your balance. MyPiggyBox keeps the fee and sends the net amount.
+                            </p>
                         </div>
                     </template>
 
