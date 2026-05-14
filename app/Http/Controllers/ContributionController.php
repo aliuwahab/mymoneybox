@@ -25,17 +25,25 @@ class ContributionController extends Controller
             return back()->with('error', 'This box is not accepting contributions.');
         }
 
+        $identity = $moneyBox->contributor_identity->value;
+        $isAnonymous = $identity === 'anonymous_allowed'
+            || ($identity !== 'must_identify' && $request->boolean('is_anonymous'));
+
         $validated = $request->validate([
             'amount'             => 'required|numeric|min:0.01',
-            'contributor_name'   => 'required_if:is_anonymous,false|nullable|string|max:255',
-            'contributor_email'  => 'required|email|max:255',
+            'contributor_name'   => [$isAnonymous ? 'nullable' : 'required', 'string', 'max:255'],
+            'contributor_email'  => [$isAnonymous ? 'nullable' : 'required', 'email', 'max:255'],
             'contributor_phone'  => 'nullable|string|max:20',
             'message'            => 'nullable|string|max:500',
-            'is_anonymous'       => 'boolean',
+            'is_anonymous'       => 'nullable|boolean',
         ]);
 
         if (!$moneyBox->validateContributionAmount($validated['amount'])) {
             return back()->with('error', 'Invalid contribution amount based on the PiggyBox rules.');
+        }
+
+        if (empty($validated['contributor_email'])) {
+            $validated['contributor_email'] = 'noreply@mypiggybox.com';
         }
 
         $reference = 'contrib_' . uniqid();
@@ -51,8 +59,8 @@ class ContributionController extends Controller
             'metadata'    => [
                 'money_box_id'    => $moneyBox->id,
                 'money_box_title' => $moneyBox->title,
-                'contributor_name' => $validated['contributor_name'] ?? 'Anonymous',
-                'is_anonymous'    => $validated['is_anonymous'] ?? false,
+                'contributor_name' => $isAnonymous ? 'Anonymous' : $validated['contributor_name'],
+                'is_anonymous'    => $isAnonymous,
                 'message'         => $validated['message'] ?? null,
             ],
         ]);
@@ -65,9 +73,9 @@ class ContributionController extends Controller
         $contributionData = new ContributionData(
             amount: (float) $validated['amount'],
             contributorEmail: $validated['contributor_email'],
-            contributorName: $validated['contributor_name'] ?? null,
+            contributorName: $isAnonymous ? null : $validated['contributor_name'],
             contributorPhone: $validated['contributor_phone'] ?? null,
-            isAnonymous: (bool) ($validated['is_anonymous'] ?? false),
+            isAnonymous: $isAnonymous,
             message: $validated['message'] ?? null,
             paymentProvider: 'trendipay',
             paymentReference: $payment['reference'],

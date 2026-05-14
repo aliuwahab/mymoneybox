@@ -64,9 +64,11 @@ class PiggyBoxController extends Controller
             return back()->with('error', 'This Piggy Wallet is not accepting gifts.');
         }
 
+        $isAnonymous = $request->boolean('is_anonymous');
+
         $validated = $request->validate([
             'amount' => 'required|numeric|min:0.01',
-            'donor_name' => 'required|string|max:255',
+            'donor_name' => [$isAnonymous ? 'nullable' : 'required', 'string', 'max:255'],
             'donor_email' => 'nullable|email',
             'donor_phone' => 'nullable|string|max:20',
             'message' => 'nullable|string|max:500',
@@ -89,8 +91,8 @@ class PiggyBoxController extends Controller
             'metadata' => [
                 'piggy_box_id' => $piggyBox->id,
                 'user_id' => $user->id,
-                'donor_name' => $validated['donor_name'] ?? 'Anonymous',
-                'is_anonymous' => $validated['is_anonymous'] ?? false,
+                'donor_name' => $isAnonymous ? 'Anonymous' : $validated['donor_name'],
+                'is_anonymous' => $isAnonymous,
                 'message' => $validated['message'] ?? null,
             ],
         ];
@@ -104,12 +106,12 @@ class PiggyBoxController extends Controller
         // Create donation record with pending status
         PiggyDonation::create([
             'piggy_box_id' => $piggyBox->id,
-            'donor_name' => $validated['donor_name'] ?? 'Anonymous',
+            'donor_name' => $isAnonymous ? 'Anonymous' : $validated['donor_name'],
             'donor_email' => $validated['donor_email'],
             'donor_phone' => $validated['donor_phone'] ?? null,
             'amount' => $validated['amount'],
             'currency_code' => $piggyBox->currency_code,
-            'is_anonymous' => $validated['is_anonymous'] ?? false,
+            'is_anonymous' => $isAnonymous,
             'message' => $validated['message'] ?? null,
             'payment_provider' => 'trendipay',
             'payment_reference' => $payment['reference'],

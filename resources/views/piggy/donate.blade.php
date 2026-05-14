@@ -484,15 +484,15 @@
 
                         <div class="grid-2-equal" style="margin-top: 12px;">
                             <div class="field">
-                                <label class="label" for="donor_name">Your name <span class="hint">*</span></label>
-                                <input id="donor_name" name="donor_name" class="input" required placeholder="Jane Asiedu" value="{{ old('donor_name', auth()->user()->name ?? '') }}">
+                                <label class="label" for="donor_name">Your name <span class="hint" x-show="!anonymous">*</span><span class="hint" x-show="anonymous">optional</span></label>
+                                <input id="donor_name" name="donor_name" class="input" :required="!anonymous" :disabled="anonymous" placeholder="Jane Asiedu" value="{{ old('donor_name', auth()->user()->name ?? '') }}">
                                 @error('donor_name')
                                     <div class="tiny" style="color: var(--danger);">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="field">
-                                <label class="label" for="donor_email">Email <span class="hint">for receipt</span></label>
-                                <input id="donor_email" name="donor_email" type="email" class="input" placeholder="jane@email.com" value="{{ old('donor_email') }}">
+                                <label class="label" for="donor_email">Email <span class="hint" x-text="anonymous ? 'optional' : 'for receipt'"></span></label>
+                                <input id="donor_email" name="donor_email" type="email" class="input" :disabled="anonymous" placeholder="jane@email.com" value="{{ old('donor_email') }}">
                                 @error('donor_email')
                                     <div class="tiny" style="color: var(--danger);">{{ $message }}</div>
                                 @enderror
