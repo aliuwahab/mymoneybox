@@ -128,6 +128,12 @@
 }
 
 @layer base {
+    :root,
+    html,
+    html.dark {
+        color-scheme: light;
+    }
+
     *,
     ::after,
     ::before,
@@ -143,6 +149,11 @@
         -webkit-font-smoothing: antialiased;
         text-rendering: optimizeLegibility;
         overflow-x: hidden;
+    }
+
+    html.dark body {
+        background-color: var(--color-sand-50);
+        color: var(--color-sand-700);
     }
 
     img, svg, video, canvas {
@@ -412,6 +423,134 @@ select:focus[data-flux-control] {
 .muted  { color: var(--color-sand-600); }
 .tiny   { font-size: 11.5px; color: var(--color-sand-500); }
 .divider { height: 1px; background: var(--color-sand-300); }
+
+/* Keep the app readable when Flux/device appearance switches to dark mode.
+   The product design is currently a warm light theme, so dark mode maps back
+   to the same accessible surface and text palette instead of mixing themes. */
+html.dark,
+html.dark body,
+html.dark input,
+html.dark textarea,
+html.dark select,
+html.dark button {
+    color-scheme: light;
+}
+
+html.dark .bg-\[\#FAFAF7\],
+html.dark .bg-\[\#F3F1EB\],
+html.dark .bg-white,
+html.dark [data-flux-main],
+html.dark [data-flux-header] {
+    background-color: var(--color-sand-50) !important;
+    color: var(--color-sand-700) !important;
+}
+
+html.dark .card,
+html.dark .stat-card,
+html.dark .vmock,
+html.dark .data-table,
+html.dark [data-flux-menu],
+html.dark [data-flux-popover],
+html.dark [data-flux-modal] {
+    background-color: #fff !important;
+    border-color: var(--color-sand-300) !important;
+    color: var(--color-sand-700) !important;
+}
+
+html.dark .card-head,
+html.dark .data-table th,
+html.dark .data-table td {
+    border-color: var(--color-sand-300) !important;
+}
+
+html.dark .data-table th {
+    background-color: #FBFAF6 !important;
+    color: var(--color-sand-500) !important;
+}
+
+html.dark .data-table tbody tr:hover td {
+    background-color: #FBFAF6 !important;
+}
+
+html.dark input[type="text"],
+html.dark input[type="email"],
+html.dark input[type="number"],
+html.dark input[type="datetime-local"],
+html.dark input[type="password"],
+html.dark textarea,
+html.dark select,
+html.dark [data-flux-control] {
+    background-color: #fff !important;
+    border-color: var(--color-sand-300) !important;
+    color: var(--color-sand-700) !important;
+    -webkit-text-fill-color: var(--color-sand-700);
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+    color: var(--color-sand-500) !important;
+    -webkit-text-fill-color: var(--color-sand-500);
+}
+
+html.dark label,
+html.dark [data-flux-label],
+html.dark .muted,
+html.dark .tiny,
+html.dark .stat-label,
+html.dark .stat-delta {
+    color: var(--color-sand-600) !important;
+}
+
+html.dark .page-title,
+html.dark .card-title,
+html.dark .stat-value,
+html.dark .text-\[\#15140F\] {
+    color: var(--color-sand-700) !important;
+}
+
+html.dark .btn {
+    background-color: #fff !important;
+    border-color: var(--color-sand-300) !important;
+    color: var(--color-sand-700) !important;
+}
+
+html.dark .btn:hover {
+    background-color: #FBFAF6 !important;
+    border-color: var(--color-sand-400) !important;
+}
+
+html.dark .btn-primary {
+    background-color: var(--color-primary-600) !important;
+    border-color: var(--color-primary-600) !important;
+    color: #fff !important;
+    -webkit-text-fill-color: #fff;
+}
+
+html.dark .btn-primary:hover {
+    background-color: var(--color-primary-700) !important;
+    border-color: var(--color-primary-700) !important;
+}
+
+html.dark .pill {
+    background-color: #fff !important;
+    border-color: var(--color-sand-300) !important;
+    color: var(--color-sand-600) !important;
+}
+
+html.dark .pill-ok,
+html.dark .pill-info {
+    background-color: var(--color-primary-50) !important;
+    border-color: transparent !important;
+    color: var(--color-primary-700) !important;
+}
+
+html.dark .progress-track {
+    background-color: var(--color-sand-200) !important;
+}
+
+html.dark .progress-fill {
+    background-color: var(--color-primary-600) !important;
+}
 
 @media (max-width: 640px) {
     .page-wrap {
