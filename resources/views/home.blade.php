@@ -444,8 +444,8 @@
         /* RESPONSIVE */
         @media (max-width: 980px) {
             .hero-grid, .section-head, .faq, .quote-grid { grid-template-columns: 1fr; gap: 32px; }
-            .visual { height: 380px; }
-            .v-card.main { left: 0; right: 0; top: 20px; height: 360px; }
+            .visual { height: 450px; }
+            .v-card.main { left: 0; right: 0; top: 20px; height: auto; min-height: 410px; }
             .v-card.float, .v-card.float-2 { display: none; }
             .feat.f-wide, .feat.f-narrow, .feat.f-third { grid-column: span 12; }
             .steps, .pricing { grid-template-columns: 1fr; }
@@ -459,6 +459,17 @@
         }
         @media (max-width: 640px) {
             .nav-links { display: none; }
+            .wrap { padding: 0 20px; }
+            .hero { padding: 56px 0 44px; }
+            .visual { height: 430px; }
+            .v-card.main { min-height: 400px; }
+            .vc-head { padding: 12px 14px; }
+            .vc-title { font-size: 11px; overflow-wrap: anywhere; }
+            .vc-body { padding: 18px; }
+            .vc-cover { height: 118px; }
+            .vc-stats { gap: 10px; margin-top: 16px; }
+            .vc-stat-label { font-size: 10.5px; }
+            .vc-stat-val { font-size: 14px; }
             .quote-aside { grid-template-columns: 1fr; }
         }
     </style>
