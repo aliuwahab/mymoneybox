@@ -5,9 +5,9 @@
     </head>
     <body class="min-h-screen bg-[#FAFAF7]">
         <flux:sidebar sticky stashable
-            class="border-e border-[#E6E3DC] bg-[#F3F1EB] !w-[248px]">
+            class="mmb-sidebar border-e border-[#CFCABD] bg-[#F7F5EF] text-[#15140F] !w-[248px] shadow-[18px_0_44px_-28px_rgba(20,18,12,.36)]">
 
-            <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
+            <flux:sidebar.toggle class="lg:hidden text-[#15140F] hover:bg-[#E6E3DC]" icon="x-mark" />
 
             {{-- Brand --}}
             <div class="flex items-center gap-2.5 px-2 pb-4 pt-1">
@@ -50,7 +50,7 @@
                     <span class="flex-1">My PiggyBoxes</span>
                     @php $boxCount = auth()->user()->moneyBoxes()->where('is_active', true)->count(); @endphp
                     @if($boxCount > 0)
-                        <span class="ml-auto text-[11px] text-[#9C998F] bg-[#ECEAE3] px-1.5 py-0.5 rounded-full tabular-nums">{{ $boxCount }}</span>
+                        <span class="ml-auto text-[11px] text-[#154F3A] bg-[#E6F1EB] px-1.5 py-0.5 rounded-full tabular-nums">{{ $boxCount }}</span>
                     @endif
                 </flux:navlist.item>
 

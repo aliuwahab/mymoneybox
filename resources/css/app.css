@@ -312,6 +312,48 @@ select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-primary-600/25 ring-offset-2 ring-offset-white;
 }
 
+/* App sidebar contrast: Flux defaults can become low contrast in the mobile slide-out. */
+.mmb-sidebar {
+    color: var(--color-sand-700);
+}
+
+.mmb-sidebar [data-flux-navlist-group] {
+    color: var(--color-sand-700);
+}
+
+.mmb-sidebar .mmb-nav-item {
+    color: var(--color-sand-700) !important;
+}
+
+.mmb-sidebar .mmb-nav-item svg {
+    color: var(--color-sand-600) !important;
+}
+
+.mmb-sidebar .mmb-nav-item:hover {
+    background: var(--color-sand-200) !important;
+    color: var(--color-sand-700) !important;
+}
+
+.mmb-sidebar .mmb-nav-item[aria-current="page"],
+.mmb-sidebar .mmb-nav-item[data-current],
+.mmb-sidebar .mmb-nav-item[aria-selected="true"] {
+    background: var(--color-primary-50) !important;
+    color: var(--color-primary-700) !important;
+}
+
+.mmb-sidebar .mmb-nav-item[aria-current="page"] svg,
+.mmb-sidebar .mmb-nav-item[data-current] svg,
+.mmb-sidebar .mmb-nav-item[aria-selected="true"] svg {
+    color: var(--color-primary-600) !important;
+}
+
+@media (max-width: 1023px) {
+    .mmb-sidebar {
+        background: #F7F5EF !important;
+        border-color: #CFCABD !important;
+    }
+}
+
 /* Cover gradients for box cards */
 .cover-emerald { background: linear-gradient(135deg, #1B6B4E 0%, #2E8E6C 100%); }
 .cover-amber   { background: linear-gradient(135deg, #B8810D 0%, #E0A535 100%); }
