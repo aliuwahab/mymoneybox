@@ -25,6 +25,12 @@ class PiggyBoxResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Piggy Wallets & Gifts';
 
+    protected static ?string $navigationLabel = 'Piggy Wallets';
+
+    protected static ?string $modelLabel = 'Piggy Wallet';
+
+    protected static ?string $pluralModelLabel = 'Piggy Wallets';
+
     protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'title';

@@ -25,6 +25,10 @@ class MoneyBoxWithdrawalResource extends Resource
 
     protected static ?string $navigationLabel = 'PiggyBox Withdrawals';
 
+    protected static ?string $modelLabel = 'PiggyBox Withdrawal';
+
+    protected static ?string $pluralModelLabel = 'PiggyBox Withdrawals';
+
     protected static ?string $recordTitleAttribute = 'reference';
 
     public static function infolist(Schema $schema): Schema

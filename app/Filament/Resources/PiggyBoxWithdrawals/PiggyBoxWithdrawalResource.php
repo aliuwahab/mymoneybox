@@ -25,6 +25,10 @@ class PiggyBoxWithdrawalResource extends Resource
 
     protected static ?string $navigationLabel = 'Piggy Wallet Withdrawals';
 
+    protected static ?string $modelLabel = 'Piggy Wallet Withdrawal';
+
+    protected static ?string $pluralModelLabel = 'Piggy Wallet Withdrawals';
+
     protected static ?string $recordTitleAttribute = 'reference';
 
     public static function infolist(Schema $schema): Schema

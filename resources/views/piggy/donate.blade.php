@@ -11,7 +11,7 @@
             ->get();
         $qrUrl = $piggyBox->getQrCodeUrl();
         $initials = $user->initials();
-        $walletTitle = $piggyBox->title ?: "{$user->name}'s Piggy Wallet";
+        $walletTitle = "{$user->name} Piggy Wallet";
         $walletDescription = $piggyBox->description ?: "Send a gift directly to {$user->name}'s Piggy Wallet. Every gift lands securely and helps them keep building toward what matters.";
     @endphp
 
