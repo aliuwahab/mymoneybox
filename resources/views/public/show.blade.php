@@ -47,7 +47,7 @@
              toastMsg: '',
              toast(m){ this.toastMsg=m; this.showToast=true; setTimeout(()=>this.showToast=false,3200); },
              amount: '{{ old('amount', $defaultAmt) }}',
-             anon: {{ old('is_anonymous') ? 'true' : 'false' }},
+             anon: {{ old('is_anonymous') || $identity === 'anonymous_allowed' ? 'true' : 'false' }},
              setAmount(v){ this.amount = v; }
          }"
          x-init="
@@ -197,11 +197,11 @@
                             @if($identity !== 'anonymous_allowed')
                                 <div class="field">
                                     <label for="contributor_name" class="label">
-                                        Your name @if($identity === 'must_identify')<span style="color:#EF4444;">*</span>@endif
+                                        Your name @if($identity === 'must_identify')<span style="color:#EF4444;">*</span>@else<span class="hint" x-show="!anon">· required unless anonymous</span><span class="hint" x-show="anon">· optional</span>@endif
                                     </label>
                                     <input type="text" name="contributor_name" id="contributor_name"
                                            value="{{ old('contributor_name', auth()->user()->name ?? '') }}"
-                                           @if($identity === 'must_identify') required @endif
+                                           @if($identity === 'must_identify') required @else :required="!anon" @endif
                                            :disabled="anon"
                                            placeholder="Jane Asiedu">
                                     @error('contributor_name')<p style="font-size:12px;color:#DC2626;margin:0;">{{ $message }}</p>@enderror
@@ -210,14 +210,20 @@
 
                             <div class="field">
                                 <label for="contributor_email" class="label">
-                                    Email <span class="hint">· for receipt</span> <span style="color:#EF4444;">*</span>
+                                    Email <span class="hint" x-text="anon ? '· optional' : '· for receipt'"></span> <span x-show="!anon" style="color:#EF4444;">*</span>
                                 </label>
-                                <input type="email" name="contributor_email" id="contributor_email" required
+                                <input type="email" name="contributor_email" id="contributor_email"
+                                       :required="!anon"
+                                       :disabled="anon"
                                        value="{{ old('contributor_email', auth()->user()->email ?? '') }}"
                                        placeholder="jane@email.com">
                                 @error('contributor_email')<p style="font-size:12px;color:#DC2626;margin:0;">{{ $message }}</p>@enderror
                             </div>
                         </div>
+
+                        @if($identity === 'anonymous_allowed')
+                            <input type="hidden" name="is_anonymous" value="1">
+                        @endif
 
                         {{-- Message --}}
                         <div class="field">
