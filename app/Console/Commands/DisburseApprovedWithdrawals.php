@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Actions\DisburseWithdrawalAction;
 use App\Models\MoneyBoxWithdrawal;
 use App\Models\PiggyBoxWithdrawal;
-use App\Payment\PaymentManager;
 use Illuminate\Console\Command;
 
 class DisburseApprovedWithdrawals extends Command
@@ -60,22 +60,30 @@ class DisburseApprovedWithdrawals extends Command
         $successCount = 0;
         $failedCount = 0;
 
+        $action = app(DisburseWithdrawalAction::class);
+
         // Process MoneyBox withdrawals
         foreach ($moneyBoxWithdrawals as $withdrawal) {
-            $result = $this->disburseWithdrawal($withdrawal, 'money-box');
-            if ($result) {
+            $this->line("Processing {$withdrawal->reference} - {$withdrawal->currency_code} {$withdrawal->net_amount}");
+            $result = $action->execute($withdrawal);
+            if ($result['success']) {
+                $this->info("✓ Submitted {$withdrawal->reference}");
                 $successCount++;
             } else {
+                $this->error("✗ Failed {$withdrawal->reference}: " . ($result['message'] ?? ''));
                 $failedCount++;
             }
         }
 
         // Process PiggyBox withdrawals
         foreach ($piggyBoxWithdrawals as $withdrawal) {
-            $result = $this->disburseWithdrawal($withdrawal, 'piggy-box');
-            if ($result) {
+            $this->line("Processing {$withdrawal->reference} - {$withdrawal->currency_code} {$withdrawal->net_amount}");
+            $result = $action->execute($withdrawal);
+            if ($result['success']) {
+                $this->info("✓ Submitted {$withdrawal->reference}");
                 $successCount++;
             } else {
+                $this->error("✗ Failed {$withdrawal->reference}: " . ($result['message'] ?? ''));
                 $failedCount++;
             }
         }
@@ -86,79 +94,5 @@ class DisburseApprovedWithdrawals extends Command
         $this->info("Total: " . ($successCount + $failedCount));
 
         return Command::SUCCESS;
-    }
-
-    private function disburseWithdrawal($withdrawal, $type): bool
-    {
-        try {
-            $account = $withdrawal->withdrawalAccount;
-            if (!$account) {
-                $this->error("Withdrawal {$withdrawal->reference} has no account");
-                return false;
-            }
-
-            $this->line("Processing {$withdrawal->reference} - {$withdrawal->currency_code} {$withdrawal->net_amount}");
-
-            // Get payment provider
-            $paymentManager = app(PaymentManager::class);
-            $provider = $paymentManager->provider($withdrawal->payment_provider ?? 'trendipay');
-
-            // Prepare transfer data
-            $transferData = [
-                'reference' => $withdrawal->reference . '-DISBURSE-' . now()->timestamp,
-                'amount' => $withdrawal->net_amount,
-                'account_number' => $account->account_number,
-                'account_name' => $account->account_name,
-                'account_type' => $account->account_type->value,
-                'network' => $account->mobile_network?->value ?? 'mtn',
-                'sender_name' => config('app.name'),
-                'description' => "Withdrawal: {$withdrawal->reference}",
-            ];
-
-            // Execute transfer
-            $result = $provider->transferAmount($transferData);
-
-            if ($result['success']) {
-                // Update withdrawal as disbursed
-                $withdrawal->update([
-                    'status' => 'disbursed',
-                    'disbursed_at' => now(),
-                    'transaction_reference' => $result['transaction_reference'] ?? null,
-                    'payment_metadata' => array_merge($withdrawal->payment_metadata ?? [], [
-                        'disbursement' => $result,
-                        'disbursed_by_command' => true,
-                    ]),
-                ]);
-
-                $this->info("✓ Disbursed {$withdrawal->reference}");
-                return true;
-            } else {
-                $this->error("✗ Failed to disburse {$withdrawal->reference}: {$result['message']}");
-
-                // Update withdrawal with failure reason
-                $withdrawal->update([
-                    'failure_reason' => $result['message'] ?? 'Transfer failed',
-                    'payment_metadata' => array_merge($withdrawal->payment_metadata ?? [], [
-                        'disbursement_attempt' => $result,
-                        'attempted_at' => now()->toDateTimeString(),
-                    ]),
-                ]);
-
-                return false;
-            }
-        } catch (\Exception $e) {
-            $this->error("✗ Exception for {$withdrawal->reference}: {$e->getMessage()}");
-
-            // Update withdrawal with error
-            $withdrawal->update([
-                'failure_reason' => 'System error: ' . $e->getMessage(),
-                'payment_metadata' => array_merge($withdrawal->payment_metadata ?? [], [
-                    'error' => $e->getMessage(),
-                    'attempted_at' => now()->toDateTimeString(),
-                ]),
-            ]);
-
-            return false;
-        }
     }
 }

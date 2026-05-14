@@ -189,7 +189,7 @@ class MoneyBox extends Model implements HasMedia
     public function getAvailableBalance(): float
     {
         $totalWithdrawn = $this->withdrawals()
-            ->whereIn('status', ['pending', 'in_review', 'approved', 'disbursed'])
+            ->whereIn('status', ['pending', 'in_review', 'approved', 'processing', 'disbursed'])
             ->sum('amount');
 
         return max(0, $this->total_contributions - $totalWithdrawn);

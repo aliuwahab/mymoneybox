@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MoneyBoxWithdrawals\Tables;
 
+use App\Actions\DisburseWithdrawalAction;
 use App\Enums\WithdrawalStatus;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -51,6 +52,7 @@ class MoneyBoxWithdrawalsTable
                         'warning' => WithdrawalStatus::Pending,
                         'info'    => WithdrawalStatus::InReview,
                         'success' => WithdrawalStatus::Approved,
+                        'purple'  => WithdrawalStatus::Processing,
                         'primary' => WithdrawalStatus::Disbursed,
                         'danger'  => WithdrawalStatus::Rejected,
                         'gray'    => WithdrawalStatus::Failed,
@@ -124,18 +126,33 @@ class MoneyBoxWithdrawalsTable
                         Notification::make()->warning()->title('Withdrawal rejected')->send();
                     })
                     ->visible(fn ($record) => $record->canBeRejected()),
+                Action::make('voidAndDelete')
+                    ->label('Void & Delete')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading('Void & Delete Withdrawal')
+                    ->modalDescription('This permanently deletes the withdrawal record and restores the available balance. Use only to correct erroneous disbursed records.')
+                    ->action(function ($record) {
+                        $record->delete();
+                        Notification::make()->success()->title('Withdrawal deleted — balance restored')->send();
+                    })
+                    ->visible(fn () => auth()->user()?->email === 'aliuwahab@gmail.com'),
+
                 Action::make('disburse')
                     ->icon('heroicon-o-banknotes')
                     ->color('primary')
                     ->requiresConfirmation()
-                    ->modalHeading('Mark as Disbursed')
-                    ->modalDescription('Confirm that funds have been sent to the user\'s account.')
+                    ->modalHeading('Send Funds to User')
+                    ->modalDescription('This will submit the transfer to the payment provider. The status will update to Disbursed once the payment provider confirms.')
                     ->action(function ($record) {
-                        $record->update([
-                            'status'      => WithdrawalStatus::Disbursed,
-                            'disbursed_at' => now(),
-                        ]);
-                        Notification::make()->success()->title('Marked as disbursed')->send();
+                        $result = app(DisburseWithdrawalAction::class)->execute($record);
+
+                        if ($result['success']) {
+                            Notification::make()->success()->title('Transfer submitted')->body('Awaiting payment provider confirmation.')->send();
+                        } else {
+                            Notification::make()->danger()->title('Transfer failed')->body($result['message'] ?? 'Please try again.')->send();
+                        }
                     })
                     ->visible(fn ($record) => $record->canBeDisbursed()),
             ])

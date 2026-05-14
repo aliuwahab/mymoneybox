@@ -18,16 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withSchedule(function (Schedule $schedule) {
-        // Disburse approved withdrawals twice daily
-        $schedule->command('withdrawals:disburse')
-            ->dailyAt('08:00')
-            ->withoutOverlapping()
-            ->runInBackground();
-
-        $schedule->command('withdrawals:disburse')
-            ->dailyAt('19:00')
-            ->withoutOverlapping()
-            ->runInBackground();
+        // Automatic disbursement disabled — use the admin Disburse button to send funds manually.
+        // Re-enable these once volume justifies twice-daily batch runs.
+        // $schedule->command('withdrawals:disburse')->dailyAt('08:00')->withoutOverlapping()->runInBackground();
+        // $schedule->command('withdrawals:disburse')->dailyAt('19:00')->withoutOverlapping()->runInBackground();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

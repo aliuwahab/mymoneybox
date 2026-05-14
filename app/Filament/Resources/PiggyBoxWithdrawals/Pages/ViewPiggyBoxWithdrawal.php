@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PiggyBoxWithdrawals\Pages;
 
+use App\Actions\DisburseWithdrawalAction;
 use App\Enums\WithdrawalStatus;
 use App\Filament\Resources\PiggyBoxWithdrawals\PiggyBoxWithdrawalResource;
 use Filament\Actions\Action;
@@ -71,19 +72,35 @@ class ViewPiggyBoxWithdrawal extends ViewRecord
                 })
                 ->visible(fn () => $this->record->canBeRejected()),
 
+            Action::make('voidAndDelete')
+                ->label('Void & Delete')
+                ->icon('heroicon-o-trash')
+                ->color('danger')
+                ->requiresConfirmation()
+                ->modalHeading('Void & Delete Withdrawal')
+                ->modalDescription('This permanently deletes the withdrawal record and restores the available balance. Use only to correct erroneous disbursed records.')
+                ->action(function () {
+                    $this->record->delete();
+                    Notification::make()->success()->title('Withdrawal deleted — balance restored')->send();
+                    $this->redirect(PiggyBoxWithdrawalResource::getUrl('index'));
+                })
+                ->visible(fn () => auth()->user()?->email === 'aliuwahab@gmail.com'),
+
             Action::make('disburse')
                 ->icon('heroicon-o-banknotes')
                 ->color('primary')
                 ->requiresConfirmation()
-                ->modalHeading('Mark as Disbursed')
-                ->modalDescription('Confirm that funds have been sent to the user\'s account.')
-                ->action(function () {
-                    $this->record->update([
-                        'status'       => WithdrawalStatus::Disbursed,
-                        'disbursed_at' => now(),
-                    ]);
-                    $this->refreshFormData(['status', 'disbursed_at']);
-                    Notification::make()->success()->title('Marked as disbursed')->send();
+                ->modalHeading('Send Funds to User')
+                ->modalDescription('This will submit the transfer to the payment provider. The status will update to Disbursed once the payment provider confirms.')
+                ->action(function (DisburseWithdrawalAction $action) {
+                    $result = $action->execute($this->record);
+                    $this->refreshFormData(['status', 'transaction_reference']);
+
+                    if ($result['success']) {
+                        Notification::make()->success()->title('Transfer submitted')->body('Awaiting payment provider confirmation.')->send();
+                    } else {
+                        Notification::make()->danger()->title('Transfer failed')->body($result['message'] ?? 'Please try again.')->send();
+                    }
                 })
                 ->visible(fn () => $this->record->canBeDisbursed()),
         ];

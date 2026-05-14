@@ -140,8 +140,9 @@ class TrendiPayWebhookController extends Controller
         $isSuccess = $webhookData['status'] === 'completed';
 
         if ($isSuccess) {
-            // Already marked disbursed by the command — just enrich the metadata
             $withdrawal->update([
+                'status'           => WithdrawalStatus::Disbursed,
+                'disbursed_at'     => now(),
                 'payment_metadata' => array_merge($withdrawal->payment_metadata ?? [], [
                     'disbursement_confirmed' => true,
                     'disbursement_callback'  => $webhookData['raw_data'] ?? [],
