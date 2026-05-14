@@ -47,6 +47,8 @@ Send a test email:
 php artisan mail:test sales@mypiggybox.com
 ```
 
+The command prints the active mailer, SMTP host, from address, queue connection, and a unique test ID. If it says SMTP accepted the message but no email reaches the inbox, search for that test ID in Brevo's transactional email logs. Laravel cannot confirm final inbox delivery after Brevo accepts the SMTP message.
+
 The app sends contribution and box-created emails from queued listeners. For the proper production setup, keep `QUEUE_CONNECTION=database` and run a queue worker:
 
 ```sh
