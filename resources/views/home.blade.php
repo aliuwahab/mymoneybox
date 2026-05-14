@@ -205,8 +205,8 @@
         /* LOGOS */
         .logos { padding: 50px 0 40px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--bg-2); }
         .logos-label { text-align: center; color: var(--fg-3); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 28px; }
-        .logos-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 32px; align-items: center; justify-items: center; color: var(--fg-2); }
-        .logo { font-family: 'Instrument Serif', serif; font-size: 22px; letter-spacing: -0.01em; opacity: 0.6; transition: opacity .15s; }
+        .logos-row { display: grid; grid-template-columns: repeat(var(--trusted-cols, 6), minmax(0, 1fr)); gap: 20px 32px; align-items: center; justify-items: center; color: var(--fg-2); }
+        .logo { font-family: 'Instrument Serif', serif; font-size: 22px; letter-spacing: 0; opacity: 0.6; transition: opacity .15s; text-align: center; overflow-wrap: anywhere; }
         .logo.alt { font-family: 'Inter'; font-weight: 600; letter-spacing: -0.02em; font-size: 18px; }
         .logo.mono { font-family: 'JetBrains Mono'; font-size: 14px; letter-spacing: 0.02em; font-weight: 500; }
         .logo:hover { opacity: 0.95; }
@@ -450,7 +450,7 @@
             .feat.f-wide, .feat.f-narrow, .feat.f-third { grid-column: span 12; }
             .steps, .pricing { grid-template-columns: 1fr; }
             .foot-grid { grid-template-columns: 1fr 1fr; }
-            .logos-row { grid-template-columns: repeat(3, 1fr); }
+            .logos-row { grid-template-columns: repeat(var(--trusted-tablet-cols, 3), minmax(0, 1fr)); }
             .featured { grid-template-columns: 1fr; }
             .featured::before { display: none; }
             .featured-cover { min-height: 340px; }
@@ -459,6 +459,7 @@
         }
         @media (max-width: 640px) {
             .nav-links { display: none; }
+            .logos-row { grid-template-columns: repeat(var(--trusted-mobile-cols, 2), minmax(0, 1fr)); }
             .wrap { padding: 0 20px; }
             .hero { padding: 56px 0 44px; }
             .visual { height: 430px; }
@@ -588,20 +589,21 @@
     </div>
 </section>
 
-<!-- TRUST LOGOS -->
-<section class="logos">
-    <div class="wrap">
-        <div class="logos-label">Trusted by communities, families, and teams across West Africa</div>
-        <div class="logos-row">
-            <span class="logo">Akoma Foundation</span>
-            <span class="logo alt">Sankofa Health</span>
-            <span class="logo">Asanteman</span>
-            <span class="logo mono">PIVOT.LABS</span>
-            <span class="logo alt">Otumfuo Scholars</span>
-            <span class="logo">Volta Co-op</span>
+@php($trustedLogos = $trustedLogos ?? collect())
+
+@if($trustedLogos->isNotEmpty())
+    <!-- TRUST LOGOS -->
+    <section class="logos">
+        <div class="wrap">
+            <div class="logos-label">Trusted by communities, families, and teams across West Africa</div>
+            <div class="logos-row" style="--trusted-cols: {{ min(max($trustedLogos->count(), 1), 6) }}; --trusted-tablet-cols: {{ min(max($trustedLogos->count(), 1), 3) }}; --trusted-mobile-cols: {{ min(max($trustedLogos->count(), 1), 2) }};">
+                @foreach($trustedLogos as $trustedLogo)
+                    <span class="logo">{{ $trustedLogo->name }}</span>
+                @endforeach
+            </div>
         </div>
-    </div>
-</section>
+    </section>
+@endif
 
 <!-- FEATURED CAMPAIGN -->
 <livewire:featured-campaign />
