@@ -24,7 +24,7 @@
             --container:    1180px;
         }
         *, ::before, ::after { box-sizing: border-box; }
-        html, body { margin: 0; padding: 0; }
+        html, body { margin: 0; padding: 0; overflow-x: hidden; }
         body {
             background: var(--bg);
             color: var(--fg);
@@ -458,10 +458,23 @@
             .placements-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 640px) {
+            body { font-size: 14px; }
             .nav-links { display: none; }
+            .nav-inner { height: 58px; gap: 12px; }
+            .brand { gap: 8px; min-width: 0; }
+            .brand span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .nav-cta { gap: 6px; }
+            .nav-cta .btn.ghost { display: none; }
+            .nav-cta .btn { padding: 7px 10px; font-size: 13px; white-space: nowrap; }
             .logos-row { grid-template-columns: repeat(var(--trusted-mobile-cols, 2), minmax(0, 1fr)); }
-            .wrap { padding: 0 20px; }
+            .wrap { padding: 0 16px; }
             .hero { padding: 56px 0 44px; }
+            .hero-grid { gap: 28px; }
+            .h1 { font-size: clamp(42px, 14vw, 56px); }
+            .lead { font-size: 16px; }
+            .hero-cta { flex-direction: column; align-items: stretch; }
+            .hero-cta .btn { justify-content: center; }
+            .hero-meta { flex-direction: column; align-items: flex-start; gap: 10px; }
             .visual { height: 430px; }
             .v-card.main { min-height: 400px; }
             .vc-head { padding: 12px 14px; }
@@ -471,7 +484,35 @@
             .vc-stats { gap: 10px; margin-top: 16px; }
             .vc-stat-label { font-size: 10.5px; }
             .vc-stat-val { font-size: 14px; }
+            .section { padding: 72px 0; }
+            .section-head,
+            .section-head.center { margin-bottom: 36px; }
+            .feat { min-height: auto; padding: 22px; }
+            .feat-visual[style] { flex-wrap: wrap; }
+            .steps { gap: 14px; }
+            .step { padding: 24px 22px; }
             .quote-aside { grid-template-columns: 1fr; }
+            .quote-section .wrap { padding-top: 72px; padding-bottom: 72px; }
+            .qstat .num { font-size: 40px; }
+            .pricing { gap: 14px; }
+            .plan { padding: 26px 22px; }
+            .price { flex-wrap: wrap; }
+            .price-num { font-size: 44px; }
+            .faq { gap: 32px; }
+            .faq-item summary { align-items: flex-start; gap: 12px; }
+            .featured-section { padding: 72px 0; }
+            .featured-body { padding: 26px 22px; }
+            .featured-cover { min-height: 300px; padding: 22px; }
+            .cover-title { font-size: clamp(36px, 12vw, 52px); max-width: 100%; }
+            .fp-row { align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+            .fp-stats { grid-template-columns: 1fr; gap: 10px; }
+            .featured-recent { align-items: flex-start; }
+            .placements-section { padding-bottom: 72px; }
+            .placement { cursor: pointer; }
+            .foot-grid { grid-template-columns: 1fr; gap: 28px; margin-bottom: 36px; }
+            .foot-bot { flex-direction: column; align-items: flex-start; gap: 14px; }
+            .foot-bot .legal { flex-wrap: wrap; gap: 14px; }
+            footer { padding: 52px 0 32px; }
         }
     </style>
 </head>

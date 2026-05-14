@@ -186,7 +186,7 @@
         </flux:header>
 
         {{-- Topbar --}}
-        <div class="sticky top-0 z-10 flex items-center gap-3 px-5 lg:px-7 py-3 border-b border-[#E6E3DC] bg-[#FAFAF7]">
+        <div class="sticky top-0 z-10 hidden lg:flex items-center gap-3 px-5 lg:px-7 py-3 border-b border-[#E6E3DC] bg-[#FAFAF7]">
             {{-- Breadcrumbs --}}
             <nav class="flex items-center gap-1.5 text-[12.5px] text-[#9C998F]">
                 @php

@@ -26,6 +26,7 @@
                 padding: 36px 18px 72px;
                 font-size: 14px;
                 line-height: 1.5;
+                overflow-x: hidden;
             }
 
             .wallet-lookup * { box-sizing: border-box; }
@@ -69,6 +70,7 @@
                 grid-template-columns: minmax(0, 1.1fr) minmax(300px, .9fr);
                 gap: 24px;
                 align-items: stretch;
+                min-width: 0;
             }
 
             .wallet-lookup .card {
@@ -238,8 +240,11 @@
                 .wallet-lookup .page-head {
                     flex-direction: column;
                     align-items: flex-start;
+                    gap: 14px;
                 }
+                .wallet-lookup .page-head .btn { width: 100%; }
                 .wallet-lookup .page-title { font-size: 32px; }
+                .wallet-lookup .input { font-size: 18px; letter-spacing: .1em; }
                 .wallet-lookup .wallet-hero { min-height: 260px; }
                 .wallet-lookup .wallet-mark { margin: 36px 0; }
             }
