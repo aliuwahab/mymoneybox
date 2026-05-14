@@ -122,7 +122,7 @@
                 </flux:navlist.item>
 
                 @if(auth()->user()->isAdmin())
-                    <flux:navlist.item icon="shield-check" href="/admin" wire:navigate class="mmb-nav-item">
+                    <flux:navlist.item icon="shield-check" href="/admin" target="_blank" rel="noopener noreferrer" class="mmb-nav-item">
                         Admin
                     </flux:navlist.item>
                 @endif
