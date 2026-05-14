@@ -42,7 +42,7 @@
         <div class="mb-3.5">
             <a href="{{ route('money-boxes.index') }}" wire:navigate class="btn btn-ghost btn-sm text-[#6B6862]">
                 <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                All piggy boxes
+                All PiggyBoxes
             </a>
         </div>
 
@@ -218,7 +218,7 @@
                     @else
                         <div class="card-body text-center py-10">
                             <div class="text-[#9C998F] mb-1">No contributions yet</div>
-                            <div class="tiny">Share your box to start receiving contributions.</div>
+                            <div class="tiny">Share your PiggyBox to start receiving contributions.</div>
                         </div>
                     @endif
                 </div>
@@ -332,7 +332,7 @@
                 @else
                     <div class="card-body text-center py-12">
                         <div class="text-[#9C998F] mb-1">No contributions yet</div>
-                        <div class="tiny">Share your box to start receiving contributions.</div>
+                        <div class="tiny">Share your PiggyBox to start receiving contributions.</div>
                     </div>
                 @endif
             </div>
@@ -390,7 +390,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
                 <div class="card">
-                    <div class="card-head"><div class="card-title">Share your box</div></div>
+                    <div class="card-head"><div class="card-title">Share your PiggyBox</div></div>
                     <div class="card-body flex flex-col gap-4">
                         <div>
                             <div class="text-[12.5px] font-medium text-[#6B6862] mb-1.5">Public link</div>
@@ -479,7 +479,7 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     <div class="text-[13px] font-medium text-[#15140F]">Public listing</div>
-                                    <div class="tiny">Who can find and view this box</div>
+                                    <div class="tiny">Who can find and view this PiggyBox</div>
                                 </div>
                                 <span class="pill {{ $moneyBox->visibility->value === 'public' ? 'pill-ok' : 'pill-muted' }}">
                                     <span class="pill-dot"></span>{{ ucfirst($moneyBox->visibility->value) }}
@@ -514,9 +514,9 @@
                         </div>
                     </div>
 
-                    {{-- Box details --}}
+                    {{-- PiggyBox details --}}
                     <div class="card">
-                        <div class="card-head"><div class="card-title">Box details</div></div>
+                        <div class="card-head"><div class="card-title">PiggyBox details</div></div>
                         <div class="card-body">
                             <dl class="space-y-3 text-[13px]">
                                 <div class="flex justify-between gap-4">
@@ -569,7 +569,7 @@
                         <div class="card-body flex flex-col gap-2">
                             <a href="{{ route('money-boxes.edit', $moneyBox) }}" wire:navigate class="btn w-full justify-start gap-2.5">
                                 <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-[#6B6862]" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6L8 22H2v-6L14 4Z"/></svg>
-                                Edit box details
+                                Edit PiggyBox details
                             </a>
                             <a href="{{ route('money-boxes.share', $moneyBox) }}" wire:navigate class="btn w-full justify-start gap-2.5">
                                 <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-[#6B6862]" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M8.6 13.5 15.4 17"/><path d="M15.4 7 8.6 10.5"/></svg>
@@ -587,7 +587,7 @@
                     <div class="card border border-red-100">
                         <div class="card-head"><div class="card-title text-red-700">Danger zone</div></div>
                         <div class="card-body flex flex-col gap-2">
-                            <p class="tiny mb-1">These actions affect your box's availability. Proceed with care.</p>
+                            <p class="tiny mb-1">These actions affect your PiggyBox's availability. Proceed with care.</p>
                             <a href="{{ route('money-boxes.edit', $moneyBox) }}" wire:navigate
                                class="btn w-full justify-start gap-2.5 text-red-600 border-red-200 hover:bg-red-50">
                                 <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -596,7 +596,7 @@
                             <a href="{{ route('money-boxes.edit', $moneyBox) }}" wire:navigate
                                class="btn w-full justify-start gap-2.5 text-red-600 border-red-200 hover:bg-red-50">
                                 <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
-                                Archive this box
+                                Archive this PiggyBox
                             </a>
                         </div>
                     </div>

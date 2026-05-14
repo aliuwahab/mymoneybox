@@ -44,7 +44,7 @@ class PiggyBoxController extends Controller
         }
 
         if (!$user->piggyBox->canReceiveDonations()) {
-            return back()->with('error', 'This piggy box is not currently accepting donations.');
+            return back()->with('error', 'This Piggy Wallet is not currently accepting gifts.');
         }
 
         return view('piggy.donate', [
@@ -61,7 +61,7 @@ class PiggyBoxController extends Controller
         $piggyBox = $user->piggyBox;
 
         if (!$piggyBox || !$piggyBox->canReceiveDonations()) {
-            return back()->with('error', 'This piggy box is not accepting donations.');
+            return back()->with('error', 'This Piggy Wallet is not accepting gifts.');
         }
 
         $validated = $request->validate([
@@ -218,7 +218,7 @@ class PiggyBoxController extends Controller
 
         if (!$user->piggyBox->canReceiveDonations()) {
             return redirect()->route('piggy.lookup')
-                ->with('error', 'This piggy box is not currently accepting donations.');
+                ->with('error', 'This Piggy Wallet is not currently accepting gifts.');
         }
 
         return view('piggy.donate', [
@@ -236,7 +236,7 @@ class PiggyBoxController extends Controller
         $piggyBox = $user->piggyBox;
 
         if (!$piggyBox) {
-            return redirect()->back()->with('error', 'Piggy box not found.');
+            return redirect()->back()->with('error', 'Piggy Wallet not found.');
         }
 
         $generateQRCodeAction = app(\App\Actions\GeneratePiggyQRCodeAction::class);
@@ -255,7 +255,7 @@ class PiggyBoxController extends Controller
         $piggyBox = $user->piggyBox;
 
         if (!$piggyBox) {
-            return redirect()->back()->with('error', 'Piggy box not found.');
+            return redirect()->back()->with('error', 'Piggy Wallet not found.');
         }
 
         // Generate QR code if it doesn't exist

@@ -45,7 +45,7 @@
                         type="submit" 
                         class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-bold py-4 px-6 rounded-lg hover:from-yellow-600 hover:to-orange-600 transition shadow-lg"
                     >
-                        Find Piggy Box
+                        Find Piggy Wallet
                     </button>
                 </form>
 

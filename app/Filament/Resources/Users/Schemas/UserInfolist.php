@@ -42,10 +42,10 @@ class UserInfolist
                     ->columns(3)
                     ->schema([
                         TextEntry::make('moneyBoxes_count')
-                            ->label('Money Boxes')
+                            ->label('PiggyBoxes')
                             ->state(fn ($record) => $record->moneyBoxes()->count()),
                         TextEntry::make('piggyBox.total_received')
-                            ->label('Piggy Box Balance')
+                            ->label('Piggy Wallet Balance')
                             ->money('GHS')
                             ->placeholder('—'),
                         TextEntry::make('created_at')

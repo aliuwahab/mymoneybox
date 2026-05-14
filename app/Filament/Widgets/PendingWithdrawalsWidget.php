@@ -34,7 +34,7 @@ class PendingWithdrawalsWidget extends BaseWidget
                     ->label('User')
                     ->searchable(),
                 TextColumn::make('moneyBox.title')
-                    ->label('Box')
+                    ->label('PiggyBox')
                     ->limit(25),
                 TextColumn::make('amount')
                     ->money('GHS')

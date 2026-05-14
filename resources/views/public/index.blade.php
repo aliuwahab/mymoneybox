@@ -2,7 +2,7 @@
     {{-- Header --}}
     <div class="bg-white border-b border-[#E6E3DC]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-            <h1 class="page-title" style="font-size:1.875rem;">Discover piggy boxes</h1>
+            <h1 class="page-title" style="font-size:1.875rem;">Discover PiggyBoxes</h1>
             <p class="tiny mt-1.5">Support causes you care about</p>
         </div>
     </div>
@@ -11,7 +11,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
         <form method="GET" action="{{ route('browse') }}" class="flex flex-col sm:flex-row gap-3">
             <div class="flex-1">
-                <input type="text" name="search" placeholder="Search piggy boxes…" value="{{ request('search') }}" />
+                <input type="text" name="search" placeholder="Search PiggyBoxes…" value="{{ request('search') }}" />
             </div>
             <div class="sm:w-52">
                 <select name="category">
@@ -60,7 +60,7 @@
                         <path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="M3 7.5 12 12l9-4.5"/><path d="M12 12v9"/>
                     </svg>
                 </div>
-                <h3 class="text-[15px] font-semibold text-[#15140F] mb-1">No boxes found</h3>
+                <h3 class="text-[15px] font-semibold text-[#15140F] mb-1">No PiggyBoxes found</h3>
                 <p class="tiny">Try adjusting your search or filters.</p>
             </div>
         @endif

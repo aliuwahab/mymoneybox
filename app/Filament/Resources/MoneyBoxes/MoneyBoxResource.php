@@ -25,7 +25,7 @@ class MoneyBoxResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-gift';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Money Boxes & Contributions';
+    protected static string|UnitEnum|null $navigationGroup = 'PiggyBoxes & Contributions';
 
     protected static ?int $navigationSort = 1;
 

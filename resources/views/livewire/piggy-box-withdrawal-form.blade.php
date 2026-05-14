@@ -42,7 +42,7 @@
                         <div class="px-6 pt-6 pb-2">
                             <div class="flex items-center justify-between mb-5">
                                 <h3 class="text-[16px] font-semibold text-[#15140F]">
-                                    Withdraw from Piggy Box
+                                    Withdraw from Piggy Wallet
                                 </h3>
                                 <button type="button" wire:click="closeModal" class="text-[#9C998F] hover:text-[#15140F] transition">
                                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>

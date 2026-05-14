@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('piggy_boxes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->unique()->constrained()->onDelete('cascade');
-            $table->string('title')->default('My Piggy Box');
+            $table->string('title')->default('My Piggy Wallet');
             $table->text('description')->nullable();
             $table->string('currency_code', 3);
             $table->decimal('total_received', 15, 2)->default(0);

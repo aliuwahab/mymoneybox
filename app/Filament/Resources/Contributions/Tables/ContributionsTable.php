@@ -19,7 +19,7 @@ class ContributionsTable
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('moneyBox.title')
-                    ->label('Box')
+                    ->label('PiggyBox')
                     ->limit(25)
                     ->searchable(),
                 TextColumn::make('contributor_name')

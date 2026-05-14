@@ -483,7 +483,7 @@
         <div class="nav-cta">
             @auth
                 <a class="btn ghost" href="{{ route('dashboard') }}">Dashboard</a>
-                <a class="btn primary" href="{{ route('money-boxes.create') }}">Create a box</a>
+                <a class="btn primary" href="{{ route('money-boxes.create') }}">Create a PiggyBox</a>
             @else
                 <a class="btn ghost" href="{{ route('login') }}">Sign in</a>
                 <a class="btn primary" href="{{ route('register') }}">Get started</a>
@@ -501,7 +501,7 @@
             <p class="lead">MyPiggyBox is the modern way to gather contributions for weddings, medical care, scholarships and team causes — with a link, a QR code, and zero awkwardness.</p>
             <div class="hero-cta">
                 <a class="btn primary lg" href="{{ route('register') }}">
-                    Start a box — free
+                    Start a PiggyBox — free
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 </a>
                 <a class="btn lg" href="#how">See how it works</a>
@@ -612,7 +612,7 @@
                 <div class="ic">
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="M3 7.5 12 12l9-4.5"/><path d="M12 12v9"/></svg>
                 </div>
-                <h3>One box, every kind of giving</h3>
+                <h3>One PiggyBox, every kind of giving</h3>
                 <p>Fixed amounts, ranges, anonymous gifts, deadlines — set the rules once and your contributors get a frictionless flow that adapts to your goal.</p>
                 <div class="feat-visual">
                     <div class="vmock">
@@ -637,7 +637,7 @@
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3"/><path d="M21 14v3"/><path d="M14 21h7"/></svg>
                 </div>
                 <h3>Share anywhere instantly</h3>
-                <p>Auto-generated link, QR code, and WhatsApp-ready post for every box. Print it, scan it, send it.</p>
+                <p>Auto-generated link, QR code, and WhatsApp-ready post for every PiggyBox. Print it, scan it, send it.</p>
                 <div class="feat-visual" style="display:flex; gap:14px; align-items:center">
                     <div class="qr"></div>
                     <div>
@@ -713,7 +713,7 @@
         <div class="steps">
             <div class="step">
                 <div class="step-num">01</div>
-                <h4>Create your box</h4>
+                <h4>Create your PiggyBox</h4>
                 <p>Name it, set a goal (or don't), choose how contributors give — fixed, range, or any amount.</p>
             </div>
             <div class="step">
@@ -751,9 +751,9 @@
             </div>
             <div class="quote-aside">
                 <div class="qstat"><div class="num">₵4.2M</div><div class="lab">Contributed to date across all MyPiggyBox communities</div></div>
-                <div class="qstat"><div class="num">12k+</div><div class="lab">Active boxes — weddings, medical, education, more</div></div>
+                <div class="qstat"><div class="num">12k+</div><div class="lab">Active PiggyBoxes — weddings, medical, education, more</div></div>
                 <div class="qstat"><div class="num">2.4×</div><div class="lab">More raised vs. ad-hoc bank transfers, on average</div></div>
-                <div class="qstat"><div class="num">48s</div><div class="lab">Median time to set up your first box from sign-up</div></div>
+                <div class="qstat"><div class="num">48s</div><div class="lab">Median time to set up your first PiggyBox from sign-up</div></div>
             </div>
         </div>
     </div>
@@ -774,7 +774,7 @@
                 <p>For one-off events and personal causes.</p>
                 <div class="price"><span class="price-num">2.9%</span><span class="price-unit">+ ₵1 per contribution</span></div>
                 <ul>
-                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Unlimited boxes</li>
+                    <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Unlimited PiggyBoxes</li>
                     <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Mobile money + card payments</li>
                     <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> QR code, share kit</li>
                     <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> CSV export</li>
@@ -837,7 +837,7 @@
                     <summary>Can contributors give anonymously?
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
                     </summary>
-                    <p>Yes. Each box can require names, allow anonymity, or leave it to the contributor's choice. Anonymous gifts still appear in your ledger with amount and method, just no identifying info.</p>
+                    <p>Yes. Each PiggyBox can require names, allow anonymity, or leave it to the contributor's choice. Anonymous gifts still appear in your ledger with amount and method, just no identifying info.</p>
                 </details>
                 <details class="faq-item">
                     <summary>What if I don't reach my goal?
@@ -868,11 +868,11 @@
 <!-- FINAL CTA -->
 <section class="final-cta">
     <div class="wrap">
-        <h2>Start your first box <em>today.</em></h2>
+        <h2>Start your first PiggyBox <em>today.</em></h2>
         <p>It takes about a minute. No credit card, no commitment. Just a clean link, a QR code, and somewhere for the love to land.</p>
         <div class="btn-row" style="justify-content:center">
             <a class="btn primary lg" href="{{ route('register') }}">
-                Create a piggy box
+                Create a PiggyBox
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </a>
             <a class="btn lg" href="{{ route('dashboard') }}">Go to dashboard</a>

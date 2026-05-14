@@ -14,12 +14,12 @@
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-6 mb-6">
             <div>
                 <h1 class="page-title">Good morning, {{ explode(' ', auth()->user()->name)[0] }}.</h1>
-                <p class="text-[13.5px] text-[#6B6862] mt-1.5">Here's what's happening across your piggy boxes.</p>
+                <p class="text-[13.5px] text-[#6B6862] mt-1.5">Here's what's happening across your PiggyBoxes.</p>
             </div>
             <div class="flex items-center gap-2 flex-none">
                 <a href="{{ route('money-boxes.create') }}" class="btn btn-primary">
                     <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-                    New piggy box
+                    New PiggyBox
                 </a>
             </div>
         </div>
@@ -31,7 +31,7 @@
                 <div class="stat-value">{{ $sym }}{{ number_format($totalRaised, 2) }}</div>
                 <div class="stat-delta text-primary-600">
                     <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
-                    All campaigns
+                    All PiggyBoxes
                 </div>
             </div>
 
@@ -42,7 +42,7 @@
             </div>
 
             <div class="stat-card">
-                <div class="stat-label">Active boxes</div>
+                <div class="stat-label">Active PiggyBoxes</div>
                 <div class="stat-value tnum">{{ $activeCount }}</div>
                 <div class="stat-delta {{ $activeCount > 0 ? 'text-primary-600' : '' }}">
                     {{ $moneyBoxes->count() }} total
@@ -74,7 +74,7 @@
                         <thead>
                             <tr>
                                 <th>Contributor</th>
-                                <th>Box</th>
+                                <th>PiggyBox</th>
                                 <th>Method</th>
                                 <th class="num">Amount</th>
                                 <th>When</th>
@@ -115,7 +115,7 @@
                 @else
                     <div class="card-body text-center py-10">
                         <div class="text-[#9C998F] mb-1">No contributions yet</div>
-                        <div class="tiny">Share your box to start receiving contributions.</div>
+                        <div class="tiny">Share your PiggyBox to start receiving contributions.</div>
                     </div>
                 @endif
             </div>
@@ -132,7 +132,7 @@
                             <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <div class="text-[13px] font-medium text-[#15140F]">Create a piggy box</div>
+                            <div class="text-[13px] font-medium text-[#15140F]">Create a PiggyBox</div>
                             <div class="tiny">Wedding, medical, project — under 60 seconds</div>
                         </div>
                         <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-[#9C998F]" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
@@ -143,7 +143,7 @@
                             <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M8.6 13.5 15.4 17"/><path d="M15.4 7 8.6 10.5"/></svg>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <div class="text-[13px] font-medium text-[#15140F]">Share your active box</div>
+                            <div class="text-[13px] font-medium text-[#15140F]">Share your active PiggyBox</div>
                             <div class="tiny">QR code, WhatsApp, link</div>
                         </div>
                         <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-[#9C998F]" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
@@ -155,7 +155,7 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="text-[13px] font-medium text-[#15140F]">Withdraw funds</div>
-                            <div class="tiny">{{ $sym }}{{ number_format($totalRaised, 2) }} across your boxes</div>
+                            <div class="tiny">{{ $sym }}{{ number_format($totalRaised, 2) }} across your PiggyBoxes</div>
                         </div>
                         <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-[#9C998F]" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                     </div>
@@ -175,10 +175,10 @@
             </div>
         </div>
 
-        {{-- Your boxes --}}
+        {{-- Your PiggyBoxes --}}
         @if($moneyBoxes->count() > 0)
             <div class="flex items-center justify-between mb-3">
-                <div class="text-[13px] font-semibold text-[#15140F]">Your piggy boxes</div>
+                <div class="text-[13px] font-semibold text-[#15140F]">Your PiggyBoxes</div>
                 <a href="{{ route('money-boxes.index') }}" class="btn btn-ghost btn-sm text-[#6B6862]">
                     See all
                     <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
@@ -255,11 +255,11 @@
                 <div class="w-12 h-12 rounded-xl bg-primary-50 text-primary-600 grid place-items-center mx-auto mb-4">
                     <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="M3 7.5 12 12l9-4.5"/><path d="M12 12v9"/></svg>
                 </div>
-                <h3 class="text-[15px] font-semibold text-[#15140F] mb-1">No piggy boxes yet</h3>
-                <p class="tiny mb-5 max-w-xs mx-auto">Create your first box to start collecting contributions for any cause.</p>
+                <h3 class="text-[15px] font-semibold text-[#15140F] mb-1">No PiggyBoxes yet</h3>
+                <p class="tiny mb-5 max-w-xs mx-auto">Create your first PiggyBox to start collecting contributions for any cause.</p>
                 <a href="{{ route('money-boxes.create') }}" class="btn btn-primary">
                     <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-                    Create your first box
+                    Create your first PiggyBox
                 </a>
             </div>
         @endif

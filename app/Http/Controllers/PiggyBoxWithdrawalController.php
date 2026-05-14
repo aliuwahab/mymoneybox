@@ -17,7 +17,7 @@ class PiggyBoxWithdrawalController extends Controller
 
         if (!$piggyBox) {
             return redirect()->route('piggy.my-piggy-box')
-                ->with('error', 'You do not have a piggy box yet.');
+                ->with('error', 'You do not have a Piggy Wallet yet.');
         }
 
         $availableBalance = $piggyBox->getAvailableBalance();
@@ -48,7 +48,7 @@ class PiggyBoxWithdrawalController extends Controller
 
         if (!$piggyBox) {
             return redirect()->route('piggy.my-piggy-box')
-                ->with('error', 'You do not have a piggy box yet.');
+                ->with('error', 'You do not have a Piggy Wallet yet.');
         }
 
         $validated = $request->validate([

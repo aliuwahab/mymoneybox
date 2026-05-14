@@ -14,7 +14,7 @@ class MoneyBoxInfolist
     {
         return $schema
             ->components([
-                Section::make('Box Overview')
+                Section::make('PiggyBox Overview')
                     ->columns(3)
                     ->schema([
                         TextEntry::make('user.name')

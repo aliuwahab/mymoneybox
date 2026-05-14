@@ -39,7 +39,7 @@
 
   <div class="body">
     <h2>New contribution 🎉</h2>
-    <p>Great news, <strong>{{ explode(' ', $moneyBox->user->name)[0] }}</strong>! Someone just contributed to your box.</p>
+    <p>Great news, <strong>{{ explode(' ', $moneyBox->user->name)[0] }}</strong>! Someone just contributed to your PiggyBox.</p>
 
     <div class="amount-band">
       <div class="amount-label">New contribution</div>
@@ -49,7 +49,7 @@
 
     <div class="meta-table">
       <div class="meta-row">
-        <span class="meta-label">Box</span>
+        <span class="meta-label">PiggyBox</span>
         <span class="meta-value">{{ $moneyBox->title }}</span>
       </div>
       <div class="meta-row">
@@ -90,11 +90,11 @@
       </div>
     </div>
 
-    <a href="{{ route('money-boxes.show', $moneyBox) }}" class="cta">View your box →</a>
+    <a href="{{ route('money-boxes.show', $moneyBox) }}" class="cta">View your PiggyBox →</a>
   </div>
 
   <div class="footer">
-    <p>You received this because you own the "<strong>{{ $moneyBox->title }}</strong>" box on <a href="{{ config('app.url') }}">{{ config('app.name') }}</a>. <a href="{{ route('profile.edit') }}">Manage notifications</a></p>
+    <p>You received this because you own the "<strong>{{ $moneyBox->title }}</strong>" PiggyBox on <a href="{{ config('app.url') }}">{{ config('app.name') }}</a>. <a href="{{ route('profile.edit') }}">Manage notifications</a></p>
   </div>
 </div>
 </body>

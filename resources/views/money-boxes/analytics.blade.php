@@ -10,7 +10,7 @@
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
         <div>
             <h1 class="page-title">Analytics</h1>
-            <p class="text-[13.5px] text-[#6B6862] mt-1.5">Trends and insights across your piggy boxes</p>
+            <p class="text-[13.5px] text-[#6B6862] mt-1.5">Trends and insights across your PiggyBoxes</p>
         </div>
         <div class="flex items-center gap-2">
             <select class="rounded-[6px] border border-[#E6E3DC] px-2.5 py-1.5 text-[13px] bg-white text-[#15140F] w-auto">
@@ -28,7 +28,7 @@
             <div class="stat-value">{{ $sym }}{{ number_format($totalRaised, 2) }}</div>
             <div class="stat-delta text-primary-600">
                 <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
-                Across all boxes
+                Across all PiggyBoxes
             </div>
         </div>
         <div class="stat-card">

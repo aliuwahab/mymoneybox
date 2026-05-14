@@ -76,7 +76,7 @@
                 {{-- Category / visibility pill --}}
                 <span class="pill pill-info" style="font-size:11.5px;">
                     <svg viewBox="0 0 24 24" style="width:11px;height:11px;" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a13 13 0 0 1 0 20"/><path d="M12 2a13 13 0 0 0 0 20"/></svg>
-                    Public box
+                    Public PiggyBox
                     @if($moneyBox->category)
                         · {{ $moneyBox->category->name }}
                     @endif

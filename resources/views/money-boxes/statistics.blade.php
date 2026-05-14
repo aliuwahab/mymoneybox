@@ -144,7 +144,7 @@
                         </svg>
                     </div>
                     <h3 class="text-[14px] font-semibold text-[#15140F] mb-1">No contributions yet</h3>
-                    <p class="tiny">Share your box to start receiving contributions.</p>
+                    <p class="tiny">Share your PiggyBox to start receiving contributions.</p>
                 </div>
             @endif
         </div>

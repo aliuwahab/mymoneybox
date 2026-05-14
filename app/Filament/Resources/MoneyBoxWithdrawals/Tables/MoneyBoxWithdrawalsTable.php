@@ -29,7 +29,7 @@ class MoneyBoxWithdrawalsTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('moneyBox.title')
-                    ->label('Money Box')
+                    ->label('PiggyBox')
                     ->limit(25)
                     ->searchable(),
                 TextColumn::make('amount')

@@ -23,7 +23,7 @@ class ContributionResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Money Boxes & Contributions';
+    protected static string|UnitEnum|null $navigationGroup = 'PiggyBoxes & Contributions';
 
     protected static ?int $navigationSort = 2;
 

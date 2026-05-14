@@ -28,7 +28,7 @@ class RecentContributionsWidget extends BaseWidget
             )
             ->columns([
                 TextColumn::make('moneyBox.title')
-                    ->label('Box')
+                    ->label('PiggyBox')
                     ->limit(30)
                     ->searchable(),
                 TextColumn::make('contributor_name')

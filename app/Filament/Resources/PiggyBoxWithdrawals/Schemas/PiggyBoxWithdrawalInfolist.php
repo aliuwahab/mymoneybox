@@ -52,7 +52,7 @@ class PiggyBoxWithdrawalInfolist
                             ->visible(fn ($record) => $record->status === WithdrawalStatus::Failed),
                     ]),
 
-                Section::make('Owner & Piggy Box')
+                Section::make('Owner & Piggy Wallet')
                     ->columns(2)
                     ->schema([
                         TextEntry::make('user.name')
@@ -61,9 +61,9 @@ class PiggyBoxWithdrawalInfolist
                             ->label('Email')
                             ->copyable(),
                         TextEntry::make('piggyBox.title')
-                            ->label('Piggy Box'),
+                            ->label('Piggy Wallet'),
                         TextEntry::make('piggyBox.total_received')
-                            ->label('Box Balance')
+                            ->label('Piggy Wallet Balance')
                             ->money('GHS'),
                     ]),
 

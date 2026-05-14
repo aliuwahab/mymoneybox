@@ -78,13 +78,13 @@ class MoneyBoxController extends Controller
             return response()->json([
                 'success' => true,
                 'id' => $moneyBox->id,
-                'message' => 'Piggy Box created successfully!'
+                'message' => 'PiggyBox created successfully!'
             ]);
         }
 
         // Traditional redirect for non-AJAX
         return redirect()->route('money-boxes.show', $moneyBox)
-            ->with('success', 'Piggy Box created successfully!');
+            ->with('success', 'PiggyBox created successfully!');
     }
 
     /**
@@ -201,7 +201,7 @@ class MoneyBoxController extends Controller
         }
 
         return redirect()->route('money-boxes.show', $moneyBox)
-            ->with('success', 'Piggy Box updated successfully!');
+            ->with('success', 'PiggyBox updated successfully!');
     }
 
     /**
@@ -214,7 +214,7 @@ class MoneyBoxController extends Controller
         $moneyBox->delete();
 
         return redirect()->route('money-boxes.index')
-            ->with('success', 'Piggy Box deleted successfully!');
+            ->with('success', 'PiggyBox deleted successfully!');
     }
 
     /**
