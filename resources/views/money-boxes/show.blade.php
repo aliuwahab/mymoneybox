@@ -6,6 +6,12 @@
         $pct    = $moneyBox->goal_amount > 0
             ? min(100, round(($moneyBox->total_contributions / $moneyBox->goal_amount) * 100))
             : 0;
+        $availableBalance = $moneyBox->getAvailableBalance();
+        $minimumWithdrawal = config('withdrawal.min_amount', 10);
+        $hasWithdrawalAccount = auth()->user()->withdrawalAccounts()->active()->count() > 0;
+        $canWithdraw = auth()->user()->isVerified()
+            && $availableBalance >= $minimumWithdrawal
+            && $hasWithdrawalAccount;
     @endphp
 
     <div
@@ -79,6 +85,24 @@
             </div>
 
             <div class="flex items-center gap-2 flex-wrap">
+                @if($availableBalance >= $minimumWithdrawal)
+                    @if($canWithdraw)
+                        <a href="{{ route('money-boxes.withdraw.create', $moneyBox) }}" class="btn btn-primary">
+                            <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+                            Withdraw
+                        </a>
+                    @elseif(!auth()->user()->isVerified())
+                        <a href="{{ route('settings.verification') }}" wire:navigate class="btn">
+                            <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            Verify ID to Withdraw
+                        </a>
+                    @elseif(!$hasWithdrawalAccount)
+                        <a href="{{ route('settings.withdrawal-accounts', ['add' => 1]) }}" wire:navigate class="btn">
+                            <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                            Add Withdrawal Account
+                        </a>
+                    @endif
+                @endif
                 <a href="{{ route('money-boxes.edit', $moneyBox) }}" wire:navigate class="btn">
                     <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6L8 22H2v-6L14 4Z"/></svg>
                     Edit
@@ -109,7 +133,7 @@
 
             <div class="stat-card">
                 <div class="stat-label">Available</div>
-                <div class="stat-value text-primary-600">{{ $sym }}{{ number_format($moneyBox->getAvailableBalance(), 2) }}</div>
+                <div class="stat-value text-primary-600">{{ $sym }}{{ number_format($availableBalance, 2) }}</div>
                 <div class="stat-delta">Ready to withdraw</div>
             </div>
 
@@ -141,11 +165,11 @@
         </div>
 
         {{-- Withdraw banner --}}
-        @if(auth()->user()->isVerified() && $moneyBox->getAvailableBalance() >= config('withdrawal.min_amount', 10) && auth()->user()->withdrawalAccounts()->active()->count() > 0)
+        @if($canWithdraw)
             <div class="flex items-center justify-between gap-4 px-4 py-3 rounded-[8px] bg-primary-50 border border-primary-200 mb-5">
                 <div class="flex items-center gap-2 text-primary-700 text-[13px]">
                     <svg viewBox="0 0 24 24" class="w-4 h-4 flex-none" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="17" cy="14.5" r="1"/></svg>
-                    <span>{{ $sym }}{{ number_format($moneyBox->getAvailableBalance(), 2) }} available to withdraw</span>
+                    <span>{{ $sym }}{{ number_format($availableBalance, 2) }} available to withdraw</span>
                 </div>
                 <a href="{{ route('money-boxes.withdraw.create', $moneyBox) }}" class="btn btn-primary btn-sm">
                     Withdraw funds

@@ -82,18 +82,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/money-boxes/{moneyBox}/withdraw', [App\Http\Controllers\MoneyBoxWithdrawalController::class, 'store'])
         ->name('money-boxes.withdraw.store');
 
-    // Piggy Box Routes (Authenticated)
-    Route::get('/my-piggy-box', [PiggyBoxController::class, 'myPiggyBox'])
+    // Piggy Wallet Routes (Authenticated)
+    Route::redirect('/my-piggy-box', '/my-piggy-wallet', 301);
+    Route::redirect('/my-piggy-box/withdraw', '/my-piggy-wallet/withdraw', 301);
+
+    Route::get('/my-piggy-wallet', [PiggyBoxController::class, 'myPiggyBox'])
         ->name('piggy.my-piggy-box');
-    Route::post('/my-piggy-box/generate-qr', [PiggyBoxController::class, 'generateQrCode'])
+    Route::post('/my-piggy-wallet/generate-qr', [PiggyBoxController::class, 'generateQrCode'])
         ->name('piggy.generate-qr');
-    Route::get('/my-piggy-box/download-qr', [PiggyBoxController::class, 'downloadQrCode'])
+    Route::get('/my-piggy-wallet/download-qr', [PiggyBoxController::class, 'downloadQrCode'])
         ->name('piggy.download-qr');
 
-    // Piggy Box Withdrawal Routes
-    Route::get('/my-piggy-box/withdraw', [App\Http\Controllers\PiggyBoxWithdrawalController::class, 'create'])
+    // Piggy Wallet Withdrawal Routes
+    Route::get('/my-piggy-wallet/withdraw', [App\Http\Controllers\PiggyBoxWithdrawalController::class, 'create'])
         ->name('piggy.withdraw.create');
-    Route::post('/my-piggy-box/withdraw', [App\Http\Controllers\PiggyBoxWithdrawalController::class, 'store'])
+    Route::post('/my-piggy-wallet/withdraw', [App\Http\Controllers\PiggyBoxWithdrawalController::class, 'store'])
         ->name('piggy.withdraw.store');
 
     // Settings Routes
