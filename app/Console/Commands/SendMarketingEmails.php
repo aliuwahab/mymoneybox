@@ -54,9 +54,12 @@ class SendMarketingEmails extends Command
 
     private function sendBoxShareReminders(): void
     {
-        $boxes = MoneyBox::with('user')
+        $targetDate = now()->subDay()->toDateString();
+        $emailKey   = 'box_share_' . $targetDate;
+
+        $byUser = MoneyBox::with('user')
             ->where('is_active', true)
-            ->whereDate('created_at', now()->subDay()->toDateString())
+            ->whereDate('created_at', $targetDate)
             ->where(function($q) {
                 $q->where('is_ongoing', true)
                   ->orWhereNull('end_date')
@@ -64,22 +67,21 @@ class SendMarketingEmails extends Command
             })
             ->whereHas('user', fn($q) => $q->whereNotNull('email_verified_at'))
             ->get()
-            ->filter(function($box) {
-                $key = 'box_share_' . $box->id;
-                return !UserMarketingEmail::where('user_id', $box->user_id)->where('email_key', $key)->exists();
-            });
+            ->groupBy('user_id');
 
-        foreach ($boxes as $box) {
+        foreach ($byUser as $userId => $userBoxes) {
+            if (UserMarketingEmail::where('user_id', $userId)->where('email_key', $emailKey)->exists()) {
+                continue;
+            }
+
+            $user = $userBoxes->first()->user;
+
             try {
-                Mail::to($box->user->email)->queue(new PiggyBoxShareReminderMail($box));
-                UserMarketingEmail::create([
-                    'user_id'   => $box->user_id,
-                    'email_key' => 'box_share_' . $box->id,
-                    'sent_at'   => now(),
-                ]);
-                $this->line("  BoxShare → {$box->user->email} (box: {$box->slug})");
+                Mail::to($user->email)->queue(new PiggyBoxShareReminderMail($userBoxes));
+                UserMarketingEmail::create(['user_id' => $userId, 'email_key' => $emailKey, 'sent_at' => now()]);
+                $this->line("  BoxShare → {$user->email} ({$userBoxes->count()} box(es))");
             } catch (\Exception $e) {
-                Log::error('SendMarketingEmails: box share failed', ['box' => $box->id, 'error' => $e->getMessage()]);
+                Log::error('SendMarketingEmails: box share failed', ['user' => $userId, 'error' => $e->getMessage()]);
             }
         }
     }

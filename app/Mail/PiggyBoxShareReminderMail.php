@@ -2,17 +2,22 @@
 
 namespace App\Mail;
 
-use App\Models\MoneyBox;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Collection;
 
 class PiggyBoxShareReminderMail extends Mailable
 {
     use SerializesModels;
 
-    public function __construct(public MoneyBox $moneyBox) {}
+    public Collection $moneyBoxes;
+
+    public function __construct(Collection $moneyBoxes)
+    {
+        $this->moneyBoxes = $moneyBoxes;
+    }
 
     public function envelope(): Envelope
     {
