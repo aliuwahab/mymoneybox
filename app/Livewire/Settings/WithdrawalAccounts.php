@@ -5,6 +5,7 @@ namespace App\Livewire\Settings;
 use App\Enums\AccountType;
 use App\Enums\MobileMoneyNetwork;
 use App\Models\WithdrawalAccount;
+use App\Payment\Providers\TrendiPayProvider;
 use Livewire\Component;
 
 class WithdrawalAccounts extends Component
@@ -94,10 +95,27 @@ class WithdrawalAccounts extends Component
     {
         $this->validate();
 
+        $accountName = $this->accountName;
+
+        if ($this->accountType === 'mobile_money') {
+            $network = MobileMoneyNetwork::from($this->mobileNetwork);
+            $verification = app(TrendiPayProvider::class)->verifyAccountName(
+                $this->accountNumber,
+                $network->trendiPayShortCode()
+            );
+
+            if (!$verification['success']) {
+                $this->addError('accountNumber', $verification['message']);
+                return;
+            }
+
+            $accountName = $verification['account_name'];
+        }
+
         $data = [
             'user_id' => auth()->id(),
             'account_type' => $this->accountType,
-            'account_name' => $this->accountName,
+            'account_name' => $accountName,
             'account_number' => $this->accountNumber,
             'is_default' => $this->isDefault,
             'is_active' => true,

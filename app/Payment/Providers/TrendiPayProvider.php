@@ -203,6 +203,46 @@ class TrendiPayProvider implements PaymentProviderInterface
         }
     }
 
+    public function verifyAccountName(string $accountNumber, string $rSwitch): array
+    {
+        try {
+            $apiBaseUrl = config('payment.trendipay.api_base_url', $this->checkoutBaseUrl);
+            $url = "{$apiBaseUrl}/v1/terminals/{$this->apiTerminalId}/account-details";
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Accept' => 'application/json',
+            ])->get($url, [
+                'rSwitch' => $rSwitch,
+                'accountNumber' => $accountNumber,
+            ]);
+
+            $result = $response->json();
+
+            Log::info('TrendiPay account verification', ['response' => $result, 'accountNumber' => $accountNumber, 'rSwitch' => $rSwitch]);
+
+            if ($response->successful() && isset($result['success']) && $result['success'] === true && isset($result['data']['accountName'])) {
+                return [
+                    'success' => true,
+                    'account_name' => $result['data']['accountName'],
+                    'account_number' => $result['data']['accountNumber'],
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => $result['message'] ?? 'Account verification failed. Please check the number and network.',
+            ];
+        } catch (\Exception $e) {
+            Log::error('TrendiPay account verification error', ['error' => $e->getMessage(), 'accountNumber' => $accountNumber]);
+
+            return [
+                'success' => false,
+                'message' => 'Account verification unavailable. Please try again.',
+            ];
+        }
+    }
+
     public function transferAmount(array $data): array
     {
         try {

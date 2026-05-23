@@ -25,4 +25,13 @@ enum MobileMoneyNetwork: string
             self::AirtelTigo => 'blue',
         };
     }
+
+    public function trendiPayShortCode(): string
+    {
+        return match($this) {
+            self::MTN => 'mtngh',
+            self::Vodafone => 'telgh',
+            self::AirtelTigo => 'atlgh',
+        };
+    }
 }

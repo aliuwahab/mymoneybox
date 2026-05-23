@@ -34,7 +34,7 @@ class DisburseWithdrawalAction
                 'account_number' => $account->account_number,
                 'account_name'   => $account->account_name,
                 'account_type'   => $account->account_type->value,
-                'network'        => $account->mobile_network?->value ?? 'mtn',
+                'network'        => $account->mobile_network?->trendiPayShortCode() ?? 'mtngh',
                 'sender_name'    => config('app.name'),
                 'description'    => "Withdrawal: {$withdrawal->reference}",
             ];

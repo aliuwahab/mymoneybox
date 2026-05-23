@@ -1,0 +1,93 @@
+{
+  "name": "TrendiPay API",
+  "docs": "https://documenter.getpostman.com/view/19494994/2sAXxJiFG3",
+  "auth": {
+    "checkout_payment_links": "Bearer TRENDIPAY_MERCHANT_EXTERNAL_ID",
+    "everything_else": "Bearer TRENDIPAY_API_KEY"
+  },
+  "base_urls": {
+    "checkout": "TRENDIPAY_CHECKOUT_BASE_URL (default: https://test-api.bsl.com.gh)",
+    "api": "TRENDIPAY_API_BASE_URL (default: https://test-api.bsl.com.gh)"
+  },
+  "endpoints": {
+    "get_banks": {
+      "method": "GET",
+      "path": "/v1/banks",
+      "auth": "api_key",
+      "params": {
+        "country": "ghana",
+        "type": "mobile money | bank"
+      },
+      "response_data": [
+        { "externalId": "uuid", "name": "MTN MOBILE MONEY", "shortCode": "mtngh", "country": "ghana" }
+      ]
+    },
+    "get_balance": {
+      "method": "GET",
+      "path": "/v1/balance",
+      "auth": "api_key",
+      "response_data": {
+        "actualBalance": "integer (pesewas)",
+        "availableBalance": "integer (pesewas)"
+      }
+    },
+    "create_payment_link": {
+      "method": "POST",
+      "path": "/v1/payment-links",
+      "auth": "merchant_external_id",
+      "body": {
+        "terminalExternalId": "TRENDIPAY_CHECKOUT_TERMINAL_ID",
+        "amount": "integer (pesewas)",
+        "description": "string",
+        "reference": "string (unique)",
+        "returnUrl": "string",
+        "callbackUrl": "string",
+        "paymentMethods": ["cards", "mobile money", "bank"],
+        "items": [{ "name": "string", "price": "string (pesewas)" }]
+      },
+      "response_data": "string (payment URL)"
+    },
+    "disburse": {
+      "method": "POST",
+      "path": "/v1/terminals/{apiTerminalId}/disbursements",
+      "auth": "api_key",
+      "body": {
+        "reference": "string (unique)",
+        "accountNumber": "string",
+        "rSwitch": "shortCode from /v1/banks e.g. mtngh, atlgh, telgh",
+        "description": "string",
+        "amount": "integer (pesewas)",
+        "accountName": "string (must be verified via name enquiry)",
+        "senderName": "string",
+        "callbackUrl": "string"
+      }
+    },
+    "name_enquiry": {
+      "method": "GET",
+      "path": "/v1/terminals/{apiTerminalId}/account-details",
+      "auth": "api_key",
+      "query_params": {
+        "rSwitch": "shortCode e.g. mtngh, atlgh, telgh",
+        "accountNumber": "string"
+      },
+      "response_data": {
+        "accountNumber": "string",
+        "accountName": "string (verified name — use this for disbursements)",
+        "rSwitch": "string"
+      },
+      "note": "Call when user saves a WithdrawalAccount. Use returned accountName, not what the user typed. Block save if verification fails."
+    }
+  },
+  "ghana_mobile_money_short_codes": {
+    "MTN": "mtngh",
+    "AirtelTigo": "atlgh",
+    "Vodafone": "telgh",
+    "GhanaMoney": "gmogh"
+  },
+  "notes": [
+    "All amounts are in minor units (pesewas). GHS 1.00 = 100 pesewas.",
+    "rSwitch must use shortCodes from /v1/banks, not plain strings like 'mtn'.",
+    "accountName in disbursements must match the verified name from name enquiry — mismatches cause silent failure.",
+    "Checkout uses merchantExternalId as Bearer; all other endpoints use the API key."
+  ]
+}
