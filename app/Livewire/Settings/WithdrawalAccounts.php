@@ -82,7 +82,7 @@ class WithdrawalAccounts extends Component
         $network      = MobileMoneyNetwork::from($this->mobileNetwork);
         $verification = app(TrendiPayProvider::class)->verifyAccountName(
             $this->accountNumber,
-            $network->trendiPayShortCode()
+            $network->value
         );
 
         if (!$verification['success']) {
