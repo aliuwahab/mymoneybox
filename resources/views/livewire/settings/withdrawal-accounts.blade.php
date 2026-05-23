@@ -207,56 +207,70 @@
 
                                             {{-- Action Buttons --}}
                                             <div class="flex flex-wrap gap-2 pt-4 border-t border-gray-200">
-                                                @if(!$account->is_default)
+                                                @if(!$account->is_verified)
                                                     <button
-                                                        wire:click="setAsDefault({{ $account->id }})"
-                                                        wire:confirm="Set this as your default withdrawal account?"
-                                                        class="flex-1 min-w-[100px] px-3 py-2 text-xs font-medium text-green-700 bg-white border border-green-300 rounded-lg hover:bg-green-50 transition-colors"
+                                                        wire:click="verify({{ $account->id }})"
+                                                        class="w-full px-3 py-2 text-xs font-bold text-white bg-yellow-500 border border-yellow-500 rounded-lg hover:bg-yellow-600 transition-colors"
                                                     >
                                                         <span class="flex items-center justify-center space-x-1">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                                            </svg>
-                                                            <span>Set Default</span>
-                                                        </span>
-                                                    </button>
-                                                @endif
-
-                                                @if($account->canBeModified())
-                                                    <button
-                                                        wire:click="edit({{ $account->id }})"
-                                                        class="flex-1 min-w-[80px] px-3 py-2 text-xs font-medium text-blue-700 bg-white border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors"
-                                                    >
-                                                        <span class="flex items-center justify-center space-x-1">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                            </svg>
-                                                            <span>Edit</span>
-                                                        </span>
-                                                    </button>
-
-                                                    <button
-                                                        wire:click="delete({{ $account->id }})"
-                                                        wire:confirm="Are you sure you want to delete this account?"
-                                                        class="flex-1 min-w-[80px] px-3 py-2 text-xs font-medium text-red-700 bg-white border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
-                                                    >
-                                                        <span class="flex items-center justify-center space-x-1">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                            </svg>
-                                                            <span>Delete</span>
+                                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                            <span>Verify Account</span>
                                                         </span>
                                                     </button>
                                                 @else
-                                                    <div class="flex-1 px-3 py-2 text-xs font-medium text-gray-500 bg-gray-100 border border-gray-200 rounded-lg text-center">
-                                                        <span class="flex items-center justify-center space-x-1">
-                                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                                                            </svg>
-                                                            <span>Account Locked</span>
-                                                        </span>
-                                                        <p class="text-[10px] mt-1 text-gray-400">Has disbursement history</p>
-                                                    </div>
+                                                    @if(!$account->is_default)
+                                                        <button
+                                                            wire:click="setAsDefault({{ $account->id }})"
+                                                            wire:confirm="Set this as your default withdrawal account?"
+                                                            class="flex-1 min-w-[100px] px-3 py-2 text-xs font-medium text-green-700 bg-white border border-green-300 rounded-lg hover:bg-green-50 transition-colors"
+                                                        >
+                                                            <span class="flex items-center justify-center space-x-1">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                                </svg>
+                                                                <span>Set Default</span>
+                                                            </span>
+                                                        </button>
+                                                    @endif
+
+                                                    @if($account->canBeModified())
+                                                        <button
+                                                            wire:click="edit({{ $account->id }})"
+                                                            class="flex-1 min-w-[80px] px-3 py-2 text-xs font-medium text-blue-700 bg-white border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors"
+                                                        >
+                                                            <span class="flex items-center justify-center space-x-1">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                                </svg>
+                                                                <span>Edit</span>
+                                                            </span>
+                                                        </button>
+
+                                                        <button
+                                                            wire:click="delete({{ $account->id }})"
+                                                            wire:confirm="Are you sure you want to delete this account?"
+                                                            class="flex-1 min-w-[80px] px-3 py-2 text-xs font-medium text-red-700 bg-white border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
+                                                        >
+                                                            <span class="flex items-center justify-center space-x-1">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                </svg>
+                                                                <span>Delete</span>
+                                                            </span>
+                                                        </button>
+                                                    @else
+                                                        <div class="flex-1 px-3 py-2 text-xs font-medium text-gray-500 bg-gray-100 border border-gray-200 rounded-lg text-center">
+                                                            <span class="flex items-center justify-center space-x-1">
+                                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                                                                </svg>
+                                                                <span>Account Locked</span>
+                                                            </span>
+                                                            <p class="text-[10px] mt-1 text-gray-400">Has disbursement history</p>
+                                                        </div>
+                                                    @endif
                                                 @endif
                                             </div>
                                         </div>

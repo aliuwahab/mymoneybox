@@ -70,6 +70,11 @@ class WithdrawalAccounts extends Component
         $this->showForm       = true;
     }
 
+    public function verify($accountId)
+    {
+        $this->edit($accountId);
+    }
+
     public function save()
     {
         $this->validate();

@@ -86,7 +86,13 @@ class PiggyBoxWithdrawalForm extends Component
             return;
         }
 
-        $this->authorize('view', WithdrawalAccount::findOrFail($this->withdrawalAccountId));
+        $account = WithdrawalAccount::findOrFail($this->withdrawalAccountId);
+        $this->authorize('view', $account);
+
+        if (!$account->is_verified) {
+            $this->addError('withdrawalAccountId', 'This account is not verified. Please verify it before withdrawing.');
+            return;
+        }
 
         try {
             $withdrawal = app(CreatePiggyBoxWithdrawalAction::class)->execute(
@@ -122,7 +128,7 @@ class PiggyBoxWithdrawalForm extends Component
     #[Computed]
     public function withdrawalAccounts()
     {
-        return auth()->user()->withdrawalAccounts()->active()->get();
+        return auth()->user()->withdrawalAccounts()->active()->where('is_verified', true)->get();
     }
 
     #[Computed]

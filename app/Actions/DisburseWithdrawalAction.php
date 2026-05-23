@@ -25,6 +25,11 @@ class DisburseWithdrawalAction
             return ['success' => false, 'message' => 'No withdrawal account found.'];
         }
 
+        if (!$account->is_verified) {
+            Log::error('DisburseWithdrawalAction: account not verified', ['reference' => $withdrawal->reference, 'account_id' => $account->id]);
+            return ['success' => false, 'message' => 'Withdrawal account is not verified. Cannot disburse.'];
+        }
+
         try {
             $provider = app(PaymentManager::class)->provider($withdrawal->payment_provider ?? 'trendipay');
 
