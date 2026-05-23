@@ -12,9 +12,9 @@
   .logo-name { color: #FAFAF7; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
   .body { padding: 40px 32px 32px; text-align: center; }
   .icon-wrap { display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; background: #E6F1EB; border-radius: 50%; margin-bottom: 20px; }
-  h2 { margin: 0 0 10px; font-size: 22px; font-weight: 700; color: #15140F; letter-spacing: -0.01em; }
+  h2 { margin: 0 0 10px; font-size: 22px; font-weight: 400; color: #15140F; letter-spacing: -0.01em; font-family: Georgia, 'Times New Roman', serif; }
   p { margin: 0 0 16px; font-size: 14px; line-height: 1.6; color: #6B6862; text-align: center; }
-  .cta { display: inline-block; background: #1B6B4E; color: #FFFFFF; text-decoration: none; padding: 14px 32px; border-radius: 7px; font-size: 15px; font-weight: 600; margin: 8px 0 20px; }
+  .cta { display: inline-block; background: #15140F; color: #FFFFFF; text-decoration: none; padding: 14px 32px; border-radius: 7px; font-size: 15px; font-weight: 600; margin: 8px 0 20px; }
   .expiry-note { font-size: 12px; color: #9C998F; margin: 0 0 16px; }
   .ignore-note { font-size: 13px; color: #9C998F; background: #FAFAF7; border: 1px solid #E6E3DC; border-radius: 8px; padding: 12px 16px; margin-top: 20px; text-align: left; }
   .url-fallback { background: #FAFAF7; border: 1px solid #E6E3DC; border-radius: 8px; padding: 12px 16px; margin: 20px 0 0; text-align: left; }

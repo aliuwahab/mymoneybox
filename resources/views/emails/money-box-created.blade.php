@@ -20,7 +20,7 @@
   }
   .hero { padding: 32px; border-bottom: 1px solid #E6E3DC; }
   .hero-tag { display: inline-block; background: #E6F1EB; color: #1B6B4E; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 10px; border-radius: 99px; margin-bottom: 14px; }
-  h2 { margin: 0 0 8px; font-size: 22px; font-weight: 700; color: #15140F; letter-spacing: -0.01em; }
+  h2 { margin: 0 0 8px; font-size: 22px; font-weight: 400; color: #15140F; letter-spacing: -0.01em; font-family: Georgia, 'Times New Roman', serif; }
   p { margin: 0 0 16px; font-size: 14px; line-height: 1.6; color: #6B6862; }
   .box-card { background: #FAFAF7; border: 1px solid #E6E3DC; border-radius: 10px; padding: 18px 20px; margin: 0 0 20px; }
   .box-name { font-size: 16px; font-weight: 700; color: #15140F; margin-bottom: 4px; }
@@ -31,8 +31,8 @@
   .step-title { font-size: 13px; font-weight: 600; color: #15140F; margin-bottom: 2px; }
   .step-desc { font-size: 13px; color: #6B6862; }
   .cta-row { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; }
-  .cta { display: inline-block; background: #1B6B4E; color: #FFFFFF; text-decoration: none; padding: 12px 22px; border-radius: 7px; font-size: 14px; font-weight: 600; }
-  .cta-outline { display: inline-block; background: transparent; color: #1B6B4E; text-decoration: none; padding: 12px 22px; border-radius: 7px; font-size: 14px; font-weight: 600; border: 1px solid #90C7A9; }
+  .cta { display: inline-block; background: #15140F; color: #FFFFFF; text-decoration: none; padding: 12px 22px; border-radius: 7px; font-size: 14px; font-weight: 600; }
+  .cta-outline { display: inline-block; background: transparent; color: #15140F; text-decoration: none; padding: 12px 22px; border-radius: 7px; font-size: 14px; font-weight: 600; border: 1px solid #D9D6CE; }
   .link-box { background: #FAFAF7; border: 1px solid #E6E3DC; border-radius: 8px; padding: 12px 16px; margin-top: 20px; font-size: 12px; color: #6B6862; }
   .link-box a { color: #1B6B4E; text-decoration: none; font-size: 13px; font-weight: 500; word-break: break-all; }
   .footer { padding: 20px 32px; border-top: 1px solid #E6E3DC; }

@@ -11,21 +11,21 @@
   .logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
   .logo-name { color: #FAFAF7; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
   .body { padding: 32px; }
-  h2 { margin: 0 0 8px; font-size: 20px; font-weight: 700; color: #15140F; letter-spacing: -0.01em; }
+  h2 { margin: 0 0 8px; font-size: 20px; font-weight: 400; color: #15140F; letter-spacing: -0.01em; font-family: Georgia, 'Times New Roman', serif; }
   p { margin: 0 0 16px; font-size: 14px; line-height: 1.6; color: #6B6862; }
   .amount-band { background: #E6F1EB; border: 1px solid #90C7A9; border-radius: 10px; padding: 20px 24px; margin-bottom: 24px; text-align: center; }
   .amount-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #154F3A; margin-bottom: 4px; }
   .amount-value { font-size: 36px; font-weight: 700; color: #1B6B4E; letter-spacing: -0.02em; line-height: 1; }
   .amount-sub { font-size: 12px; color: #2E8E60; margin-top: 4px; }
-  .status-badge { display: inline-block; background: #DCFCE7; color: #15803D; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 5px 12px; border-radius: 99px; border: 1px solid #86EFAC; margin-bottom: 20px; }
+  .status-badge { display: inline-block; background: #E6F1EB; color: #154F3A; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 5px 12px; border-radius: 99px; border: 1px solid #90C7A9; margin-bottom: 20px; }
   .meta-table { background: #FAFAF7; border: 1px solid #E6E3DC; border-radius: 8px; padding: 0 16px; margin-bottom: 24px; }
   .meta-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #E6E3DC; font-size: 13px; }
   .meta-row:last-child { border-bottom: none; }
   .meta-label { color: #9C998F; }
   .meta-value { color: #15140F; font-weight: 500; }
-  .info-box { background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 14px 16px; margin-bottom: 24px; }
-  .info-box p { font-size: 13px; color: #166534; margin: 0; line-height: 1.5; }
-  .cta { display: inline-block; background: #1B6B4E; color: #FFFFFF; text-decoration: none; padding: 12px 24px; border-radius: 7px; font-size: 14px; font-weight: 600; }
+  .info-box { background: #E6F1EB; border: 1px solid #90C7A9; border-radius: 8px; padding: 14px 16px; margin-bottom: 24px; }
+  .info-box p { font-size: 13px; color: #154F3A; margin: 0; line-height: 1.5; }
+  .cta { display: inline-block; background: #15140F; color: #FFFFFF; text-decoration: none; padding: 12px 24px; border-radius: 7px; font-size: 14px; font-weight: 600; }
   .footer { padding: 20px 32px; border-top: 1px solid #E6E3DC; }
   .footer p { font-size: 12px; color: #9C998F; margin: 0; }
   .footer a { color: #1B6B4E; text-decoration: none; }
