@@ -1,0 +1,37 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 72.62.156.149
+          username: root
+          port: 22
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            cd /home/mypiggybox/htdocs/www.mypiggybox.com
+
+            git pull origin main
+
+            /usr/bin/php8.5 /usr/local/bin/composer install \
+              --no-dev \
+              --optimize-autoloader \
+              --no-interaction
+
+            /usr/bin/php8.5 artisan migrate --force
+
+            /usr/bin/php8.5 artisan config:cache
+            /usr/bin/php8.5 artisan route:cache
+            /usr/bin/php8.5 artisan view:cache
+
+            /usr/bin/php8.5 artisan queue:restart
