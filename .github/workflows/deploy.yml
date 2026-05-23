@@ -23,15 +23,18 @@ jobs:
 
             git pull origin main
 
+            npm ci --prefer-offline
+            npm run build
+
             /usr/bin/php8.5 /usr/local/bin/composer install \
               --no-dev \
               --optimize-autoloader \
               --no-interaction
 
+            /usr/bin/php8.5 artisan optimize:clear
             /usr/bin/php8.5 artisan migrate --force
+            /usr/bin/php8.5 artisan storage:link --force
 
-            /usr/bin/php8.5 artisan config:cache
-            /usr/bin/php8.5 artisan route:cache
-            /usr/bin/php8.5 artisan view:cache
+            /usr/bin/php8.5 artisan optimize
 
             /usr/bin/php8.5 artisan queue:restart
