@@ -9,8 +9,16 @@
   .wrap { max-width: 560px; margin: 40px auto; background: #FFFFFF; border-radius: 12px; overflow: hidden; border: 1px solid #E6E3DC; }
   .header { background: #15140F; padding: 28px 32px; }
   .logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
-  .logo-mark { width: 32px; height: 32px; background: #1B6B4E; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: #FAFAF7; }
   .logo-name { color: #FAFAF7; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+  @media only screen and (max-width: 600px) {
+    .wrap { margin: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
+    .header { padding: 20px !important; }
+    .body, .hero { padding: 20px !important; }
+    .footer { padding: 16px 20px !important; }
+    .amount-value { font-size: 28px !important; }
+    .cta, .cta-outline { display: block !important; text-align: center !important; margin-bottom: 8px !important; }
+    .cta-row { flex-direction: column !important; }
+  }
   .body { padding: 32px; }
   .amount-band { background: #E6F1EB; border: 1px solid #90C7A9; border-radius: 10px; padding: 20px 24px; margin-bottom: 24px; text-align: center; }
   .amount-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #154F3A; margin-bottom: 4px; }
@@ -31,7 +39,7 @@
 <div class="wrap">
   <div class="header">
     <span class="logo">
-      <span class="logo-mark">M</span>
+      <img src="{{ config('app.url') }}/apple-touch-icon.png" alt="MyPiggyBox" width="36" height="36" style="border-radius:8px;display:inline-block;vertical-align:middle;">
       <span class="logo-name">MyPiggyBox</span>
     </span>
   </div>

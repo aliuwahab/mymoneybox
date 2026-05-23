@@ -46,6 +46,7 @@ class ViewMoneyBoxWithdrawal extends ViewRecord
                         'processed_at' => now(),
                     ]);
                     $this->refreshFormData(['status', 'processed_by', 'processed_at']);
+                    event(new \App\Events\WithdrawalApproved($this->record));
                     Notification::make()->success()->title('Withdrawal approved')->send();
                 })
                 ->visible(fn () => $this->record->canBeApproved()),

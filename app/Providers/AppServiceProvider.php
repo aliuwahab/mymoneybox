@@ -4,10 +4,13 @@ namespace App\Providers;
 
 use App\Events\ContributionProcessed;
 use App\Events\MoneyBoxCreated;
+use App\Events\WithdrawalApproved;
 use App\Events\WithdrawalRequested;
 use App\Listeners\NotifyMoneyBoxOwner;
 use App\Listeners\SendContributionThankYouEmail;
 use App\Listeners\SendMoneyBoxCreatedNotification;
+use App\Listeners\SendWithdrawalApprovedEmail;
+use App\Listeners\SendWithdrawalSubmittedEmail;
 use App\Payment\PaymentManager;
 use App\Payment\Providers\TrendiPayProvider;
 use Illuminate\Support\Facades\Event;
@@ -36,10 +39,9 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(MoneyBoxCreated::class, SendMoneyBoxCreatedNotification::class);
 
         // Fired when a withdrawal request is submitted (ready for admin review)
-        // Wire in your notification logic as needed, e.g.:
-        // Event::listen(WithdrawalRequested::class, NotifyAdminOfWithdrawal::class);
-        Event::listen(WithdrawalRequested::class, function (WithdrawalRequested $event) {
-            // placeholder — add a queued listener when notification infra is ready
-        });
+        Event::listen(WithdrawalRequested::class, SendWithdrawalSubmittedEmail::class);
+
+        // Fired when a withdrawal is approved by an admin
+        Event::listen(WithdrawalApproved::class, SendWithdrawalApprovedEmail::class);
     }
 }

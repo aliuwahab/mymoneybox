@@ -8,8 +8,16 @@
   body { margin: 0; padding: 0; background: #F3F1EB; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
   .wrap { max-width: 560px; margin: 40px auto; background: #FFFFFF; border-radius: 12px; overflow: hidden; border: 1px solid #E6E3DC; }
   .header { background: #15140F; padding: 28px 32px; }
-  .logo-mark { width: 32px; height: 32px; background: #1B6B4E; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: #FAFAF7; }
   .logo-name { color: #FAFAF7; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; vertical-align: middle; margin-left: 10px; }
+  @media only screen and (max-width: 600px) {
+    .wrap { margin: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
+    .header { padding: 20px !important; }
+    .body, .hero { padding: 20px !important; }
+    .footer { padding: 16px 20px !important; }
+    .amount-value { font-size: 28px !important; }
+    .cta, .cta-outline { display: block !important; text-align: center !important; margin-bottom: 8px !important; }
+    .cta-row { flex-direction: column !important; }
+  }
   .hero { padding: 32px; border-bottom: 1px solid #E6E3DC; }
   .hero-tag { display: inline-block; background: #E6F1EB; color: #1B6B4E; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 10px; border-radius: 99px; margin-bottom: 14px; }
   h2 { margin: 0 0 8px; font-size: 22px; font-weight: 700; color: #15140F; letter-spacing: -0.01em; }
@@ -35,7 +43,7 @@
 <body>
 <div class="wrap">
   <div class="header">
-    <span class="logo-mark">M</span>
+    <img src="{{ config('app.url') }}/apple-touch-icon.png" alt="MyPiggyBox" width="36" height="36" style="border-radius:8px;display:inline-block;vertical-align:middle;">
     <span class="logo-name">MyPiggyBox</span>
   </div>
 
