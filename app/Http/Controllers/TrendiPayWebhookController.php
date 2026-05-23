@@ -151,6 +151,7 @@ class TrendiPayWebhookController extends Controller
             ]);
 
             Log::info('TrendiPay disbursement confirmed', ['reference' => $withdrawalReference]);
+            event(new \App\Events\WithdrawalDisbursed($withdrawal));
         } else {
             // Transfer ultimately failed — mark accordingly
             $withdrawal->update([
