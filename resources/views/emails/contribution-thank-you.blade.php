@@ -8,7 +8,6 @@
   body { margin: 0; padding: 0; background: #F3F1EB; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
   .wrap { max-width: 560px; margin: 40px auto; background: #FFFFFF; border-radius: 12px; overflow: hidden; border: 1px solid #E6E3DC; }
   .header { background: #15140F; padding: 28px 32px; }
-  .logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
   .logo-name { color: #FAFAF7; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
   @media only screen and (max-width: 600px) {
     .wrap { margin: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
@@ -38,10 +37,16 @@
 <body>
 <div class="wrap">
   <div class="header">
-    <span class="logo">
-      <span style="display:inline-block;width:32px;height:32px;background:#1B6B4E;border-radius:8px;text-align:center;line-height:32px;font-weight:700;font-size:16px;color:#FAFAF7;font-family:Arial,sans-serif;vertical-align:middle;">M</span>
-      <span class="logo-name">MyPiggyBox</span>
-    </span>
+    <table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+      <tr>
+        <td valign="middle" style="padding:0;">
+          <span style="display:inline-block;width:32px;height:32px;background:#1B6B4E;border-radius:8px;text-align:center;line-height:32px;font-weight:700;font-size:16px;color:#FAFAF7;font-family:Arial,sans-serif;">M</span>
+        </td>
+        <td valign="middle" style="padding:0 0 0 10px;">
+          <span class="logo-name">MyPiggyBox</span>
+        </td>
+      </tr>
+    </table>
   </div>
 
   <div class="body">

@@ -8,10 +8,8 @@
   body { margin: 0; padding: 0; background: #F3F1EB; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
   .wrap { max-width: 560px; margin: 40px auto; background: #FFFFFF; border-radius: 12px; overflow: hidden; border: 1px solid #E6E3DC; }
   .header { background: #15140F; padding: 28px 32px; }
-  .logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
   .logo-name { color: #FAFAF7; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
   .body { padding: 40px 32px 32px; text-align: center; }
-  .icon-wrap { display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; background: #E6F1EB; border-radius: 50%; margin-bottom: 20px; }
   h2 { margin: 0 0 10px; font-size: 22px; font-weight: 400; color: #15140F; letter-spacing: -0.01em; font-family: Georgia, 'Times New Roman', serif; }
   p { margin: 0 0 16px; font-size: 14px; line-height: 1.6; color: #6B6862; text-align: center; }
   .cta { display: inline-block; background: #15140F; color: #FFFFFF; text-decoration: none; padding: 14px 32px; border-radius: 7px; font-size: 15px; font-weight: 600; margin: 8px 0 20px; }
@@ -35,15 +33,21 @@
 <body>
 <div class="wrap">
   <div class="header">
-    <span class="logo">
-      <span style="display:inline-block;width:32px;height:32px;background:#1B6B4E;border-radius:8px;text-align:center;line-height:32px;font-weight:700;font-size:16px;color:#FAFAF7;font-family:Arial,sans-serif;vertical-align:middle;">M</span>
-      <span class="logo-name">MyPiggyBox</span>
-    </span>
+    <table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+      <tr>
+        <td valign="middle" style="padding:0;">
+          <span style="display:inline-block;width:32px;height:32px;background:#1B6B4E;border-radius:8px;text-align:center;line-height:32px;font-weight:700;font-size:16px;color:#FAFAF7;font-family:Arial,sans-serif;">M</span>
+        </td>
+        <td valign="middle" style="padding:0 0 0 10px;">
+          <span class="logo-name">MyPiggyBox</span>
+        </td>
+      </tr>
+    </table>
   </div>
 
   <div class="body">
-    <div class="icon-wrap">
-      <span style="font-size:26px;line-height:1;color:#1B6B4E;">&#128274;</span>
+    <div style="display:inline-block;width:64px;height:64px;background:#E6F1EB;border-radius:50%;text-align:center;line-height:64px;margin-bottom:20px;">
+      <span style="display:inline-block;width:36px;height:36px;background:#1B6B4E;border-radius:8px;text-align:center;line-height:36px;font-weight:700;font-size:18px;color:#FAFAF7;font-family:Arial,sans-serif;vertical-align:middle;">M</span>
     </div>
 
     <h2>Reset your password</h2>

@@ -41,8 +41,16 @@
 <body>
 <div class="wrap">
   <div class="header">
-    <span style="display:inline-block;width:32px;height:32px;background:#1B6B4E;border-radius:8px;text-align:center;line-height:32px;font-weight:700;font-size:16px;color:#FAFAF7;font-family:Arial,sans-serif;vertical-align:middle;">M</span>
-    <span class="logo-name">MyPiggyBox</span>
+    <table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+      <tr>
+        <td valign="middle" style="padding:0;">
+          <span style="display:inline-block;width:32px;height:32px;background:#1B6B4E;border-radius:8px;text-align:center;line-height:32px;font-weight:700;font-size:16px;color:#FAFAF7;font-family:Arial,sans-serif;">M</span>
+        </td>
+        <td valign="middle" style="padding:0 0 0 10px;">
+          <span class="logo-name">MyPiggyBox</span>
+        </td>
+      </tr>
+    </table>
   </div>
 
   <div class="body">
