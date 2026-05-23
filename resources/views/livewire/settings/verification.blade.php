@@ -97,8 +97,9 @@
                         <input type="file" wire:model.live="frontImage" accept="image/*" class="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer" />
                         <div wire:loading wire:target="frontImage" class="mt-2 text-sm text-green-600">Uploading...</div>
                         @if ($frontImage)
-                            <div class="mt-2">
-                                <img src="{{ $frontImage->temporaryUrl() }}" class="w-full h-48 object-cover rounded-lg border border-gray-300">
+                            <div class="mt-2 flex items-center space-x-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                                <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                <span class="truncate">{{ $frontImage->getClientOriginalName() }}</span>
                             </div>
                         @endif
                         @error('frontImage') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
@@ -109,8 +110,9 @@
                         <input type="file" wire:model.live="backImage" accept="image/*" class="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer" />
                         <div wire:loading wire:target="backImage" class="mt-2 text-sm text-green-600">Uploading...</div>
                         @if ($backImage)
-                            <div class="mt-2">
-                                <img src="{{ $backImage->temporaryUrl() }}" class="w-full h-48 object-cover rounded-lg border border-gray-300">
+                            <div class="mt-2 flex items-center space-x-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                                <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                <span class="truncate">{{ $backImage->getClientOriginalName() }}</span>
                             </div>
                         @endif
                         @error('backImage') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
