@@ -36,3 +36,6 @@ Artisan::command('mail:test {email}', function (string $email) {
 
     $this->info("SMTP accepted the test email for {$email}. Search for {$mailId} in your provider logs.");
 })->purpose('Send a test email using the configured mailer');
+
+use Illuminate\Support\Facades\Schedule;
+Schedule::command('app:send-marketing-emails')->dailyAt('08:00');

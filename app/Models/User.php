@@ -110,6 +110,11 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         return $this->hasMany(MoneyBox::class);
     }
 
+    public function marketingEmails(): HasMany
+    {
+        return $this->hasMany(UserMarketingEmail::class);
+    }
+
     /**
      * Get the user's personal piggy box
      */
