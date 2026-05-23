@@ -98,7 +98,7 @@ return [
     'middleware' => [
         'web',
         'auth',
-        \App\Http\Middleware\EnsureUserIsAdmin::class,
+        \App\Http\Middleware\EnsureUserIsDeveloper::class,
     ],
 
     /*
@@ -113,7 +113,7 @@ return [
     'api_middleware' => [
         \Opcodes\LogViewer\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         'auth',
-        \App\Http\Middleware\EnsureUserIsAdmin::class,
+        \App\Http\Middleware\EnsureUserIsDeveloper::class,
     ],
 
     'api_stateful_domains' => env('LOG_VIEWER_API_STATEFUL_DOMAINS') ? explode(',', env('LOG_VIEWER_API_STATEFUL_DOMAINS')) : null,
