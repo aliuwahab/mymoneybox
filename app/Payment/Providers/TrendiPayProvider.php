@@ -8,14 +8,15 @@ use Illuminate\Support\Facades\Log;
 
 class TrendiPayProvider implements PaymentProviderInterface
 {
-    protected string $merchantExternalId; // Used as Bearer token
+    protected string $apiKey;             // Used as Bearer token for disbursements
+    protected string $merchantExternalId; // Used as Bearer token for checkout
     protected string $checkoutTerminalId; // Used for payment link / checkout flow
     protected string $apiTerminalId;      // Used for disbursements
     protected string $checkoutBaseUrl;
 
     public function __construct()
     {
-        // According to docs: Use Merchant External ID as Bearer token, NOT the API key
+        $this->apiKey             = config('payment.trendipay.api_key');
         $this->merchantExternalId = config('payment.trendipay.merchant_external_id');
         $this->checkoutTerminalId = config('payment.trendipay.checkout_terminal_id');
         $this->apiTerminalId      = config('payment.trendipay.api_terminal_id');
@@ -224,7 +225,7 @@ class TrendiPayProvider implements PaymentProviderInterface
             $url = "{$apiBaseUrl}/v1/terminals/{$this->apiTerminalId}/disbursements";
 
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->merchantExternalId,
+                'Authorization' => 'Bearer ' . $this->apiKey,
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
             ])->post($url, $payload);
