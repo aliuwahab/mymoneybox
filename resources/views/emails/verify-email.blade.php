@@ -35,17 +35,14 @@
 <div class="wrap">
   <div class="header">
     <span class="logo">
-      <img src="{{ config('app.url') }}/apple-touch-icon.png" alt="MyPiggyBox" width="36" height="36" style="border-radius:8px;display:inline-block;vertical-align:middle;">
+      <span style="display:inline-block;width:32px;height:32px;background:#1B6B4E;border-radius:8px;text-align:center;line-height:32px;font-weight:700;font-size:16px;color:#FAFAF7;font-family:Arial,sans-serif;vertical-align:middle;">M</span>
       <span class="logo-name">MyPiggyBox</span>
     </span>
   </div>
 
   <div class="body">
     <div class="icon-wrap">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1B6B4E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="4" width="20" height="16" rx="2"/>
-        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-      </svg>
+      <span style="font-size:26px;line-height:1;color:#1B6B4E;">&#9993;</span>
     </div>
 
     <h2>Welcome to MyPiggyBox!</h2>
