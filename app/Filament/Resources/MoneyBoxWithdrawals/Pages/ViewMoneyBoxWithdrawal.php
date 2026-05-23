@@ -99,7 +99,12 @@ class ViewMoneyBoxWithdrawal extends ViewRecord
                     if ($result['success']) {
                         Notification::make()->success()->title('Transfer submitted')->body('Awaiting payment provider confirmation.')->send();
                     } else {
-                        Notification::make()->danger()->title('Transfer failed')->body($result['message'] ?? 'Please try again.')->send();
+                        Notification::make()
+                            ->danger()
+                            ->title('Transfer failed')
+                            ->body($result['message'] ?? 'Please try again.')
+                            ->persistent()
+                            ->send();
                     }
                 })
                 ->visible(fn () => $this->record->canBeDisbursed()),
