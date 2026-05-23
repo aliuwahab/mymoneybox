@@ -2,7 +2,7 @@
     <section class="w-full">
         @include('partials.settings-heading')
 
-        <x-settings.layout :heading="__('Withdrawal Accounts')" :subheading="__('Manage your bank and mobile money accounts for withdrawals')">
+        <x-settings.layout :heading="__('Withdrawal Accounts')" :subheading="__('Manage your mobile money accounts for withdrawals')">
             <div class="my-6 w-full space-y-6">
 
                 @if (session('success'))
@@ -60,36 +60,39 @@
                                 {{-- Account Type --}}
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Account Type *</label>
-                                    <select wire:model.live="accountType" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">
-                                        <option value="">Select account type...</option>
-                                        @foreach($accountTypes as $type)
-                                            <option value="{{ $type->value }}">{{ $type->label() }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('accountType') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <label class="relative flex items-center gap-3 p-3 rounded-lg border-2 border-green-500 bg-green-50 cursor-pointer">
+                                            <input type="radio" name="accountType" value="mobile_money" checked class="text-green-600 focus:ring-green-600">
+                                            <span class="text-sm font-medium text-green-800">Mobile Money</span>
+                                        </label>
+                                        <label class="relative flex items-center gap-3 p-3 rounded-lg border-2 border-gray-200 bg-gray-50 cursor-not-allowed opacity-60">
+                                            <input type="radio" name="accountType" value="bank_account" disabled class="text-gray-400">
+                                            <span class="text-sm font-medium text-gray-500">Bank Account</span>
+                                            <span class="ml-auto text-[10px] font-bold text-gray-400 uppercase tracking-wide">Coming Soon</span>
+                                        </label>
+                                    </div>
                                 </div>
 
-                                @if($accountType === 'mobile_money')
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Mobile Network *</label>
-                                        <select wire:model="mobileNetwork" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">
-                                            <option value="">Select network...</option>
-                                            @foreach($mobileNetworks as $network)
-                                                <option value="{{ $network->value }}">{{ $network->label() }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('mobileNetwork') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                    </div>
-                                    <flux:input wire:model="accountNumber" label="Mobile Number *" type="text" placeholder="0XXXXXXXXX" />
-                                    <flux:input wire:model="accountName" label="Account Name *" type="text" placeholder="Name registered on mobile money" />
-                                @elseif($accountType === 'bank_account')
-                                    <flux:input wire:model="bankName" label="Bank Name *" type="text" placeholder="e.g., GCB Bank, Ecobank Ghana" />
-                                    <flux:input wire:model="accountNumber" label="Account Number *" type="text" placeholder="Enter bank account number" />
-                                    <flux:input wire:model="accountName" label="Account Holder Name *" type="text" placeholder="Name as shown on account" />
-                                    <flux:input wire:model="bankBranch" label="Branch (Optional)" type="text" placeholder="e.g., Accra Main Branch" />
-                                @endif
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Mobile Network *</label>
+                                    <select wire:model="mobileNetwork" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">
+                                        <option value="">Select network...</option>
+                                        @foreach($mobileNetworks as $network)
+                                            <option value="{{ $network->value }}">{{ $network->label() }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('mobileNetwork') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                </div>
 
-                                @if($accountType)
+                                <flux:input wire:model="accountNumber" label="Mobile Number *" type="text" placeholder="0XXXXXXXXX" />
+
+                                <div>
+                                    <flux:input wire:model="accountName" label="Account Name *" type="text" placeholder="Name registered on mobile money" />
+                                    <p class="mt-1 text-xs text-gray-500">Must match the name registered on your mobile money account. The verified name will be saved.</p>
+                                    @error('accountName') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                </div>
+
+                                @if(true)
                                     <div class="flex items-center space-x-2">
                                         <input type="checkbox" wire:model="isDefault" id="isDefault" class="rounded border-gray-300 text-green-600 focus:ring-green-600">
                                         <label for="isDefault" class="text-sm text-gray-700">Set as default withdrawal account</label>
@@ -130,6 +133,21 @@
                                             @if($account->is_default)
                                                 <div class="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
                                                     ★ DEFAULT
+                                                </div>
+                                            @endif
+                                            @if($account->is_verified)
+                                                <div class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg flex items-center space-x-1">
+                                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                    <span>VERIFIED</span>
+                                                </div>
+                                            @else
+                                                <div class="bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg flex items-center space-x-1">
+                                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                    <span>UNVERIFIED</span>
                                                 </div>
                                             @endif
                                             @if(!$account->canBeModified())
@@ -254,7 +272,7 @@
                                 </svg>
                             </div>
                             <flux:heading size="lg" class="mb-2">No Withdrawal Accounts</flux:heading>
-                            <p class="text-gray-600 mb-6">Add a bank account or mobile money account to receive withdrawals</p>
+                            <p class="text-gray-600 mb-6">Add a mobile money account to receive withdrawals</p>
                             <a
                                 href="{{ route('settings.withdrawal-accounts', ['add' => 1]) }}"
                                 wire:click.prevent="showAddForm"

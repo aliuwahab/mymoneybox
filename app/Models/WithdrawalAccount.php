@@ -20,6 +20,7 @@ class WithdrawalAccount extends Model
         'bank_branch',
         'is_default',
         'is_active',
+        'is_verified',
     ];
 
     protected $casts = [
@@ -27,6 +28,7 @@ class WithdrawalAccount extends Model
         'mobile_network' => MobileMoneyNetwork::class,
         'is_default' => 'boolean',
         'is_active' => 'boolean',
+        'is_verified' => 'boolean',
     ];
 
     // Relationships

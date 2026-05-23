@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Settings;
 
-use App\Enums\AccountType;
 use App\Enums\MobileMoneyNetwork;
 use App\Models\WithdrawalAccount;
 use App\Payment\Providers\TrendiPayProvider;
@@ -12,41 +11,26 @@ class WithdrawalAccounts extends Component
 {
     public $showForm = false;
     public $editingId = null;
-    
+
     // Form fields
-    public $accountType = '';
     public $accountName = '';
     public $accountNumber = '';
     public $mobileNetwork = '';
-    public $bankName = '';
-    public $bankBranch = '';
     public $isDefault = false;
 
-    protected function rules()
+    protected function rules(): array
     {
-        $rules = [
-            'accountType' => 'required|in:mobile_money,bank_account',
-            'accountName' => 'required|string|max:255',
+        return [
+            'accountName'   => 'required|string|max:255',
             'accountNumber' => 'required|string|max:255',
+            'mobileNetwork' => 'required|in:mtn,vodafone,airteltigo',
         ];
-
-        if ($this->accountType === 'mobile_money') {
-            $rules['mobileNetwork'] = 'required|in:mtn,vodafone,airteltigo';
-        } else {
-            $rules['bankName'] = 'required|string|max:255';
-            $rules['bankBranch'] = 'nullable|string|max:255';
-        }
-
-        return $rules;
     }
 
     protected $validationAttributes = [
-        'accountType' => 'account type',
-        'accountName' => 'account name',
+        'accountName'   => 'account name',
         'accountNumber' => 'account number',
         'mobileNetwork' => 'mobile network',
-        'bankName' => 'bank name',
-        'bankBranch' => 'bank branch',
     ];
 
     public function mount()
@@ -58,13 +42,12 @@ class WithdrawalAccounts extends Component
 
     public function showAddForm()
     {
-        if (! auth()->user()->can('create', WithdrawalAccount::class)) {
+        if (!auth()->user()->can('create', WithdrawalAccount::class)) {
             session()->flash('error', 'Please submit ID verification before adding a withdrawal account.');
             $this->redirectRoute('settings.verification', navigate: true);
-
             return;
         }
-        
+
         $this->resetForm();
         $this->showForm = true;
     }
@@ -74,62 +57,53 @@ class WithdrawalAccounts extends Component
         $account = WithdrawalAccount::findOrFail($accountId);
         $this->authorize('update', $account);
 
-        // Check if account can be modified (no disbursements)
         if (!$account->canBeModified()) {
-            session()->flash('error', 'This account cannot be edited because it has received disbursements. Please contact support if you need to make changes.');
+            session()->flash('error', 'This account cannot be edited because it has received disbursements.');
             return;
         }
 
-        $this->editingId = $account->id;
-        $this->accountType = $account->account_type->value;
-        $this->accountName = $account->account_name;
-        $this->accountNumber = $account->account_number;
-        $this->mobileNetwork = $account->mobile_network?->value ?? '';
-        $this->bankName = $account->bank_name ?? '';
-        $this->bankBranch = $account->bank_branch ?? '';
-        $this->isDefault = $account->is_default;
-        $this->showForm = true;
+        $this->editingId      = $account->id;
+        $this->accountName    = $account->account_name;
+        $this->accountNumber  = $account->account_number;
+        $this->mobileNetwork  = $account->mobile_network?->value ?? '';
+        $this->isDefault      = $account->is_default;
+        $this->showForm       = true;
     }
 
     public function save()
     {
         $this->validate();
 
-        $accountName = $this->accountName;
+        $network      = MobileMoneyNetwork::from($this->mobileNetwork);
+        $verification = app(TrendiPayProvider::class)->verifyAccountName(
+            $this->accountNumber,
+            $network->trendiPayShortCode()
+        );
 
-        if ($this->accountType === 'mobile_money') {
-            $network = MobileMoneyNetwork::from($this->mobileNetwork);
-            $verification = app(TrendiPayProvider::class)->verifyAccountName(
-                $this->accountNumber,
-                $network->trendiPayShortCode()
-            );
+        if (!$verification['success']) {
+            $this->addError('accountNumber', $verification['message']);
+            return;
+        }
 
-            if (!$verification['success']) {
-                $this->addError('accountNumber', $verification['message']);
-                return;
-            }
+        $verifiedName = $verification['account_name'];
 
-            $accountName = $verification['account_name'];
+        if (!$this->namesMatch($this->accountName, $verifiedName)) {
+            $this->addError('accountName', "The name you entered doesn't match the registered account name. Please check and try again.");
+            return;
         }
 
         $data = [
-            'user_id' => auth()->id(),
-            'account_type' => $this->accountType,
-            'account_name' => $accountName,
+            'user_id'        => auth()->id(),
+            'account_type'   => 'mobile_money',
+            'account_name'   => $verifiedName,
             'account_number' => $this->accountNumber,
-            'is_default' => $this->isDefault,
-            'is_active' => true,
+            'mobile_network' => $this->mobileNetwork,
+            'bank_name'      => null,
+            'bank_branch'    => null,
+            'is_default'     => $this->isDefault,
+            'is_active'      => true,
+            'is_verified'    => true,
         ];
-
-        if ($this->accountType === 'mobile_money') {
-            $data['mobile_network'] = $this->mobileNetwork;
-            $data['bank_name'] = null;
-            $data['bank_branch'] = null;
-        } else {
-            $data['bank_name'] = $this->bankName;
-            $data['bank_branch'] = $this->bankBranch;
-            $data['mobile_network'] = null;
-        }
 
         if ($this->editingId) {
             $account = WithdrawalAccount::findOrFail($this->editingId);
@@ -139,10 +113,9 @@ class WithdrawalAccounts extends Component
         } else {
             $this->authorize('create', WithdrawalAccount::class);
             $account = WithdrawalAccount::create($data);
-            $message = 'Withdrawal account added successfully!';
+            $message = 'Withdrawal account verified and added successfully!';
         }
 
-        // If marked as default, update other accounts
         if ($this->isDefault) {
             $account->setAsDefault();
         }
@@ -156,7 +129,7 @@ class WithdrawalAccounts extends Component
     {
         $account = WithdrawalAccount::findOrFail($accountId);
         $this->authorize('update', $account);
-        
+
         $account->setAsDefault();
         session()->flash('success', 'Default account updated!');
     }
@@ -166,9 +139,8 @@ class WithdrawalAccounts extends Component
         $account = WithdrawalAccount::findOrFail($accountId);
         $this->authorize('delete', $account);
 
-        // Check if account can be modified (no disbursements)
         if (!$account->canBeModified()) {
-            session()->flash('error', 'This account cannot be deleted because it has received disbursements. Accounts with disbursement history must be kept for audit purposes.');
+            session()->flash('error', 'This account cannot be deleted because it has received disbursements.');
             return;
         }
 
@@ -182,16 +154,38 @@ class WithdrawalAccounts extends Component
         $this->showForm = false;
     }
 
+    private function namesMatch(string $userInput, string $verifiedName): bool
+    {
+        $normalize = fn(string $s) => strtolower(trim(preg_replace('/\s+/', ' ', $s)));
+
+        $a = $normalize($userInput);
+        $b = $normalize($verifiedName);
+
+        if ($a === $b) {
+            return true;
+        }
+
+        // Check if all words the user typed appear in the verified name
+        $userWords     = explode(' ', $a);
+        $verifiedWords = explode(' ', $b);
+        $matches       = count(array_intersect($userWords, $verifiedWords));
+
+        if ($matches / count($userWords) >= 0.6) {
+            return true;
+        }
+
+        // Fallback: character-level similarity
+        similar_text($a, $b, $percent);
+        return $percent >= 60;
+    }
+
     private function resetForm()
     {
-        $this->editingId = null;
-        $this->accountType = '';
-        $this->accountName = '';
+        $this->editingId     = null;
+        $this->accountName   = '';
         $this->accountNumber = '';
         $this->mobileNetwork = '';
-        $this->bankName = '';
-        $this->bankBranch = '';
-        $this->isDefault = false;
+        $this->isDefault     = false;
         $this->resetValidation();
     }
 
@@ -203,8 +197,7 @@ class WithdrawalAccounts extends Component
             ->get();
 
         return view('livewire.settings.withdrawal-accounts', [
-            'accounts' => $accounts,
-            'accountTypes' => AccountType::cases(),
+            'accounts'      => $accounts,
             'mobileNetworks' => MobileMoneyNetwork::cases(),
         ]);
     }
