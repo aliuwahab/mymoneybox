@@ -12,7 +12,7 @@
             <div class="flex items-center gap-2">
                 <a href="{{ route('events.create') }}" class="btn btn-primary">
                     <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-                    Create Event
+                    Create EventBox
                 </a>
             </div>
         </div>
@@ -101,7 +101,7 @@
                 <p class="tiny mb-5">Create your first event and start selling tickets.</p>
                 <a href="{{ route('events.create') }}" class="btn btn-primary">
                     <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-                    Create an Event
+                    Create EventBox
                 </a>
             </div>
         @endif

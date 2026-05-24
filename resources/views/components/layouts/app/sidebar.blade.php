@@ -223,7 +223,7 @@
                         request()->routeIs('analytics.index') => ['Workspace', 'Analytics'],
                         request()->routeIs('withdrawals.*') => ['Workspace', 'Withdrawals'],
                         request()->routeIs('events.index') => ['Events', 'My EventBoxes'],
-                        request()->routeIs('events.create') => ['Events', 'My EventBoxes', 'Create Event'],
+                        request()->routeIs('events.create') => ['Events', 'My EventBoxes', 'Create EventBox'],
                         request()->routeIs('events.edit') => ['Events', 'My EventBoxes', 'Edit Event'],
                         request()->routeIs('events.dashboard') => ['Events', 'My EventBoxes', 'Dashboard'],
                         request()->routeIs('piggy.my-piggy-box') => ['Account', 'My Piggy Wallet'],

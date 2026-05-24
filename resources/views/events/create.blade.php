@@ -89,7 +89,7 @@
 
         <div class="page-head">
             <div>
-                <h1 class="page-title">Create an Event</h1>
+                <h1 class="page-title">Create EventBox</h1>
                 <div class="page-sub">Set up your event and start selling tickets.</div>
             </div>
             <a href="{{ route('events.index') }}" class="btn ghost">Cancel</a>
@@ -256,7 +256,7 @@
                                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                             </button>
                             <button type="submit" class="btn primary" x-show="currentStep === 2" :disabled="isSubmitting">
-                                <span x-show="!isSubmitting">Create Event</span>
+                                <span x-show="!isSubmitting">Create EventBox</span>
                                 <span x-show="isSubmitting">Creating...</span>
                             </button>
                         </div>

@@ -39,7 +39,8 @@ Route::view('/cookies', 'pages.cookies')->name('cookies');
 
 // EventBox public routes
 Route::get('/events', [EventBoxController::class, 'publicIndex'])->name('events.public.index');
-Route::get('/events/{slug}', [EventBoxController::class, 'publicShow'])->name('events.show');
+Route::get('/events/{slug}', [EventBoxController::class, 'publicShow'])->name('events.show')
+    ->where('slug', '^(?!create$|edit$).*');
 Route::post('/events/{slug}/purchase', [EventBoxController::class, 'purchase'])->name('events.purchase');
 Route::get('/events/{slug}/confirmation/{reference}', [EventBoxController::class, 'confirmation'])->name('events.confirmation');
 
