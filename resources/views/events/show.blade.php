@@ -15,6 +15,7 @@
         $accentDark  = sprintf('#%02x%02x%02x', max(0, $r - 28), max(0, $g - 28), max(0, $b - 28));
         $accentRgb   = "$r, $g, $b";
         $coverUrl    = $eventBox->getCoverImageUrl();
+        $gallery     = $eventBox->getGalleryUrls();
     @endphp
 
     <style>
@@ -156,6 +157,109 @@
                     <div class="bg-white border border-[#E6E3DC] rounded-[14px] p-6">
                         <h2 style="font-family:Georgia,'Times New Roman',serif;font-size:1.15rem;font-weight:400;color:#15140F;margin:0 0 14px;">About this event</h2>
                         <div class="text-[14px] text-[#6B6862] leading-relaxed whitespace-pre-line">{{ $eventBox->description }}</div>
+                    </div>
+                @endif
+
+                {{-- Gallery --}}
+                @if(count($gallery) > 0)
+                    @php $galleryJson = json_encode(array_column($gallery, 'url')); @endphp
+                    <div class="bg-white border border-[#E6E3DC] rounded-[14px] overflow-hidden"
+                         x-data="{ open: null, photos: {{ $galleryJson }} }"
+                         @keydown.escape.window="open = null">
+
+                        <div class="px-5 pt-4 pb-3 border-b border-[#F3F1EB]">
+                            <h2 style="font-family:Georgia,'Times New Roman',serif;font-size:1.05rem;font-weight:400;color:#15140F;margin:0;">
+                                Gallery <span class="text-[13px] text-[#9C998F] font-sans font-normal ml-1">{{ count($gallery) }} photos</span>
+                            </h2>
+                        </div>
+
+                        <div class="p-3">
+                            @php
+                                $first   = $gallery[0] ?? null;
+                                $others  = array_slice($gallery, 1, 4);
+                                $hasMore = count($gallery) > 5;
+                                $extra   = count($gallery) - 5;
+                            @endphp
+
+                            @if($first)
+                                <div class="grid gap-1.5"
+                                     style="grid-template-columns: 1fr 1fr; grid-template-rows: auto auto;">
+
+                                    {{-- First (large) --}}
+                                    <button type="button"
+                                        @click="open = 0"
+                                        class="rounded-[8px] overflow-hidden bg-[#F3F1EB] hover:opacity-95 transition-opacity focus:outline-none"
+                                        style="grid-row: span 2; aspect-ratio: 1;">
+                                        <img src="{{ $first['url'] }}" alt="" class="w-full h-full object-cover">
+                                    </button>
+
+                                    {{-- Next 4 in 2×2 --}}
+                                    @foreach($others as $idx => $item)
+                                        <button type="button"
+                                            @click="open = {{ $idx + 1 }}"
+                                            class="relative rounded-[8px] overflow-hidden bg-[#F3F1EB] hover:opacity-95 transition-opacity focus:outline-none"
+                                            style="aspect-ratio: 1;">
+                                            <img src="{{ $item['url'] }}" alt="" class="w-full h-full object-cover">
+                                            @if($hasMore && $idx === 3)
+                                                <div class="absolute inset-0 bg-black/55 flex items-center justify-center">
+                                                    <span class="text-white font-semibold text-[15px]">+{{ $extra + 1 }}</span>
+                                                </div>
+                                            @endif
+                                        </button>
+                                    @endforeach
+                                </div>
+                            @endif
+
+                            @if(count($gallery) > 5)
+                                <button type="button" @click="open = 0"
+                                    class="mt-2.5 w-full text-[12.5px] font-medium py-2 rounded-[7px] border border-[#E6E3DC] hover:bg-[#F3F1EB] transition-colors text-[#6B6862]">
+                                    View all {{ count($gallery) }} photos
+                                </button>
+                            @endif
+                        </div>
+
+                        {{-- Lightbox --}}
+                        <div x-show="open !== null" x-cloak
+                             class="fixed inset-0 z-50 flex flex-col bg-black/95"
+                             @click.self="open = null">
+
+                            {{-- Top bar --}}
+                            <div class="flex items-center justify-between px-4 py-3 flex-none">
+                                <span class="text-white/50 text-[13px]" x-text="(open + 1) + ' / ' + photos.length"></span>
+                                <button @click="open = null" class="text-white/70 hover:text-white transition p-1">
+                                    <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                                </button>
+                            </div>
+
+                            {{-- Image --}}
+                            <div class="flex-1 flex items-center justify-center px-4 pb-4 min-h-0">
+                                <img :src="photos[open]" alt="" class="max-w-full max-h-full object-contain rounded-[6px] select-none">
+                            </div>
+
+                            {{-- Prev / Next --}}
+                            <button x-show="open > 0" @click.stop="open--"
+                                class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition">
+                                <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                            </button>
+                            <button x-show="open < photos.length - 1" @click.stop="open++"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition">
+                                <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                            </button>
+
+                            {{-- Thumbnail strip --}}
+                            @if(count($gallery) > 1)
+                                <div class="flex gap-1.5 overflow-x-auto px-4 pb-4 flex-none justify-center" style="scrollbar-width:none;">
+                                    @foreach($gallery as $idx => $item)
+                                        <button type="button" @click.stop="open = {{ $idx }}"
+                                            class="flex-none w-12 h-12 rounded-[5px] overflow-hidden transition-all"
+                                            :class="open === {{ $idx }} ? 'ring-2 opacity-100' : 'opacity-45 hover:opacity-70'"
+                                            :style="open === {{ $idx }} ? 'ring-color: var(--evt-accent)' : ''">
+                                            <img src="{{ $item['url'] }}" alt="" class="w-full h-full object-cover">
+                                        </button>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 @endif
 

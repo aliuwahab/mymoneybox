@@ -72,6 +72,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/events/{eventBox}/status', [EventBoxController::class, 'updateStatus'])->name('events.status');
     Route::post('/events/{eventBox}/tickets/validate', [EventBoxValidationController::class, 'validate'])->name('events.tickets.validate');
     Route::post('/events/{eventBox}/tickets/{ticket}/redeem', [EventBoxValidationController::class, 'redeem'])->name('events.tickets.redeem');
+    Route::delete('/events/{eventBox}/gallery/{mediaId}', [EventBoxController::class, 'removeGalleryImage'])->name('events.gallery.remove');
 
     // Contributors & Analytics
     Route::get('/contributors', [MoneyBoxController::class, 'contributors'])->name('contributors.index');

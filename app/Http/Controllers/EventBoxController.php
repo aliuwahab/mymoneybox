@@ -6,6 +6,7 @@ use App\Models\EventBox;
 use App\Models\EventBoxTicket;
 use App\Models\EventBoxTicketType;
 use App\Payment\PaymentManager;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -110,6 +111,8 @@ class EventBoxController extends Controller
             'event_date'                  => ['required', 'date'],
             'capacity'                    => ['nullable', 'integer', 'min:1'],
             'cover_image'                 => ['nullable', 'image', 'max:5120'],
+            'gallery_images'              => ['nullable', 'array', 'max:20'],
+            'gallery_images.*'            => ['image', 'max:5120'],
             'ticket_types'                => ['required', 'array', 'min:1'],
             'ticket_types.*.name'         => ['required', 'string', 'max:100'],
             'ticket_types.*.price'        => ['required', 'numeric', 'min:0'],
@@ -132,6 +135,12 @@ class EventBoxController extends Controller
             $eventBox->clearMediaCollection('cover');
         } elseif ($request->hasFile('cover_image')) {
             $eventBox->addMediaFromRequest('cover_image')->toMediaCollection('cover');
+        }
+
+        if ($request->hasFile('gallery_images')) {
+            foreach ($request->file('gallery_images') as $image) {
+                $eventBox->addMedia($image)->toMediaCollection('gallery');
+            }
         }
 
         $eventBox->ticketTypes()->delete();
@@ -159,6 +168,19 @@ class EventBoxController extends Controller
 
         return redirect()->route('events.index')
             ->with('success', 'Event deleted.');
+    }
+
+    // ── Auth: remove single gallery image ─────────────────────────────────────
+
+    public function removeGalleryImage(EventBox $eventBox, int $mediaId): JsonResponse
+    {
+        abort_if(auth()->id() !== $eventBox->user_id, 403);
+
+        $media = $eventBox->getMedia('gallery')->firstWhere('id', $mediaId);
+        abort_if(!$media, 404);
+        $media->delete();
+
+        return response()->json(['status' => 'ok']);
     }
 
     // ── Auth: owner dashboard ─────────────────────────────────────────────────

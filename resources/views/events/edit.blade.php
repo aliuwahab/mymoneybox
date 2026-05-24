@@ -6,7 +6,8 @@
             'capacity'    => $t->capacity ? (string) $t->capacity : '',
             'description' => $t->description ?? '',
         ])->values()->toJson();
-        $coverUrl = $eventBox->getCoverImageUrl();
+        $coverUrl  = $eventBox->getCoverImageUrl();
+        $gallery   = $eventBox->getGalleryUrls();
     @endphp
 
     <div class="page-wrap max-w-[720px] mx-auto w-full">
@@ -162,6 +163,59 @@
                 </div>
             </div>
 
+            {{-- Gallery --}}
+            <div class="card" x-data="galleryManager()" x-init="init()">
+                <div class="card-head">
+                    <span class="card-title">Photo gallery</span>
+                    <span class="text-[11.5px] text-[#9C998F]">Up to 20 photos · 5 MB each</span>
+                </div>
+                <div class="card-body space-y-4">
+
+                    {{-- Existing images --}}
+                    @if(count($gallery) > 0)
+                        <div class="grid grid-cols-3 sm:grid-cols-4 gap-2" id="gallery-grid">
+                            @foreach($gallery as $item)
+                                <div class="relative group rounded-[8px] overflow-hidden bg-[#F3F1EB]" style="aspect-ratio:1;" data-media-id="{{ $item['id'] }}">
+                                    <img src="{{ $item['url'] }}" alt="" class="w-full h-full object-cover">
+                                    <button type="button"
+                                        @click="removeImage({{ $item['id'] }}, $el.closest('[data-media-id]'))"
+                                        class="absolute top-1.5 right-1.5 w-6 h-6 bg-black/55 hover:bg-black/80 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                                    </button>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    {{-- New image previews --}}
+                    <template x-if="previews.length > 0">
+                        <div>
+                            <div class="text-[11.5px] font-semibold text-[#9C998F] uppercase tracking-wide mb-2">New photos to add</div>
+                            <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                                <template x-for="(src, i) in previews" :key="i">
+                                    <div class="relative rounded-[8px] overflow-hidden bg-[#F3F1EB] ring-2 ring-[#1B6B4E]/30" style="aspect-ratio:1;">
+                                        <img :src="src" class="w-full h-full object-cover">
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+
+                    {{-- Upload zone --}}
+                    <label class="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-[#E6E3DC] rounded-[8px] px-4 py-5 cursor-pointer hover:border-[#1B6B4E] hover:bg-[#E6F1EB]/30 transition-colors bg-[#FAFAF7]">
+                        <svg viewBox="0 0 24 24" class="w-7 h-7 text-[#9C998F]" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <div class="text-center">
+                            <div class="text-[13px] font-medium text-[#6B6862]">Add photos</div>
+                            <div class="text-[11.5px] text-[#9C998F]">PNG, JPG, WebP · Select multiple</div>
+                        </div>
+                        <input type="file" name="gallery_images[]" accept="image/*" multiple class="sr-only"
+                               @change="handleFiles($event)">
+                    </label>
+
+                    @error('gallery_images.*')<p class="text-[12px] text-red-600">{{ $message }}</p>@enderror
+                </div>
+            </div>
+
             {{-- Ticket types (Alpine.js repeater) --}}
             <div class="card" x-data="ticketTypeEditor({{ $ticketTypesJson }})">
                 <div class="card-head">
@@ -250,6 +304,37 @@
     </div>
 
     <script>
+        function galleryManager() {
+            return {
+                previews: [],
+                init() {},
+                handleFiles(e) {
+                    this.previews = Array.from(e.target.files).map(f => URL.createObjectURL(f));
+                },
+                async removeImage(mediaId, el) {
+                    if (!confirm('Remove this photo?')) return;
+                    try {
+                        const resp = await fetch('{{ route('events.gallery.remove', [$eventBox, '__ID__']) }}'.replace('__ID__', mediaId), {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                            },
+                        });
+                        if (resp.ok) {
+                            el.style.transition = 'opacity .2s';
+                            el.style.opacity = '0';
+                            setTimeout(() => el.remove(), 200);
+                        } else {
+                            alert('Failed to remove photo.');
+                        }
+                    } catch (e) {
+                        alert('Network error. Please try again.');
+                    }
+                },
+            };
+        }
+
         function ticketTypeEditor(initial) {
             return {
                 types: initial.length > 0 ? initial : [{ name: '', price: '', capacity: '', description: '' }],
