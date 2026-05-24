@@ -18,7 +18,7 @@
                 @endforeach
             </div>
 
-            <p class="mt-8 text-[#6B6862]">To introduce yourself, email <a class="text-[#1B6B4E] font-medium" href="mailto:sales@mypiggybox.com">sales@mypiggybox.com</a>.</p>
+            <p class="mt-8 text-[#6B6862]">To introduce yourself, email <a class="text-[#1B6B4E] font-medium" href="mailto:support@mypiggybox.com">support@mypiggybox.com</a>.</p>
         </div>
     </section>
 </x-layouts.guest>

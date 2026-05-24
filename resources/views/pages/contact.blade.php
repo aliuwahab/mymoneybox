@@ -8,13 +8,13 @@
             </div>
 
             <div class="grid md:grid-cols-2 gap-5">
-                <a href="mailto:sales@mypiggybox.com" class="bg-white border border-[#E6E3DC] rounded-[10px] p-7 shadow-sm hover:border-[#D9D6CE] transition">
+                <a href="mailto:support@mypiggybox.com" class="bg-white border border-[#E6E3DC] rounded-[10px] p-7 shadow-sm hover:border-[#D9D6CE] transition">
                     <div class="w-11 h-11 rounded-[10px] bg-[#E6F1EB] text-[#1B6B4E] grid place-items-center mb-5">
                         <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
                     </div>
                     <h2 class="text-[18px] font-semibold text-[#15140F]">Email</h2>
                     <p class="text-[#6B6862] text-[14px] mt-1">For sales, onboarding, and product questions.</p>
-                    <div class="mt-5 font-medium text-[#15140F]">sales@mypiggybox.com</div>
+                    <div class="mt-5 font-medium text-[#15140F]">support@mypiggybox.com</div>
                 </a>
 
                 <a href="https://wa.me/233546418092" class="bg-white border border-[#E6E3DC] rounded-[10px] p-7 shadow-sm hover:border-[#D9D6CE] transition">

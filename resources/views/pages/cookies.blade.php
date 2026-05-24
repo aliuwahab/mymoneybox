@@ -15,7 +15,7 @@
             <p>You can control cookies through your browser settings. Blocking essential cookies may prevent some MyPiggyBox features from working correctly.</p>
 
             <h2>Contact</h2>
-            <p>Questions about cookies can be sent to <a href="mailto:sales@mypiggybox.com">sales@mypiggybox.com</a>.</p>
+            <p>Questions about cookies can be sent to <a href="mailto:support@mypiggybox.com">support@mypiggybox.com</a>.</p>
         </div>
     </section>
 </x-layouts.guest>

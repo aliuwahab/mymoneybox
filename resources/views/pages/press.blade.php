@@ -16,7 +16,7 @@
                 <div class="bg-white border border-[#E6E3DC] rounded-[10px] p-6">
                     <h2 class="text-xl font-semibold text-[#15140F] mb-3">Media contact</h2>
                     <p class="text-[#6B6862]">For interviews, product notes, or brand assets, contact our team.</p>
-                    <a class="inline-flex mt-5 text-[#1B6B4E] font-medium" href="mailto:sales@mypiggybox.com">sales@mypiggybox.com</a>
+                    <a class="inline-flex mt-5 text-[#1B6B4E] font-medium" href="mailto:support@mypiggybox.com">support@mypiggybox.com</a>
                 </div>
             </div>
         </div>

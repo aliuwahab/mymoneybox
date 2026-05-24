@@ -69,7 +69,7 @@
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">7. Contact Us</h2>
                     <p class="text-gray-700 mb-4">If you have questions about this Privacy Policy, contact us at:</p>
                     <div class="bg-gray-50 rounded-lg p-6">
-                        <p class="text-gray-700"><strong>Email:</strong> privacy@mypiggybox.com</p>
+                        <p class="text-gray-700"><strong>Email:</strong> support@mypiggybox.com</p>
                     </div>
                 </section>
             </div>
