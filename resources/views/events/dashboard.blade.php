@@ -38,7 +38,10 @@
                 const formats = [window.ZXingBrowser.BarcodeFormat.QR_CODE];
                 hints.set(window.ZXingBrowser.DecodeHintType.POSSIBLE_FORMATS, formats);
                 this.scanner = new window.ZXingBrowser.BrowserQRCodeReader(hints);
-                this.scanner.decodeFromVideoDevice(null, 'qr-video', (res, err, controls) => {
+                this.scanner.decodeFromConstraints(
+                    { video: { facingMode: { ideal: 'environment' } } },
+                    'qr-video',
+                    (res, err, controls) => {
                     if (res) {
                         this.code = res.getText();
                         controls.stop();
