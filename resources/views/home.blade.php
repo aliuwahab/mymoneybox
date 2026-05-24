@@ -486,6 +486,20 @@
         .ev-barcode span { background: #15140F; border-radius: 1px; }
         .ev-ticket-code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 10.5px; letter-spacing: .12em; color: #6B6862; }
 
+        /* EVENTS HERO */
+        .events-hero {
+            padding: 80px 0 60px;
+            background: var(--bg-2);
+            border-top: 1px solid var(--border);
+            position: relative; overflow: hidden;
+        }
+        .events-hero::before {
+            content: ''; position: absolute; inset: -40px 0 0 0; pointer-events: none;
+            background: radial-gradient(60% 50% at 50% 0%, rgba(37,99,235,0.055), transparent 70%);
+        }
+        .ev-em { font-style: italic; color: #2563EB; }
+        .ev-ping { background: #2563EB; box-shadow: 0 0 0 4px rgba(37,99,235,0.18); animation: ping 1.6s infinite; }
+
         /* RESPONSIVE */
         @media (max-width: 980px) {
             .hero-grid, .section-head, .faq, .quote-grid { grid-template-columns: 1fr; gap: 32px; }
@@ -501,6 +515,7 @@
             .featured-cover { min-height: 340px; }
             .featured-head, .placements-head, .events-head { grid-template-columns: 1fr; }
             .placements-grid, .events-grid { grid-template-columns: 1fr; }
+            .events-hero { padding: 60px 0 44px; }
         }
         @media (max-width: 640px) {
             body { font-size: 14px; }
@@ -556,6 +571,7 @@
             .placement { cursor: pointer; }
             .events-section { padding-bottom: 72px; }
             .ev-ticket-overlay { display: none; }
+            .events-hero { padding: 48px 0 36px; }
             .foot-grid { grid-template-columns: 1fr; gap: 28px; margin-bottom: 36px; }
             .foot-bot { flex-direction: column; align-items: flex-start; gap: 14px; }
             .foot-bot .legal { flex-wrap: wrap; gap: 14px; }
@@ -671,6 +687,100 @@
                     <div>
                         <div style="font-size:12.5px; font-weight:500">Scan to contribute</div>
                         <div style="font-size:11px; color:var(--fg-3)">PNG · SVG · PDF</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- EVENTS HERO -->
+<section class="events-hero">
+    <div class="wrap hero-grid">
+        <div>
+            <span class="eyebrow"><span class="dot" style="background:#2563EB;box-shadow:0 0 0 3px rgba(37,99,235,0.18)"></span> New · Sell tickets in minutes</span>
+            <h1 class="h1" style="margin-top:20px">Host events people <em class="ev-em">actually attend</em>.</h1>
+            <p class="lead">Create your event page, set ticket types, and go live in minutes. Attendees pay by mobile money or card and get their ticket instantly — no app download needed.</p>
+            <div class="hero-cta">
+                @auth
+                    <a class="btn primary lg" href="{{ route('events.create') }}" style="background:#2563EB;border-color:#2563EB">
+                        Create an event — free
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </a>
+                @else
+                    <a class="btn primary lg" href="{{ route('register') }}" style="background:#2563EB;border-color:#2563EB">
+                        Create an event — free
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </a>
+                @endauth
+                <a class="btn lg" href="/events">Browse events</a>
+            </div>
+            <div class="hero-meta">
+                <span class="check">
+                    <span class="check-ic" style="background:rgba(37,99,235,0.1);color:#2563EB"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>
+                    Free to create
+                </span>
+                <span class="check">
+                    <span class="check-ic" style="background:rgba(37,99,235,0.1);color:#2563EB"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>
+                    Instant ticket delivery
+                </span>
+                <span class="check">
+                    <span class="check-ic" style="background:rgba(37,99,235,0.1);color:#2563EB"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>
+                    Mobile money + card
+                </span>
+            </div>
+        </div>
+
+        <!-- Events visual -->
+        <div class="visual">
+            <div class="v-card main">
+                <div class="vc-head">
+                    <span class="vc-dot r"></span><span class="vc-dot y"></span><span class="vc-dot g"></span>
+                    <span class="vc-title">mypiggybox.com / liberated-men-conference-2026</span>
+                </div>
+                <div class="vc-body">
+                    <div class="vc-cover" style="background:linear-gradient(135deg,#1B3A6B 0%,#2563EB 55%,#1B6B4E 100%)">
+                        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-4 0v2"/><path d="M12 7V5a2 2 0 0 0-4 0v2"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg>
+                    </div>
+                    <div class="vc-h2">Liberated Men Conference 2026</div>
+                    <div class="vc-sub">AICC, Accra · Sat 28 Jun, 9:00am</div>
+                    <div class="vc-row">
+                        <span class="vc-amt">248 <span class="muted">of 500 tickets sold</span></span>
+                        <span class="vc-amt tnum">49%</span>
+                    </div>
+                    <div class="progress"><span style="width:49%;background:#2563EB"></span></div>
+                    <div class="vc-stats">
+                        <div><div class="vc-stat-label">Tickets sold</div><div class="vc-stat-val">248</div></div>
+                        <div><div class="vc-stat-label">Revenue</div><div class="vc-stat-val">₵7,440</div></div>
+                        <div><div class="vc-stat-label">Remaining</div><div class="vc-stat-val">252</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="v-card float">
+                <div class="float-row">
+                    <div class="avatar" style="background:#2563EB">KA</div>
+                    <div style="flex:1">
+                        <div style="font-size:13px;font-weight:500">Kwame just bought 2 tickets</div>
+                        <div style="font-size:11.5px;color:var(--fg-3)">General Admission · just now</div>
+                    </div>
+                    <div style="font-weight:600;font-variant-numeric:tabular-nums">₵400</div>
+                </div>
+                <div style="height:1px;background:var(--border)"></div>
+                <div class="float-row">
+                    <span class="ping ev-ping"></span>
+                    <div style="font-size:12.5px;color:var(--fg-2)">Live · 12 tickets sold this hour</div>
+                </div>
+            </div>
+
+            <div class="v-card float-2">
+                <div class="float-row">
+                    <div style="width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#1B3A6B,#2563EB);flex:none;display:grid;place-items:center">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><path d="m9 12 2 2 4-4"/></svg>
+                    </div>
+                    <div>
+                        <div style="font-size:12.5px;font-weight:500">Ticket confirmed</div>
+                        <div style="font-size:11px;color:var(--fg-3);font-family:'JetBrains Mono',monospace;letter-spacing:.06em">TKT-A7F2-9C1E</div>
                     </div>
                 </div>
             </div>
