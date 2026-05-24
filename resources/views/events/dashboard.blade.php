@@ -380,8 +380,6 @@
 
         </div>
 
-    </div>
-
     {{-- ── Validate Ticket Modal ── --}}
     <div
         x-show="showValidateModal"
@@ -539,6 +537,8 @@
             </div>
         </div>
     </div>
+
+    </div>{{-- end page-wrap x-data --}}
 
     <script src="https://unpkg.com/@zxing/browser@latest/umd/index.min.js"></script>
 </x-layouts.app>
