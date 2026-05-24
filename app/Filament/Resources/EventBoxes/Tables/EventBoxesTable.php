@@ -1,0 +1,107 @@
+<?php
+
+namespace App\Filament\Resources\EventBoxes\Tables;
+
+use App\Enums\EventBoxStatus;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\ViewAction;
+use Filament\Notifications\Notification;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
+
+class EventBoxesTable
+{
+    public static function configure(Table $table): Table
+    {
+        return $table
+            ->defaultSort('event_date', 'asc')
+            ->columns([
+                TextColumn::make('user.name')
+                    ->label('Owner')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('title')
+                    ->searchable()
+                    ->limit(35),
+                TextColumn::make('status')
+                    ->badge()
+                    ->color(fn (EventBoxStatus $state) => match($state) {
+                        EventBoxStatus::Active    => 'success',
+                        EventBoxStatus::Draft     => 'gray',
+                        EventBoxStatus::SoldOut   => 'warning',
+                        EventBoxStatus::Ended     => 'gray',
+                        EventBoxStatus::Cancelled => 'danger',
+                    })
+                    ->formatStateUsing(fn (EventBoxStatus $state) => $state->label()),
+                TextColumn::make('event_date')
+                    ->label('Event date')
+                    ->dateTime('M j, Y g:ia')
+                    ->sortable(),
+                TextColumn::make('venue')
+                    ->limit(25)
+                    ->toggleable(),
+                TextColumn::make('tickets_sold')
+                    ->label('Tickets sold')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('capacity')
+                    ->numeric()
+                    ->default('Unlimited')
+                    ->toggleable(),
+                TextColumn::make('contact_email')
+                    ->label('Contact email')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('contact_phone')
+                    ->label('Contact phone')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                TrashedFilter::make(),
+                SelectFilter::make('status')
+                    ->options(collect(EventBoxStatus::cases())->mapWithKeys(
+                        fn ($case) => [$case->value => $case->label()]
+                    )->toArray()),
+            ])
+            ->recordActions([
+                ViewAction::make(),
+                Action::make('activate')
+                    ->label('Set Active')
+                    ->icon('heroicon-o-play')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->action(function ($record) {
+                        $record->update(['status' => EventBoxStatus::Active]);
+                        Notification::make()->success()->title('EventBox set to active')->send();
+                    })
+                    ->visible(fn ($record) => $record->status !== EventBoxStatus::Active && !$record->trashed()),
+                Action::make('cancel')
+                    ->label('Cancel event')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->action(function ($record) {
+                        $record->update(['status' => EventBoxStatus::Cancelled]);
+                        Notification::make()->warning()->title('EventBox cancelled')->send();
+                    })
+                    ->visible(fn ($record) => !in_array($record->status, [EventBoxStatus::Cancelled, EventBoxStatus::Ended]) && !$record->trashed()),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                ]),
+            ]);
+    }
+}

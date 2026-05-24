@@ -179,6 +179,16 @@
                                 <div class="hint">Shown as "Organized by …" on event page.</div>
                             </div>
                             <div class="field">
+                                <label class="label" for="contact_email">Contact email <span class="hint">optional</span></label>
+                                <input id="contact_email" type="email" class="input" x-model="formData.contact_email" placeholder="hello@example.com">
+                            </div>
+                        </div>
+                        <div class="grid-2-equal">
+                            <div class="field">
+                                <label class="label" for="contact_phone">Contact phone <span class="hint">optional</span></label>
+                                <input id="contact_phone" type="tel" class="input" x-model="formData.contact_phone" placeholder="+233 …">
+                            </div>
+                            <div class="field">
                                 <label class="label">Accent colour <span class="hint">optional</span></label>
                                 <div class="row" style="gap: 8px;">
                                     <div style="width:32px;height:32px;border-radius:6px;border:1px solid var(--nb-border);flex:none;transition:background .2s;" :style="'background:' + formData.accent_color"></div>
@@ -360,6 +370,8 @@
                     description: '',
                     venue: '',
                     organizer_name: '',
+                    contact_email: '',
+                    contact_phone: '',
                     accent_color: '#1B6B4E',
                     event_date: '',
                     capacity: '',
@@ -420,6 +432,8 @@
                         if (this.formData.description)    fd.append('description', this.formData.description);
                         if (this.formData.venue)          fd.append('venue', this.formData.venue);
                         if (this.formData.organizer_name) fd.append('organizer_name', this.formData.organizer_name);
+                        if (this.formData.contact_email)  fd.append('contact_email', this.formData.contact_email);
+                        if (this.formData.contact_phone)  fd.append('contact_phone', this.formData.contact_phone);
                         if (this.formData.accent_color)   fd.append('accent_color', this.formData.accent_color);
                         fd.append('event_date', this.formData.event_date);
                         if (this.formData.capacity)       fd.append('capacity', this.formData.capacity);

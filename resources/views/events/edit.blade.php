@@ -160,6 +160,18 @@
                             @error('accent_color')<p class="text-[12px] text-red-600">{{ $message }}</p>@enderror
                         </div>
                     </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="grid gap-1.5">
+                            <label for="contact_email" class="text-[13px] font-medium text-[#6B6862]">Contact email <span class="text-[#9C998F] font-normal">(optional)</span></label>
+                            <input type="email" name="contact_email" id="contact_email" value="{{ old('contact_email', $eventBox->contact_email) }}" placeholder="hello@example.com" />
+                            @error('contact_email')<p class="text-[12px] text-red-600">{{ $message }}</p>@enderror
+                        </div>
+                        <div class="grid gap-1.5">
+                            <label for="contact_phone" class="text-[13px] font-medium text-[#6B6862]">Contact phone <span class="text-[#9C998F] font-normal">(optional)</span></label>
+                            <input type="tel" name="contact_phone" id="contact_phone" value="{{ old('contact_phone', $eventBox->contact_phone) }}" placeholder="+233 …" />
+                            @error('contact_phone')<p class="text-[12px] text-red-600">{{ $message }}</p>@enderror
+                        </div>
+                    </div>
                 </div>
             </div>
 

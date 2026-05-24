@@ -27,6 +27,8 @@ class EventBox extends Model implements HasMedia
         'description',
         'venue',
         'organizer_name',
+        'contact_email',
+        'contact_phone',
         'accent_color',
         'event_date',
         'capacity',
