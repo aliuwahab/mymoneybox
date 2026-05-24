@@ -99,38 +99,20 @@ class EventBox extends Model implements HasMedia
 
     public function getCoverImageUrl(): ?string
     {
-        $media = $this->getFirstMedia('cover');
-
-        if (!$media) {
-            return null;
-        }
-
-        try {
-            return $media->getTemporaryUrl(now()->addMinutes(30));
-        } catch (\Exception $e) {
-            return $media->getUrl();
-        }
+        return $this->getFirstMediaUrl('cover') ?: null;
     }
 
     public function getGalleryUrls(): array
     {
         return $this->getMedia('gallery')->map(function ($media) {
-            try {
-                return ['id' => $media->id, 'url' => $media->getTemporaryUrl(now()->addMinutes(60))];
-            } catch (\Exception $e) {
-                return ['id' => $media->id, 'url' => $media->getUrl()];
-            }
+            return ['id' => $media->id, 'url' => $media->getUrl()];
         })->toArray();
     }
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('cover')
-            ->useDisk('s3')
-            ->singleFile();
-
-        $this->addMediaCollection('gallery')
-            ->useDisk('s3');
+        $this->addMediaCollection('cover')->singleFile();
+        $this->addMediaCollection('gallery');
     }
 
     public function getEffectiveFeePercentage(): float
