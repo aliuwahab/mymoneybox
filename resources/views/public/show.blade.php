@@ -68,10 +68,10 @@
         </div>
 
         {{-- pub-shell: the campaign card ──────────────────────────────────────── --}}
-        <div class="pub-shell max-w-[980px] mx-auto" style="display:flex;flex-wrap:nowrap;gap:24px;align-items:flex-start;">
+        <div class="pub-shell max-w-[980px] mx-auto" style="display:flex;gap:24px;align-items:flex-start;">
 
             {{-- ── LEFT: pill + title + description + progress + form ── --}}
-            <div id="contribute-form" class="pub-left" style="flex:1.2;min-width:0;">
+            <div id="contribute-form" class="pub-left" style="flex:0 0 auto;width:calc(55% - 12px);min-width:0;">
 
                 {{-- Category / visibility pill --}}
                 <span class="pill pill-info" style="font-size:11.5px;">
@@ -274,14 +274,12 @@
             </div>
 
             {{-- ── RIGHT: cover visual + contributors + QR/share ── --}}
-            <div class="pub-right" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;">
+            <div class="pub-right" style="flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:16px;">
 
                 {{-- Campaign cover visual (200px tall per design) --}}
                 @php $coverUrl = $moneyBox->getMainImageUrl(); @endphp
-                <div class="pub-cover {{ ($hasImg && $coverUrl) ? '' : 'cover-emerald' }}"
-                     @if($hasImg && $coverUrl)
-                         style="background-image:url('{{ $coverUrl }}');background-size:cover;background-position:center 30%;"
-                     @endif>
+                <div class="{{ ($hasImg && $coverUrl) ? '' : 'cover-emerald' }}"
+                     style="position:relative;height:200px;min-height:200px;border-radius:10px;overflow:hidden;flex-shrink:0;{{ ($hasImg && $coverUrl) ? 'background-image:url(\'' . $coverUrl . '\');background-size:cover;background-position:center 30%;' : '' }}">
                     @if($hasImg && $coverUrl)
                         <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55) 0%,rgba(0,0,0,.05) 60%,transparent 100%);"></div>
                     @else
@@ -507,6 +505,7 @@
             .pub-left,
             .pub-right {
                 flex: 1 1 100% !important;
+                width: 100% !important;
                 min-width: 0 !important;
             }
             .grid-2-equal { grid-template-columns: 1fr; }
@@ -519,6 +518,7 @@
             .pub-shell {
                 flex-wrap: wrap !important;
                 border-radius: 0;
+
                 border-left: 0;
                 border-right: 0;
                 margin-left: -1rem;
