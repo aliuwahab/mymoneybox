@@ -1,10 +1,12 @@
 <x-layouts.app>
     @php
         $ticketTypesJson = $eventBox->ticketTypes->map(fn($t) => [
+            'id'          => $t->id,
             'name'        => $t->name,
             'price'       => (string) $t->price,
             'capacity'    => $t->capacity ? (string) $t->capacity : '',
             'description' => $t->description ?? '',
+            'sold'        => (int) $t->sold,
         ])->values()->toJson();
         $coverUrl  = $eventBox->getCoverImageUrl();
         $gallery   = $eventBox->getGalleryUrls();
@@ -234,20 +236,23 @@
             <div class="card" x-data="ticketTypeEditor({{ $ticketTypesJson }})">
                 <div class="card-head">
                     <span class="card-title">Ticket types</span>
-                    <span class="text-[11.5px] text-[#9C998F]">Redefining types will reset sold counts</span>
+                    <span class="text-[11.5px] text-[#9C998F]">Types with sales are preserved on save</span>
                 </div>
                 <div class="card-body space-y-3">
-                    <div class="hidden sm:grid gap-1" style="grid-template-columns: 1fr 110px 90px 1fr 32px;">
+                    <div class="hidden sm:grid gap-1" style="grid-template-columns: 1fr 110px 90px 1fr 60px 32px;">
                         <p class="text-[11px] font-semibold uppercase tracking-wide text-[#9C998F]">Name</p>
                         <p class="text-[11px] font-semibold uppercase tracking-wide text-[#9C998F]">Price (GH₵)</p>
                         <p class="text-[11px] font-semibold uppercase tracking-wide text-[#9C998F]">Capacity</p>
                         <p class="text-[11px] font-semibold uppercase tracking-wide text-[#9C998F]">Description</p>
+                        <p class="text-[11px] font-semibold uppercase tracking-wide text-[#9C998F]">Sold</p>
                         <div></div>
                     </div>
 
                     <template x-for="(type, index) in types" :key="index">
                         <div class="grid gap-2 p-3 bg-[#FAFAF7] border border-[#E6E3DC] rounded-[8px]"
-                             style="grid-template-columns: 1fr 110px 90px 1fr 32px;">
+                             style="grid-template-columns: 1fr 110px 90px 1fr 60px 32px;">
+                            {{-- Hidden fields to preserve existing type IDs --}}
+                            <input type="hidden" :name="`ticket_types[${index}][id]`" :value="type.id || ''">
                             <div>
                                 <input type="text"
                                     :name="`ticket_types[${index}][name]`"
@@ -280,9 +285,15 @@
                                     placeholder="Optional note"
                                     class="w-full text-[13.5px]" />
                             </div>
+                            {{-- Sold count badge --}}
+                            <div class="flex items-center">
+                                <span class="text-[12.5px] font-semibold text-[#15140F] tnum" x-text="type.sold ?? 0"></span>
+                                <span class="text-[11px] text-[#9C998F] ml-1">sold</span>
+                            </div>
                             <button type="button"
                                 @click="remove(index)"
-                                :disabled="types.length === 1"
+                                :disabled="types.length === 1 || (type.sold && type.sold > 0)"
+                                :title="(type.sold && type.sold > 0) ? 'Cannot remove a type with sales' : ''"
                                 class="flex items-center justify-center w-8 h-8 rounded-[6px] bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 disabled:opacity-40 disabled:cursor-not-allowed">
                                 <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
                             </button>
@@ -387,9 +398,9 @@
 
         function ticketTypeEditor(initial) {
             return {
-                types: initial.length > 0 ? initial : [{ name: '', price: '', capacity: '', description: '' }],
+                types: initial.length > 0 ? initial : [{ id: null, name: '', price: '', capacity: '', description: '', sold: 0 }],
                 add() {
-                    this.types.push({ name: '', price: '', capacity: '', description: '' });
+                    this.types.push({ id: null, name: '', price: '', capacity: '', description: '', sold: 0 });
                 },
                 remove(index) {
                     if (this.types.length > 1) this.types.splice(index, 1);

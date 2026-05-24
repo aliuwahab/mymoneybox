@@ -404,12 +404,26 @@
                                             class="w-full border border-[#E6E3DC] rounded-[8px] px-3 py-2.5 text-[13.5px] text-[#15140F] bg-white placeholder-[#C5C2BC] focus:outline-none focus:border-[var(--evt-accent)] transition-colors" />
                                     </div>
 
+                                    <div>
+                                        <label class="block text-[11.5px] font-semibold text-[#6B6862] mb-1.5 uppercase tracking-wide">Quantity</label>
+                                        <div class="flex items-center gap-2">
+                                            <button type="button" @click="quantity = Math.max(1, quantity - 1)"
+                                                class="w-9 h-9 rounded-[8px] border border-[#E6E3DC] flex items-center justify-center text-[#15140F] hover:bg-[#F3F1EB] transition-colors font-medium text-[18px] leading-none select-none">−</button>
+                                            <span class="w-10 text-center text-[14px] font-semibold text-[#15140F]" x-text="quantity"></span>
+                                            <button type="button" @click="quantity = Math.min(10, quantity + 1)"
+                                                class="w-9 h-9 rounded-[8px] border border-[#E6E3DC] flex items-center justify-center text-[#15140F] hover:bg-[#F3F1EB] transition-colors font-medium text-[18px] leading-none select-none">+</button>
+                                            <span class="text-[12px] text-[#9C998F] ml-1">max 10</span>
+                                        </div>
+                                    </div>
+
+                                    <input type="hidden" name="quantity" :value="quantity">
+
                                     <button type="submit"
                                         :disabled="!selectedTypeId"
                                         class="evt-btn w-full text-white font-semibold text-[14px] py-3.5 px-4 rounded-[10px] transition-all duration-150 flex items-center justify-center gap-2 mt-1"
                                         style="letter-spacing: 0.01em;">
                                         <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M16 8V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v3"/><path d="M12 13v3"/><path d="M9.5 13h5"/></svg>
-                                        <span x-text="selectedTypeId ? 'Buy Ticket · GH₵ ' + Number(selectedPrice).toFixed(2) : 'Select a ticket type'"></span>
+                                        <span x-text="selectedTypeId ? 'Buy ' + quantity + (quantity > 1 ? ' Tickets' : ' Ticket') + ' · GH₵ ' + (Number(selectedPrice) * quantity).toFixed(2) : 'Select a ticket type'"></span>
                                     </button>
                                 </div>
                             </form>
@@ -436,6 +450,7 @@
                 selectedTypeId: null,
                 selectedPrice: 0,
                 selectedName: '',
+                quantity: 1,
                 init() {
                     @php $firstAvailable = $eventBox->ticketTypes->first(fn($t) => $t->isAvailable()); @endphp
                     @if($firstAvailable)
@@ -448,6 +463,7 @@
                     this.selectedTypeId = id;
                     this.selectedName   = name;
                     this.selectedPrice  = price;
+                    this.quantity       = 1;
                 },
                 submitForm(e) {
                     if (!this.selectedTypeId) {

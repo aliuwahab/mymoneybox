@@ -43,6 +43,7 @@ Route::get('/events/{slug}', [EventBoxController::class, 'publicShow'])->name('e
     ->where('slug', '^(?!create$|edit$|dashboard$)[^/]+$');
 Route::post('/events/{slug}/purchase', [EventBoxController::class, 'purchase'])->name('events.purchase');
 Route::get('/events/{slug}/confirmation/{reference}', [EventBoxController::class, 'confirmation'])->name('events.confirmation');
+Route::get('/events/{slug}/ticket-status/{reference}', [EventBoxController::class, 'ticketStatus'])->name('events.ticket-status');
 
 // Contribution Routes (Public)
 Route::post('/box/{slug}/contribute', [ContributionController::class, 'store'])->name('box.contribute');
@@ -74,6 +75,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/events/{eventBox}/status', [EventBoxController::class, 'updateStatus'])->name('events.status');
     Route::post('/events/{eventBox}/tickets/validate', [EventBoxValidationController::class, 'validate'])->name('events.tickets.validate');
     Route::post('/events/{eventBox}/tickets/{ticket}/redeem', [EventBoxValidationController::class, 'redeem'])->name('events.tickets.redeem');
+    Route::post('/events/{eventBox}/tickets/{ticket}/void', [EventBoxValidationController::class, 'void'])->name('events.tickets.void');
     Route::delete('/events/{eventBox}/gallery/{mediaId}', [EventBoxController::class, 'removeGalleryImage'])->name('events.gallery.remove');
 
     // Contributors & Analytics

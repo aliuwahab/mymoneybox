@@ -96,6 +96,27 @@
                 } finally {
                     this.redeemLoading = false;
                 }
+            },
+            async voidTicket(ticketId) {
+                if (!confirm('Void this ticket? It will be marked refunded and can no longer be used.')) return;
+                try {
+                    const resp = await fetch(`/events/{{ $eventBox->id }}/tickets/${ticketId}/void`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                            'Accept': 'application/json',
+                        },
+                    });
+                    const data = await resp.json();
+                    if (data.status === 'voided') {
+                        window.location.reload();
+                    } else {
+                        alert(data.message || 'Could not void ticket.');
+                    }
+                } catch(e) {
+                    alert('Network error. Please try again.');
+                }
             }
         }"
     >
@@ -231,6 +252,7 @@
                                 <th>Status</th>
                                 <th>Redeemed at</th>
                                 <th class="num">Amount</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -255,6 +277,16 @@
                                         {{ $ticket->redeemed_at?->format('M j, Y · g:ia') ?? '—' }}
                                     </td>
                                     <td class="num font-semibold text-[#15140F] tnum">GH₵ {{ number_format((float) $ticket->amount, 2) }}</td>
+                                    <td>
+                                        @if($ticket->status->value !== 'voided')
+                                            <button type="button" @click="voidTicket({{ $ticket->id }})"
+                                                class="text-[12px] text-red-500 hover:text-red-700 underline whitespace-nowrap">
+                                                Void
+                                            </button>
+                                        @else
+                                            <span class="text-[11.5px] text-[#C5C2BC]">Voided</span>
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

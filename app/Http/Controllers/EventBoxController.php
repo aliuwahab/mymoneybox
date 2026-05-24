@@ -120,6 +120,7 @@ class EventBoxController extends Controller
             'gallery_images'              => ['nullable', 'array', 'max:20'],
             'gallery_images.*'            => ['image', 'max:5120'],
             'ticket_types'                => ['required', 'array', 'min:1'],
+            'ticket_types.*.id'           => ['nullable', 'integer'],
             'ticket_types.*.name'         => ['required', 'string', 'max:100'],
             'ticket_types.*.price'        => ['required', 'numeric', 'min:0'],
             'ticket_types.*.capacity'     => ['nullable', 'integer', 'min:1'],
@@ -151,15 +152,39 @@ class EventBoxController extends Controller
             }
         }
 
-        $eventBox->ticketTypes()->delete();
+        // Smart ticket type update: preserve types that have sales
+        $submittedIds = collect($validated['ticket_types'])
+            ->pluck('id')
+            ->filter()
+            ->map(fn($id) => (int) $id)
+            ->values();
+
+        // Delete only types not submitted AND with zero sales
+        $eventBox->ticketTypes()
+            ->when($submittedIds->isNotEmpty(), fn($q) => $q->whereNotIn('id', $submittedIds))
+            ->where('sold', 0)
+            ->delete();
+
         foreach ($validated['ticket_types'] as $index => $typeData) {
-            $eventBox->ticketTypes()->create([
-                'name'        => $typeData['name'],
-                'description' => $typeData['description'] ?? null,
-                'price'       => $typeData['price'],
-                'capacity'    => $typeData['capacity'] ?? null,
-                'sort_order'  => $index,
-            ]);
+            $id = isset($typeData['id']) ? (int) $typeData['id'] : null;
+
+            if ($id && $existing = $eventBox->ticketTypes()->find($id)) {
+                $existing->update([
+                    'name'        => $typeData['name'],
+                    'description' => $typeData['description'] ?? null,
+                    'price'       => $typeData['price'],
+                    'capacity'    => $typeData['capacity'] ?? null,
+                    'sort_order'  => $index,
+                ]);
+            } else {
+                $eventBox->ticketTypes()->create([
+                    'name'        => $typeData['name'],
+                    'description' => $typeData['description'] ?? null,
+                    'price'       => $typeData['price'],
+                    'capacity'    => $typeData['capacity'] ?? null,
+                    'sort_order'  => $index,
+                ]);
+            }
         }
 
         return redirect()->route('events.dashboard', $eventBox)
@@ -251,7 +276,7 @@ class EventBoxController extends Controller
         return view('events.show', compact('eventBox'));
     }
 
-    // ── Public: purchase ticket ───────────────────────────────────────────────
+    // ── Public: purchase ticket(s) ────────────────────────────────────────────
 
     public function purchase(Request $request, string $slug)
     {
@@ -265,31 +290,50 @@ class EventBoxController extends Controller
 
         $validated = $request->validate([
             'ticket_type_id' => ['required', 'integer'],
+            'quantity'       => ['nullable', 'integer', 'min:1', 'max:10'],
             'buyer_name'     => ['required', 'string', 'max:255'],
             'buyer_email'    => ['required', 'email', 'max:255'],
             'buyer_phone'    => ['nullable', 'string', 'max:30'],
         ]);
 
+        $quantity   = (int) ($validated['quantity'] ?? 1);
         $ticketType = $eventBox->ticketTypes()->findOrFail($validated['ticket_type_id']);
 
         if (!$ticketType->isAvailable()) {
             return back()->with('error', "'{$ticketType->name}' tickets are sold out.");
         }
 
-        $reference = 'EVT-' . strtoupper(Str::random(16));
+        // Ensure enough capacity remains for the requested quantity
+        if ($ticketType->capacity !== null) {
+            $remaining = $ticketType->availableCount();
+            if ($quantity > $remaining) {
+                return back()->with('error', "Only {$remaining} ticket(s) remaining for '{$ticketType->name}'.");
+            }
+        }
+
+        if ($eventBox->capacity !== null) {
+            $remaining = $eventBox->capacity - $eventBox->tickets_sold;
+            if ($quantity > $remaining) {
+                return back()->with('error', "Only {$remaining} ticket(s) remaining for this event.");
+            }
+        }
+
+        $totalAmount    = $ticketType->price * $quantity;
+        $groupReference = 'EVT-' . strtoupper(Str::random(16));
 
         $payment = app(PaymentManager::class)->initializePayment([
             'email'       => $validated['buyer_email'],
-            'amount'      => $ticketType->price,
+            'amount'      => $totalAmount,
             'currency'    => 'GHS',
-            'reference'   => $reference,
-            'return_url'  => route('events.confirmation', [$slug, $reference]),
+            'reference'   => $groupReference,
+            'return_url'  => route('events.confirmation', [$slug, $groupReference]),
             'webhook_url' => route('trendipay.webhook'),
-            'description' => "{$ticketType->name} ticket for {$eventBox->title}",
+            'description' => "{$quantity}× {$ticketType->name} ticket for {$eventBox->title}",
             'metadata'    => [
-                'event_box_id'    => $eventBox->id,
-                'event_title'     => $eventBox->title,
-                'ticket_type'     => $ticketType->name,
+                'event_box_id' => $eventBox->id,
+                'event_title'  => $eventBox->title,
+                'ticket_type'  => $ticketType->name,
+                'quantity'     => $quantity,
             ],
         ]);
 
@@ -297,17 +341,24 @@ class EventBoxController extends Controller
             return back()->with('error', $payment['message'] ?? 'Payment initialization failed.');
         }
 
-        EventBoxTicket::create([
-            'event_box_id'      => $eventBox->id,
-            'ticket_type_id'    => $ticketType->id,
-            'ticket_type_name'  => $ticketType->name,
-            'buyer_name'        => $validated['buyer_name'],
-            'buyer_email'       => $validated['buyer_email'],
-            'buyer_phone'       => $validated['buyer_phone'] ?? null,
-            'amount'            => $ticketType->price,
-            'payment_reference' => $reference,
-            'payment_status'    => 'pending',
-        ]);
+        for ($i = 1; $i <= $quantity; $i++) {
+            // For a single ticket, payment_reference == group_reference for backward compat
+            $ticketRef = $quantity > 1 ? $groupReference . '-' . $i : $groupReference;
+
+            EventBoxTicket::create([
+                'event_box_id'      => $eventBox->id,
+                'ticket_type_id'    => $ticketType->id,
+                'ticket_type_name'  => $ticketType->name,
+                'buyer_name'        => $validated['buyer_name'],
+                'buyer_email'       => $validated['buyer_email'],
+                'buyer_phone'       => $validated['buyer_phone'] ?? null,
+                'amount'            => $ticketType->price,
+                'payment_reference' => $ticketRef,
+                'payment_group'     => $groupReference,
+                'quantity'          => 1,
+                'payment_status'    => 'pending',
+            ]);
+        }
 
         return redirect($payment['payment_url']);
     }
@@ -317,10 +368,46 @@ class EventBoxController extends Controller
     public function confirmation(string $slug, string $reference)
     {
         $eventBox = EventBox::where('slug', $slug)->firstOrFail();
-        $ticket   = EventBoxTicket::where('payment_reference', $reference)
-            ->where('event_box_id', $eventBox->id)
-            ->first();
 
-        return view('events.confirmation', compact('eventBox', 'ticket'));
+        // Support both single (payment_reference) and multi-ticket (payment_group) lookups
+        $tickets = EventBoxTicket::where('event_box_id', $eventBox->id)
+            ->where(function ($q) use ($reference) {
+                $q->where('payment_reference', $reference)
+                  ->orWhere('payment_group', $reference);
+            })
+            ->get();
+
+        $ticket  = $tickets->first();
+        $pending = $ticket && $ticket->payment_status->value === 'pending';
+
+        return view('events.confirmation', compact('eventBox', 'ticket', 'tickets', 'pending', 'reference'));
+    }
+
+    // ── Public: ticket status check (for confirmation page polling) ───────────
+
+    public function ticketStatus(string $slug, string $reference): JsonResponse
+    {
+        $eventBox = EventBox::where('slug', $slug)->firstOrFail();
+
+        $tickets = EventBoxTicket::where('event_box_id', $eventBox->id)
+            ->where(function ($q) use ($reference) {
+                $q->where('payment_reference', $reference)
+                  ->orWhere('payment_group', $reference);
+            })
+            ->get();
+
+        if ($tickets->isEmpty()) {
+            return response()->json(['status' => 'not_found']);
+        }
+
+        $allCompleted = $tickets->every(fn($t) => $t->payment_status->value === 'completed');
+        $anyFailed    = $tickets->contains(fn($t) => $t->payment_status->value === 'failed');
+
+        return response()->json([
+            'status'     => $allCompleted ? 'completed' : ($anyFailed ? 'failed' : 'pending'),
+            'code_ready' => $allCompleted && $tickets->first()?->code !== null,
+            'email'      => $tickets->first()?->buyer_email,
+            'quantity'   => $tickets->count(),
+        ]);
     }
 }

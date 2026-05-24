@@ -18,6 +18,8 @@ class EventBoxTicket extends Model
         'buyer_phone',
         'amount',
         'payment_reference',
+        'payment_group',
+        'quantity',
         'payment_status',
         'code',
         'status',

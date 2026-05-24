@@ -180,17 +180,26 @@ class TrendiPayWebhookController extends Controller
     /**
      * Handle an EventBox ticket payment callback.
      */
+    /**
+     * Handle an EventBox ticket payment callback.
+     * Supports single-ticket (payment_reference) and multi-ticket group (payment_group) purchases.
+     */
     private function handleEventTicketCallback(array $webhookData, string $reference): JsonResponse
     {
-        $ticket = \App\Models\EventBoxTicket::where('payment_reference', $reference)->first();
+        // Find all tickets for this payment — single ticket or whole group
+        $tickets = \App\Models\EventBoxTicket::where('payment_reference', $reference)->get();
 
-        if (!$ticket) {
-            Log::warning('EventBox ticket webhook: ticket not found', ['reference' => $reference]);
+        if ($tickets->isEmpty()) {
+            $tickets = \App\Models\EventBoxTicket::where('payment_group', $reference)->get();
+        }
+
+        if ($tickets->isEmpty()) {
+            Log::warning('EventBox ticket webhook: ticket(s) not found', ['reference' => $reference]);
             return response()->json(['status' => 'error', 'message' => 'Ticket not found'], 404);
         }
 
-        // Idempotency
-        if ($ticket->payment_status === \App\Enums\PaymentStatus::Completed) {
+        // Idempotency: all tickets already completed
+        if ($tickets->every(fn($t) => $t->payment_status === \App\Enums\PaymentStatus::Completed)) {
             return response()->json(['status' => 'success', 'message' => 'Already processed'], 200);
         }
 
@@ -200,27 +209,37 @@ class TrendiPayWebhookController extends Controller
             default     => \App\Enums\PaymentStatus::Pending,
         };
 
-        $updates = [
-            'payment_status'   => $paymentStatus,
-            'payment_metadata' => $webhookData['raw_data'] ?? null,
-        ];
-
-        if ($paymentStatus === \App\Enums\PaymentStatus::Completed) {
-            // Generate unique ticket code
-            $code = \App\Models\EventBoxTicket::generateCode();
-            $updates['code']   = $code;
-            $updates['status'] = 'unused';
-
-            // Increment tickets_sold on the event
-            $ticket->eventBox->increment('tickets_sold');
-
-            // Increment sold count on the ticket type
-            if ($ticket->ticket_type_id) {
-                \App\Models\EventBoxTicketType::where('id', $ticket->ticket_type_id)->increment('sold');
+        foreach ($tickets as $ticket) {
+            if ($ticket->payment_status === \App\Enums\PaymentStatus::Completed) {
+                continue; // already handled in a previous webhook delivery
             }
 
-            // Mark sold out if overall capacity reached, or all ticket types exhausted
-            $eventBox = $ticket->eventBox->fresh()->load('ticketTypes');
+            $updates = [
+                'payment_status'   => $paymentStatus,
+                'payment_metadata' => $webhookData['raw_data'] ?? null,
+            ];
+
+            if ($paymentStatus === \App\Enums\PaymentStatus::Completed) {
+                $updates['code']   = \App\Models\EventBoxTicket::generateCode();
+                $updates['status'] = 'unused';
+
+                $ticket->eventBox->increment('tickets_sold');
+
+                if ($ticket->ticket_type_id) {
+                    \App\Models\EventBoxTicketType::where('id', $ticket->ticket_type_id)->increment('sold');
+                }
+            }
+
+            $ticket->update($updates);
+
+            if ($paymentStatus === \App\Enums\PaymentStatus::Completed) {
+                event(new \App\Events\TicketIssued($ticket->fresh()));
+            }
+        }
+
+        // Re-check sold-out after all tickets in the group are processed
+        if ($paymentStatus === \App\Enums\PaymentStatus::Completed) {
+            $eventBox    = $tickets->first()->eventBox->fresh()->load('ticketTypes');
             $overallFull = $eventBox->capacity && $eventBox->tickets_sold >= $eventBox->capacity;
             $typesFull   = $eventBox->ticketTypes->isNotEmpty()
                 && $eventBox->ticketTypes->every(fn($t) => !$t->isAvailable());
@@ -230,19 +249,13 @@ class TrendiPayWebhookController extends Controller
             }
         }
 
-        $ticket->update($updates);
-
-        if ($paymentStatus === \App\Enums\PaymentStatus::Completed) {
-            event(new \App\Events\TicketIssued($ticket->fresh()));
-        }
-
         Log::info('EventBox ticket webhook processed', [
             'reference' => $reference,
+            'count'     => $tickets->count(),
             'status'    => $paymentStatus->value,
-            'code'      => $updates['code'] ?? null,
         ]);
 
-        return response()->json(['status' => 'success', 'message' => 'Ticket processed'], 200);
+        return response()->json(['status' => 'success', 'message' => 'Ticket(s) processed'], 200);
     }
 
     /**

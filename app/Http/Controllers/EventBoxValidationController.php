@@ -63,6 +63,46 @@ class EventBoxValidationController extends Controller
     }
 
     /**
+     * Void a ticket (owner only). Decrements sold counts and marks refunded.
+     */
+    public function void(Request $request, EventBox $eventBox, EventBoxTicket $ticket): JsonResponse
+    {
+        abort_if(auth()->id() !== $eventBox->user_id, 403);
+
+        if ($ticket->event_box_id !== $eventBox->id) {
+            return response()->json(['status' => 'error', 'message' => 'Ticket does not belong to this event.'], 422);
+        }
+
+        if ($ticket->status === TicketStatus::Voided) {
+            return response()->json(['status' => 'error', 'message' => 'Ticket is already voided.'], 422);
+        }
+
+        $wasCompleted = $ticket->payment_status === PaymentStatus::Completed;
+
+        $ticket->update([
+            'status'         => TicketStatus::Voided,
+            'payment_status' => PaymentStatus::Refunded,
+        ]);
+
+        if ($wasCompleted) {
+            $eventBox->decrement('tickets_sold');
+
+            if ($ticket->ticket_type_id) {
+                \App\Models\EventBoxTicketType::where('id', $ticket->ticket_type_id)
+                    ->where('sold', '>', 0)
+                    ->decrement('sold');
+            }
+
+            // Restore sold_out event back to active
+            if ($eventBox->fresh()->status->value === 'sold_out') {
+                $eventBox->update(['status' => 'active']);
+            }
+        }
+
+        return response()->json(['status' => 'voided', 'message' => 'Ticket voided successfully.']);
+    }
+
+    /**
      * Redeem a ticket (owner only).
      */
     public function redeem(Request $request, EventBox $eventBox, EventBoxTicket $ticket): JsonResponse

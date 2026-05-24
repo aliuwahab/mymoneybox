@@ -43,4 +43,5 @@ use Illuminate\Support\Facades\Schedule;
 Schedule::call(fn() => Log::info('Scheduler: heartbeat', ['at' => now()->toDateTimeString()]))->everyMinute();
 
 Schedule::command('app:send-marketing-emails')->dailyAt('08:00');
+Schedule::command('tickets:recover')->everyFiveMinutes();
 
