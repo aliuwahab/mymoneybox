@@ -203,9 +203,13 @@
                     <div x-show="previews.length > 0">
                         <div class="text-[11.5px] font-semibold text-[#9C998F] uppercase tracking-wide mb-2">New photos to add</div>
                         <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                            <template x-for="(src, i) in previews" :key="i">
-                                <div class="relative rounded-[8px] overflow-hidden bg-[#F3F1EB] ring-2 ring-[#1B6B4E]/30" style="aspect-ratio:1;">
+                            <template x-for="(src, i) in previews" :key="src">
+                                <div class="relative rounded-[8px] overflow-hidden bg-[#F3F1EB] ring-2 ring-[#1B6B4E]/30 group" style="aspect-ratio:1;">
                                     <img :src="src" class="w-full h-full object-cover">
+                                    <button type="button" @click="removePending(i)"
+                                        class="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                                    </button>
                                 </div>
                             </template>
                         </div>
@@ -318,9 +322,35 @@
         function galleryManager() {
             return {
                 previews: [],
+                pendingFiles: [],
                 init() {},
                 handleFiles(e) {
-                    this.previews = Array.from(e.target.files).map(f => URL.createObjectURL(f));
+                    const input = e.target;
+                    const newFiles = Array.from(input.files);
+
+                    // Merge new files into pending list (avoid exact duplicates by name+size)
+                    newFiles.forEach(f => {
+                        const isDupe = this.pendingFiles.some(p => p.name === f.name && p.size === f.size);
+                        if (!isDupe) this.pendingFiles.push(f);
+                    });
+
+                    // Rebuild the input's FileList so all pending files are submitted
+                    const dt = new DataTransfer();
+                    this.pendingFiles.forEach(f => dt.items.add(f));
+                    input.files = dt.files;
+
+                    this.previews = this.pendingFiles.map(f => URL.createObjectURL(f));
+                },
+                removePending(i) {
+                    URL.revokeObjectURL(this.previews[i]);
+                    this.pendingFiles.splice(i, 1);
+                    this.previews.splice(i, 1);
+
+                    // Rebuild input FileList after removal
+                    const input = this.$el.querySelector('input[name="gallery_images[]"]');
+                    const dt = new DataTransfer();
+                    this.pendingFiles.forEach(f => dt.items.add(f));
+                    if (input) input.files = dt.files;
                 },
                 async removeImage(mediaId, el) {
                     if (!confirm('Remove this photo?')) return;
