@@ -68,10 +68,10 @@
         </div>
 
         {{-- pub-shell: the campaign card ──────────────────────────────────────── --}}
-        <div class="pub-shell max-w-[980px] mx-auto" style="display:grid;grid-template-columns:1.2fr 1fr;gap:24px;align-items:start;">
+        <div class="pub-shell max-w-[980px] mx-auto" style="display:flex;flex-wrap:nowrap;gap:24px;align-items:flex-start;">
 
             {{-- ── LEFT: pill + title + description + progress + form ── --}}
-            <div id="contribute-form" class="pub-left">
+            <div id="contribute-form" class="pub-left" style="flex:1.2;min-width:0;">
 
                 {{-- Category / visibility pill --}}
                 <span class="pill pill-info" style="font-size:11.5px;">
@@ -274,7 +274,7 @@
             </div>
 
             {{-- ── RIGHT: cover visual + contributors + QR/share ── --}}
-            <div class="pub-right" style="display:flex;flex-direction:column;gap:16px;min-width:0;">
+            <div class="pub-right" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;">
 
                 {{-- Campaign cover visual (200px tall per design) --}}
                 @php $coverUrl = $moneyBox->getMainImageUrl(); @endphp
@@ -403,13 +403,9 @@
             border: 1px solid #E6E3DC;
             border-radius: 10px;
             padding: 28px;
-            display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap: 24px;
-            align-items: start;
         }
         .pub-left  { display: flex; flex-direction: column; gap: 16px; }
-        .pub-right { display: flex; flex-direction: column; gap: 16px; align-self: start; }
+        .pub-right { display: flex; flex-direction: column; gap: 16px; }
 
         .pub-form { display: flex; flex-direction: column; gap: 12px; }
 
@@ -505,11 +501,14 @@
         /* Mobile: single column */
         @media (max-width: 768px) {
             .pub-shell {
-                grid-template-columns: 1fr !important;
+                flex-wrap: wrap !important;
                 padding: 20px;
             }
             .pub-left,
-            .pub-right { min-width: 0; }
+            .pub-right {
+                flex: 1 1 100% !important;
+                min-width: 0 !important;
+            }
             .grid-2-equal { grid-template-columns: 1fr; }
             .pub-stats-row { flex-wrap: wrap; }
         }
@@ -518,7 +517,7 @@
         @media (max-width: 600px) {
             .pub-left h1 { overflow-wrap: anywhere; }
             .pub-shell {
-                grid-template-columns: 1fr !important;
+                flex-wrap: wrap !important;
                 border-radius: 0;
                 border-left: 0;
                 border-right: 0;
