@@ -4,12 +4,14 @@ namespace App\Providers;
 
 use App\Events\ContributionProcessed;
 use App\Events\MoneyBoxCreated;
+use App\Events\TicketIssued;
 use App\Events\WithdrawalApproved;
 use App\Events\WithdrawalDisbursed;
 use App\Events\WithdrawalRequested;
 use App\Listeners\NotifyMoneyBoxOwner;
 use App\Listeners\SendContributionThankYouEmail;
 use App\Listeners\SendMoneyBoxCreatedNotification;
+use App\Listeners\SendTicketEmail;
 use App\Listeners\SendWithdrawalApprovedEmail;
 use App\Listeners\SendWithdrawalDisbursedEmail;
 use App\Listeners\SendWithdrawalSubmittedEmail;
@@ -48,5 +50,8 @@ class AppServiceProvider extends ServiceProvider
 
         // Fired when TrendiPay confirms a disbursement via webhook
         Event::listen(WithdrawalDisbursed::class, SendWithdrawalDisbursedEmail::class);
+
+        // Fired when a ticket is issued after payment confirmation
+        Event::listen(TicketIssued::class, SendTicketEmail::class);
     }
 }

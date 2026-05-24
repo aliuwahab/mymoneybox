@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ContributionController;
+use App\Http\Controllers\EventBoxController;
+use App\Http\Controllers\EventBoxValidationController;
 use App\Http\Controllers\MoneyBoxController;
 use App\Http\Controllers\PiggyBoxController;
 use App\Http\Controllers\PiggyWebhookController;
@@ -35,6 +37,12 @@ Route::view('/security', 'pages.security')->name('security');
 Route::view('/status', 'pages.status')->name('status');
 Route::view('/cookies', 'pages.cookies')->name('cookies');
 
+// EventBox public routes
+Route::get('/events', [EventBoxController::class, 'publicIndex'])->name('events.public.index');
+Route::get('/events/{slug}', [EventBoxController::class, 'publicShow'])->name('events.show');
+Route::post('/events/{slug}/purchase', [EventBoxController::class, 'purchase'])->name('events.purchase');
+Route::get('/events/{slug}/confirmation/{reference}', [EventBoxController::class, 'confirmation'])->name('events.confirmation');
+
 // Contribution Routes (Public)
 Route::post('/box/{slug}/contribute', [ContributionController::class, 'store'])->name('box.contribute');
 
@@ -57,6 +65,13 @@ Route::get('/piggy/callback', [PiggyBoxController::class, 'callback'])->name('pi
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [MoneyBoxController::class, 'dashboard'])->name('dashboard');
+
+    // EventBox (authenticated owner) routes
+    Route::resource('events', EventBoxController::class)->except(['show']);
+    Route::get('/events/{eventBox}/dashboard', [EventBoxController::class, 'eventDashboard'])->name('events.dashboard');
+    Route::post('/events/{eventBox}/status', [EventBoxController::class, 'updateStatus'])->name('events.status');
+    Route::post('/events/{eventBox}/tickets/validate', [EventBoxValidationController::class, 'validate'])->name('events.tickets.validate');
+    Route::post('/events/{eventBox}/tickets/{ticket}/redeem', [EventBoxValidationController::class, 'redeem'])->name('events.tickets.redeem');
 
     // Contributors & Analytics
     Route::get('/contributors', [MoneyBoxController::class, 'contributors'])->name('contributors.index');

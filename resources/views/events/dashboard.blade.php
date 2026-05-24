@@ -1,0 +1,458 @@
+<x-layouts.app>
+    <div
+        class="page-wrap max-w-[1280px]"
+        x-data="{
+            tab: 'overview',
+            showValidateModal: false,
+            scanTab: 'enter',
+            code: '',
+            result: null,
+            loading: false,
+            redeemLoading: false,
+            redeemDone: false,
+            scanner: null,
+
+            openModal() {
+                this.showValidateModal = true;
+                this.result = null;
+                this.code = '';
+                this.redeemDone = false;
+            },
+            closeModal() {
+                this.showValidateModal = false;
+                this.stopScanner();
+            },
+            switchScanTab(t) {
+                this.scanTab = t;
+                if (t === 'scan') {
+                    this.$nextTick(() => this.startScanner());
+                } else {
+                    this.stopScanner();
+                }
+            },
+            startScanner() {
+                if (!window.ZXingBrowser) return;
+                const videoEl = document.getElementById('qr-video');
+                if (!videoEl) return;
+                const hints = new Map();
+                const formats = [window.ZXingBrowser.BarcodeFormat.QR_CODE];
+                hints.set(window.ZXingBrowser.DecodeHintType.POSSIBLE_FORMATS, formats);
+                this.scanner = new window.ZXingBrowser.BrowserQRCodeReader(hints);
+                this.scanner.decodeFromVideoDevice(null, 'qr-video', (res, err, controls) => {
+                    if (res) {
+                        this.code = res.getText();
+                        controls.stop();
+                        this.scanTab = 'enter';
+                        this.$nextTick(() => this.validateCode());
+                    }
+                }).catch(() => {});
+            },
+            stopScanner() {
+                if (this.scanner) {
+                    try { this.scanner.reset(); } catch(e) {}
+                    this.scanner = null;
+                }
+            },
+            async validateCode() {
+                if (!this.code.trim()) return;
+                this.loading = true;
+                this.result = null;
+                this.redeemDone = false;
+                try {
+                    const resp = await fetch('{{ route('events.tickets.validate', $eventBox) }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify({ code: this.code.trim() }),
+                    });
+                    this.result = await resp.json();
+                } catch(e) {
+                    this.result = { status: 'error', message: 'Network error. Please try again.' };
+                } finally {
+                    this.loading = false;
+                }
+            },
+            async redeemTicket(ticketId) {
+                this.redeemLoading = true;
+                try {
+                    const resp = await fetch(`/events/{{ $eventBox->id }}/tickets/${ticketId}/redeem`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                            'Accept': 'application/json',
+                        },
+                    });
+                    const data = await resp.json();
+                    if (data.status === 'redeemed') {
+                        this.redeemDone = true;
+                        this.result = { status: 'redeemed_now', holder_name: this.result.holder_name };
+                    }
+                } catch(e) {
+                    alert('Network error. Please try again.');
+                } finally {
+                    this.redeemLoading = false;
+                }
+            }
+        }"
+        x-init="
+            @if(session('success'))
+                $dispatch('toast', '{{ session('success') }}');
+            @endif
+        "
+        @toast.window="
+            let t = document.createElement('div');
+            t.className = 'fixed top-4 right-4 z-50 bg-[#15140F] text-white px-4 py-2.5 rounded-[8px] shadow-lg flex items-center gap-2 text-[13px]';
+            t.innerHTML = '<svg viewBox=\"0 0 24 24\" class=\"w-4 h-4 text-[#1B6B4E] flex-none\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m5 12 5 5L20 7\"/></svg><span>' + $event.detail + '</span>';
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3500);
+        "
+    >
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
+        {{-- Back --}}
+        <div class="mb-3.5">
+            <a href="{{ route('events.index') }}" class="btn btn-ghost btn-sm text-[#6B6862]">
+                <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                All Events
+            </a>
+        </div>
+
+        {{-- Header --}}
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
+            <div class="flex items-center gap-4 min-w-0">
+                <div class="w-14 h-14 rounded-[12px] bg-gradient-to-br from-[#1B6B4E] to-[#154F3A] flex items-center justify-center flex-none">
+                    <span class="text-white/80 font-serif text-[22px]">{{ substr($eventBox->title, 0, 1) }}</span>
+                </div>
+                <div>
+                    <div class="flex items-center flex-wrap gap-1.5 mb-1">
+                        <span class="pill {{ $eventBox->status->color() }}">
+                            <span class="pill-dot"></span>{{ $eventBox->status->label() }}
+                        </span>
+                    </div>
+                    <h1 class="page-title" style="font-size:1.6rem">{{ $eventBox->title }}</h1>
+                    <p class="text-[13px] text-[#6B6862] mt-1">
+                        {{ $eventBox->event_date->format('D, M j, Y · g:ia') }}
+                        @if($eventBox->venue) · {{ $eventBox->venue }} @endif
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 flex-wrap">
+                <button @click="openModal()" class="btn btn-primary">
+                    <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+                    Validate Ticket
+                </button>
+                <a href="{{ route('events.edit', $eventBox) }}" class="btn">
+                    <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6L8 22H2v-6L14 4Z"/></svg>
+                    Edit
+                </a>
+                <a href="{{ route('events.show', $eventBox->slug) }}" target="_blank" class="btn">
+                    <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    Public page
+                </a>
+            </div>
+        </div>
+
+        {{-- Stat grid --}}
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 mb-6">
+            <div class="stat-card">
+                <div class="stat-label">Tickets sold</div>
+                <div class="stat-value tnum">{{ number_format($eventBox->tickets_sold) }}</div>
+                @if($eventBox->capacity)
+                    <div class="stat-delta">of {{ number_format($eventBox->capacity) }} capacity</div>
+                @else
+                    <div class="stat-delta">Unlimited capacity</div>
+                @endif
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Revenue</div>
+                <div class="stat-value tnum text-primary-600">GH₵ {{ number_format($revenue, 2) }}</div>
+                <div class="stat-delta">Gross ticket sales</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Ticket price</div>
+                <div class="stat-value">{{ $eventBox->formatPrice() }}</div>
+                <div class="stat-delta">Per ticket</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Redeemed</div>
+                <div class="stat-value tnum">{{ $tickets->where('status.value', 'redeemed')->count() }}</div>
+                <div class="stat-delta">Checked in</div>
+            </div>
+        </div>
+
+        {{-- Status controls --}}
+        <div class="flex flex-wrap items-center gap-2 mb-6">
+            @if($eventBox->status->value === 'draft')
+                <form action="{{ route('events.status', $eventBox) }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="status" value="active">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m10 8 6 4-6 4V8z"/></svg>
+                        Activate Event
+                    </button>
+                </form>
+            @elseif($eventBox->status->value === 'active')
+                <form action="{{ route('events.status', $eventBox) }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="status" value="ended">
+                    <button type="submit" class="btn btn-sm border-amber-200 text-amber-700 hover:bg-amber-50" onclick="return confirm('Mark this event as ended?')">
+                        Mark as Ended
+                    </button>
+                </form>
+            @elseif($eventBox->status->value === 'ended')
+                <form action="{{ route('events.status', $eventBox) }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="status" value="active">
+                    <button type="submit" class="btn btn-sm">Re-activate</button>
+                </form>
+            @endif
+        </div>
+
+        {{-- Tabs --}}
+        <div class="tabs">
+            <button class="tab" :class="tab === 'attendees' ? 'active' : ''" @click="tab = 'attendees'">Attendees</button>
+            <button class="tab" :class="tab === 'details' ? 'active' : ''" @click="tab = 'details'">Event details</button>
+        </div>
+
+        {{-- Attendees tab --}}
+        <div x-show="tab === 'attendees'" x-cloak>
+            <div class="card">
+                <div class="card-head">
+                    <div class="card-title">Attendees ({{ $tickets->where('payment_status.value', 'completed')->count() }} confirmed)</div>
+                </div>
+                @if($tickets->where('payment_status.value', 'completed')->count() > 0)
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Ticket code</th>
+                                <th>Status</th>
+                                <th>Redeemed at</th>
+                                <th class="num">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($tickets->where('payment_status.value', 'completed') as $ticket)
+                                <tr>
+                                    <td class="font-medium text-[#15140F]">{{ $ticket->buyer_name }}</td>
+                                    <td class="muted text-[12.5px]">{{ $ticket->buyer_email }}</td>
+                                    <td>
+                                        <span class="font-mono text-[12px] font-medium text-[#15140F]">{{ $ticket->code ?? '—' }}</span>
+                                    </td>
+                                    <td>
+                                        @if($ticket->code)
+                                            <span class="pill {{ $ticket->status->color() }}">
+                                                <span class="pill-dot"></span>{{ $ticket->status->label() }}
+                                            </span>
+                                        @else
+                                            <span class="pill pill-muted"><span class="pill-dot"></span>Pending</span>
+                                        @endif
+                                    </td>
+                                    <td class="muted text-[12px]">
+                                        {{ $ticket->redeemed_at?->format('M j, Y · g:ia') ?? '—' }}
+                                    </td>
+                                    <td class="num font-semibold text-[#15140F] tnum">GH₵ {{ number_format((float) $ticket->amount, 2) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @else
+                    <div class="card-body text-center py-12">
+                        <div class="text-[#9C998F] mb-1">No confirmed attendees yet</div>
+                        <div class="tiny">Share your event to start selling tickets.</div>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        {{-- Details tab --}}
+        <div x-show="tab === 'details'" x-cloak>
+            <div class="card">
+                <div class="card-head">
+                    <div class="card-title">Event details</div>
+                    <a href="{{ route('events.edit', $eventBox) }}" class="btn btn-sm">Edit</a>
+                </div>
+                <div class="card-body">
+                    <dl class="space-y-3 text-[13px]">
+                        <div class="flex justify-between gap-4"><dt class="text-[#6B6862]">Title</dt><dd class="font-medium text-right">{{ $eventBox->title }}</dd></div>
+                        <div class="flex justify-between gap-4"><dt class="text-[#6B6862]">Date & time</dt><dd class="font-medium">{{ $eventBox->event_date->format('D, M j, Y · g:ia') }}</dd></div>
+                        <div class="flex justify-between gap-4"><dt class="text-[#6B6862]">Venue</dt><dd class="font-medium">{{ $eventBox->venue ?? '—' }}</dd></div>
+                        <div class="flex justify-between gap-4"><dt class="text-[#6B6862]">Ticket price</dt><dd class="font-medium tnum">{{ $eventBox->formatPrice() }}</dd></div>
+                        <div class="flex justify-between gap-4"><dt class="text-[#6B6862]">Capacity</dt><dd class="font-medium">{{ $eventBox->capacity ? number_format($eventBox->capacity) . ' seats' : 'Unlimited' }}</dd></div>
+                        <div class="flex justify-between gap-4"><dt class="text-[#6B6862]">Status</dt><dd><span class="pill {{ $eventBox->status->color() }}"><span class="pill-dot"></span>{{ $eventBox->status->label() }}</span></dd></div>
+                        <div class="flex justify-between gap-4"><dt class="text-[#6B6862]">Public link</dt>
+                            <dd><a href="{{ route('events.show', $eventBox->slug) }}" target="_blank" class="text-[#1B6B4E] text-[12px] font-medium">View event page →</a></dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {{-- ── Validate Ticket Modal ── --}}
+    <div
+        x-show="showValidateModal"
+        x-cloak
+        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+    >
+        {{-- Backdrop --}}
+        <div class="absolute inset-0 bg-[#15140F]/60" @click="closeModal()"></div>
+
+        {{-- Modal panel --}}
+        <div
+            class="relative bg-white rounded-[14px] shadow-2xl w-full max-w-[440px] overflow-hidden"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+        >
+            {{-- Modal header --}}
+            <div class="flex items-center justify-between px-6 py-4 border-b border-[#E6E3DC]">
+                <div class="text-[15px] font-semibold text-[#15140F]">Validate Ticket</div>
+                <button @click="closeModal()" class="w-7 h-7 rounded-full bg-[#F3F1EB] flex items-center justify-center text-[#6B6862] hover:bg-[#E6E3DC]">
+                    <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+
+            {{-- Tabs --}}
+            <div class="flex border-b border-[#E6E3DC]">
+                <button
+                    class="flex-1 py-2.5 text-[13px] font-medium transition"
+                    :class="scanTab === 'enter' ? 'text-[#15140F] border-b-2 border-[#15140F]' : 'text-[#9C998F]'"
+                    @click="switchScanTab('enter')"
+                >
+                    Enter Code
+                </button>
+                <button
+                    class="flex-1 py-2.5 text-[13px] font-medium transition"
+                    :class="scanTab === 'scan' ? 'text-[#15140F] border-b-2 border-[#15140F]' : 'text-[#9C998F]'"
+                    @click="switchScanTab('scan')"
+                >
+                    Scan QR
+                </button>
+            </div>
+
+            <div class="p-6">
+
+                {{-- Enter code tab --}}
+                <div x-show="scanTab === 'enter'">
+                    <div class="mb-4">
+                        <label class="block text-[12.5px] font-medium text-[#6B6862] mb-1.5">Ticket code</label>
+                        <input
+                            type="text"
+                            x-model="code"
+                            placeholder="TKT-XXXX-XXXX-XXXX"
+                            @keydown.enter="validateCode()"
+                            class="w-full border border-[#E6E3DC] rounded-[7px] px-3 py-2.5 text-[14px] font-mono text-[#15140F] bg-white placeholder-[#C5C2BC] focus:outline-none focus:ring-2 focus:ring-[#1B6B4E]/30 focus:border-[#1B6B4E] uppercase"
+                        />
+                    </div>
+                    <button
+                        @click="validateCode()"
+                        :disabled="loading || !code.trim()"
+                        class="w-full bg-[#15140F] hover:bg-[#2A2820] disabled:opacity-50 text-white font-semibold text-[14px] py-2.5 px-4 rounded-[8px] transition-colors flex items-center justify-center gap-2"
+                    >
+                        <span x-show="!loading">Check ticket</span>
+                        <span x-show="loading" class="flex items-center gap-2">
+                            <svg class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"/></svg>
+                            Checking...
+                        </span>
+                    </button>
+                </div>
+
+                {{-- Scan QR tab --}}
+                <div x-show="scanTab === 'scan'">
+                    <div class="rounded-[8px] overflow-hidden bg-black mb-3 aspect-square">
+                        <video id="qr-video" class="w-full h-full object-cover" autoplay muted playsinline></video>
+                    </div>
+                    <p class="text-[12px] text-[#9C998F] text-center">Point the camera at the attendee's QR code. It will be detected automatically.</p>
+                </div>
+
+                {{-- Result --}}
+                <div x-show="result !== null" class="mt-4">
+
+                    {{-- Valid --}}
+                    <div x-show="result && result.status === 'valid'" class="bg-[#E6F1EB] border border-[#90C7A9] rounded-[10px] p-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg viewBox="0 0 24 24" class="w-5 h-5 text-[#1B6B4E]" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>
+                            <span class="font-semibold text-[#154F3A] text-[14px]">Valid ticket</span>
+                        </div>
+                        <p class="text-[13px] text-[#154F3A] mb-3">Holder: <strong x-text="result && result.holder_name"></strong></p>
+                        <button
+                            @click="redeemTicket(result.ticket_id)"
+                            :disabled="redeemLoading"
+                            class="w-full bg-[#1B6B4E] hover:bg-[#154F3A] disabled:opacity-50 text-white font-semibold text-[13px] py-2 px-4 rounded-[7px] transition-colors flex items-center justify-center gap-2"
+                        >
+                            <span x-show="!redeemLoading">Redeem ticket</span>
+                            <span x-show="redeemLoading" class="flex items-center gap-2">
+                                <svg class="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"/></svg>
+                                Redeeming...
+                            </span>
+                        </button>
+                    </div>
+
+                    {{-- Redeemed now --}}
+                    <div x-show="result && result.status === 'redeemed_now'" class="bg-[#E6F1EB] border border-[#90C7A9] rounded-[10px] p-4 text-center">
+                        <svg viewBox="0 0 24 24" class="w-8 h-8 text-[#1B6B4E] mx-auto mb-2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>
+                        <div class="font-semibold text-[#154F3A] text-[15px] mb-1">Redeemed</div>
+                        <div class="text-[13px] text-[#154F3A]" x-text="'Welcome, ' + (result && result.holder_name) + '!'"></div>
+                    </div>
+
+                    {{-- Already redeemed --}}
+                    <div x-show="result && result.status === 'already_redeemed'" class="bg-amber-50 border border-amber-200 rounded-[10px] p-4">
+                        <div class="font-semibold text-amber-700 text-[14px] mb-1">Already redeemed</div>
+                        <p class="text-[13px] text-amber-700">This ticket was already used by <strong x-text="result && result.holder_name"></strong>.</p>
+                        <p class="text-[12px] text-amber-600 mt-1">At: <span x-text="result && result.redeemed_at"></span></p>
+                    </div>
+
+                    {{-- Not found --}}
+                    <div x-show="result && result.status === 'not_found'" class="bg-red-50 border border-red-200 rounded-[10px] p-4">
+                        <div class="font-semibold text-red-700 text-[14px] mb-1">Ticket not found</div>
+                        <p class="text-[13px] text-red-600">No ticket with this code exists for this event. Please double-check the code.</p>
+                    </div>
+
+                    {{-- Payment pending --}}
+                    <div x-show="result && result.status === 'payment_pending'" class="bg-amber-50 border border-amber-200 rounded-[10px] p-4">
+                        <div class="font-semibold text-amber-700 text-[14px] mb-1">Payment not confirmed</div>
+                        <p class="text-[13px] text-amber-700">Payment has not been confirmed yet for this ticket.</p>
+                    </div>
+
+                    {{-- Voided --}}
+                    <div x-show="result && result.status === 'voided'" class="bg-red-50 border border-red-200 rounded-[10px] p-4">
+                        <div class="font-semibold text-red-700 text-[14px] mb-1">Ticket voided</div>
+                        <p class="text-[13px] text-red-600">This ticket has been voided and cannot be used.</p>
+                    </div>
+
+                    {{-- Error --}}
+                    <div x-show="result && result.status === 'error'" class="bg-red-50 border border-red-200 rounded-[10px] p-4">
+                        <div class="font-semibold text-red-700 text-[14px] mb-1">Error</div>
+                        <p class="text-[13px] text-red-600" x-text="result && result.message"></p>
+                    </div>
+
+                    {{-- Try another --}}
+                    <div x-show="result !== null" class="mt-3">
+                        <button
+                            @click="result = null; code = ''; redeemDone = false;"
+                            class="text-[13px] text-[#6B6862] hover:text-[#15140F] underline"
+                        >
+                            Check another ticket
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/@zxing/browser@latest/umd/index.min.js"></script>
+</x-layouts.app>
