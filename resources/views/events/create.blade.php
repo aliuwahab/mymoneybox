@@ -446,7 +446,7 @@
                         const data = await response.json();
 
                         if (response.ok) {
-                            window.location.href = `/dashboard/events/${data.id}/dashboard`;
+                            window.location.href = `/events/${data.id}/dashboard`;
                         } else {
                             const messages = data.errors
                                 ? Object.values(data.errors).flat().join('\n')
