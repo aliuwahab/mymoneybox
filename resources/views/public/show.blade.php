@@ -280,7 +280,7 @@
                 <div class="pub-cover {{ $hasImg ? '' : 'cover-emerald' }}">
                     @if($hasImg)
                         <img src="{{ $moneyBox->getMainImageUrl() }}" alt="{{ $moneyBox->title }}"
-                             style="width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;">
+                             style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;">
                         <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55) 0%,rgba(0,0,0,.05) 60%,transparent 100%);"></div>
                     @else
                         <div style="position:absolute;inset:0;display:grid;place-items:center;color:rgba(255,255,255,0.95);font-family:'Instrument Serif',Georgia,serif;font-size:56px;letter-spacing:.02em;">
@@ -415,8 +415,10 @@
         .pub-cover {
             position: relative;
             height: 200px;
+            min-height: 200px;
             border-radius: 10px;
             overflow: hidden;
+            flex-shrink: 0;
         }
 
         /* Field + label */
