@@ -68,7 +68,7 @@
         </div>
 
         {{-- pub-shell: the campaign card ──────────────────────────────────────── --}}
-        <div class="pub-shell max-w-[980px] mx-auto">
+        <div class="pub-shell max-w-[980px] mx-auto" style="display:grid;grid-template-columns:1.2fr 1fr;gap:24px;align-items:start;">
 
             {{-- ── LEFT: pill + title + description + progress + form ── --}}
             <div id="contribute-form" class="pub-left">
@@ -274,7 +274,7 @@
             </div>
 
             {{-- ── RIGHT: cover visual + contributors + QR/share ── --}}
-            <div class="pub-right">
+            <div class="pub-right" style="display:flex;flex-direction:column;gap:16px;min-width:0;">
 
                 {{-- Campaign cover visual (200px tall per design) --}}
                 @php $coverUrl = $moneyBox->getMainImageUrl(); @endphp
@@ -505,7 +505,7 @@
         /* Mobile: single column */
         @media (max-width: 768px) {
             .pub-shell {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr !important;
                 padding: 20px;
             }
             .pub-left,
@@ -518,6 +518,7 @@
         @media (max-width: 600px) {
             .pub-left h1 { overflow-wrap: anywhere; }
             .pub-shell {
+                grid-template-columns: 1fr !important;
                 border-radius: 0;
                 border-left: 0;
                 border-right: 0;
