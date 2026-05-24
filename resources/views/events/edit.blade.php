@@ -17,7 +17,7 @@
             <p class="tiny mt-1.5">{{ $eventBox->title }}</p>
         </div>
 
-        <form method="POST" action="{{ route('events.update', $eventBox) }}" class="space-y-4" enctype="multipart/form-data">
+        <form id="update-form" method="POST" action="{{ route('events.update', $eventBox) }}" class="space-y-4" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -295,24 +295,25 @@
                 </div>
             </div>
 
-            {{-- Actions --}}
-            <div class="flex items-center justify-between gap-3">
-                <form id="delete-form" method="POST" action="{{ route('events.destroy', $eventBox) }}" class="inline">
-                    @csrf
-                    @method('DELETE')
-                    <button type="button"
-                        onclick="if(confirm('Delete this event? Existing tickets remain in the database.')) document.getElementById('delete-form').submit();"
-                        class="btn bg-red-50 border-red-200 text-red-700 hover:bg-red-100 hover:border-red-300">
-                        Delete event
-                    </button>
-                </form>
-
-                <div class="flex items-center gap-2">
-                    <a href="{{ route('events.dashboard', $eventBox) }}" class="btn">Cancel</a>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
         </form>
+
+        {{-- Actions (outside the update form to avoid nesting) --}}
+        <div class="flex items-center justify-between gap-3">
+            <form id="delete-form" method="POST" action="{{ route('events.destroy', $eventBox) }}" class="inline">
+                @csrf
+                @method('DELETE')
+                <button type="button"
+                    onclick="if(confirm('Delete this event? Existing tickets remain in the database.')) document.getElementById('delete-form').submit();"
+                    class="btn bg-red-50 border-red-200 text-red-700 hover:bg-red-100 hover:border-red-300">
+                    Delete event
+                </button>
+            </form>
+
+            <div class="flex items-center gap-2">
+                <a href="{{ route('events.dashboard', $eventBox) }}" class="btn">Cancel</a>
+                <button type="submit" form="update-form" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
     </div>
 
     <script>
