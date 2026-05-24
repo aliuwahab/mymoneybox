@@ -90,6 +90,15 @@ class EventBoxController extends Controller
 
     public function edit(EventBox $eventBox)
     {
+        dd([
+            'auth_id'      => auth()->id(),
+            'auth_id_type' => gettype(auth()->id()),
+            'event_user_id'      => $eventBox->user_id,
+            'event_user_id_type' => gettype($eventBox->user_id),
+            'match' => auth()->id() === $eventBox->user_id,
+            'event_slug' => $eventBox->slug,
+        ]);
+
         abort_if(auth()->id() !== $eventBox->user_id, 403);
 
         return view('events.edit', compact('eventBox'));
