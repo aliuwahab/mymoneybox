@@ -495,10 +495,10 @@
         }
         .events-hero::before {
             content: ''; position: absolute; inset: -40px 0 0 0; pointer-events: none;
-            background: radial-gradient(60% 50% at 50% 0%, rgba(37,99,235,0.055), transparent 70%);
+            background: radial-gradient(60% 50% at 50% 0%, rgba(180,83,9,0.055), transparent 70%);
         }
-        .ev-em { font-style: italic; color: #2563EB; }
-        .ev-ping { background: #2563EB; box-shadow: 0 0 0 4px rgba(37,99,235,0.18); animation: ping 1.6s infinite; }
+        .ev-em { font-style: italic; color: #D97706; }
+        .ev-ping { background: #B45309; box-shadow: 0 0 0 4px rgba(180,83,9,0.18); animation: ping 1.6s infinite; }
 
         /* RESPONSIVE */
         @media (max-width: 980px) {
@@ -698,17 +698,17 @@
 <section class="events-hero">
     <div class="wrap hero-grid">
         <div>
-            <span class="eyebrow"><span class="dot" style="background:#2563EB;box-shadow:0 0 0 3px rgba(37,99,235,0.18)"></span> New · Sell tickets in minutes</span>
+            <span class="eyebrow"><span class="dot" style="background:#D97706;box-shadow:0 0 0 3px rgba(217,119,6,0.2)"></span> New · Sell tickets in minutes</span>
             <h1 class="h1" style="margin-top:20px">Host events people <em class="ev-em">actually attend</em>.</h1>
             <p class="lead">Create your event page, set ticket types, and go live in minutes. Attendees pay by mobile money or card and get their ticket instantly — no app download needed.</p>
             <div class="hero-cta">
                 @auth
-                    <a class="btn primary lg" href="{{ route('events.create') }}" style="background:#2563EB;border-color:#2563EB">
+                    <a class="btn primary lg" href="{{ route('events.create') }}" style="background:#B45309;border-color:#B45309">
                         Create an event — free
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </a>
                 @else
-                    <a class="btn primary lg" href="{{ route('register') }}" style="background:#2563EB;border-color:#2563EB">
+                    <a class="btn primary lg" href="{{ route('register') }}" style="background:#B45309;border-color:#B45309">
                         Create an event — free
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </a>
@@ -717,15 +717,15 @@
             </div>
             <div class="hero-meta">
                 <span class="check">
-                    <span class="check-ic" style="background:rgba(37,99,235,0.1);color:#2563EB"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>
+                    <span class="check-ic" style="background:rgba(180,83,9,0.1);color:#B45309"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>
                     Free to create
                 </span>
                 <span class="check">
-                    <span class="check-ic" style="background:rgba(37,99,235,0.1);color:#2563EB"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>
+                    <span class="check-ic" style="background:rgba(180,83,9,0.1);color:#B45309"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>
                     Instant ticket delivery
                 </span>
                 <span class="check">
-                    <span class="check-ic" style="background:rgba(37,99,235,0.1);color:#2563EB"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>
+                    <span class="check-ic" style="background:rgba(180,83,9,0.1);color:#B45309"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>
                     Mobile money + card
                 </span>
             </div>
@@ -739,7 +739,7 @@
                     <span class="vc-title">mypiggybox.com / liberated-men-conference-2026</span>
                 </div>
                 <div class="vc-body">
-                    <div class="vc-cover" style="background:linear-gradient(135deg,#1B3A6B 0%,#2563EB 55%,#1B6B4E 100%)">
+                    <div class="vc-cover" style="background:linear-gradient(135deg,#78350F 0%,#B45309 55%,#1B6B4E 100%)">
                         <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-4 0v2"/><path d="M12 7V5a2 2 0 0 0-4 0v2"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg>
                     </div>
                     <div class="vc-h2">Liberated Men Conference 2026</div>
@@ -748,7 +748,7 @@
                         <span class="vc-amt">248 <span class="muted">of 500 tickets sold</span></span>
                         <span class="vc-amt tnum">49%</span>
                     </div>
-                    <div class="progress"><span style="width:49%;background:#2563EB"></span></div>
+                    <div class="progress"><span style="width:49%;background:#B45309"></span></div>
                     <div class="vc-stats">
                         <div><div class="vc-stat-label">Tickets sold</div><div class="vc-stat-val">248</div></div>
                         <div><div class="vc-stat-label">Revenue</div><div class="vc-stat-val">₵7,440</div></div>
@@ -759,7 +759,7 @@
 
             <div class="v-card float">
                 <div class="float-row">
-                    <div class="avatar" style="background:#2563EB">KA</div>
+                    <div class="avatar" style="background:#B45309">KA</div>
                     <div style="flex:1">
                         <div style="font-size:13px;font-weight:500">Kwame just bought 2 tickets</div>
                         <div style="font-size:11.5px;color:var(--fg-3)">General Admission · just now</div>
@@ -775,7 +775,7 @@
 
             <div class="v-card float-2">
                 <div class="float-row">
-                    <div style="width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#1B3A6B,#2563EB);flex:none;display:grid;place-items:center">
+                    <div style="width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#78350F,#B45309);flex:none;display:grid;place-items:center">
                         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><path d="m9 12 2 2 4-4"/></svg>
                     </div>
                     <div>
@@ -1108,7 +1108,7 @@
                     @if($coverUrl)
                         <img src="{{ $coverUrl }}" alt="{{ $event->title }}" loading="lazy">
                     @else
-                        <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1B3A6B 0%,#2a5298 55%,#1B6B4E 100%)"></div>
+                        <div style="position:absolute;inset:0;background:linear-gradient(135deg,#78350F 0%,#B45309 55%,#1B6B4E 100%)"></div>
                     @endif
                     <div class="ev-cover-grad" style="background:linear-gradient(to top,rgba(15,14,8,.68) 0%,transparent 60%)"></div>
                     <div class="ev-date-chip">
