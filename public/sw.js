@@ -1,4 +1,4 @@
-const CACHE = 'mpb-v1';
+const CACHE = 'mpb-v2';
 
 // ── Install: pre-cache the offline fallback ───────────────────────────────────
 self.addEventListener('install', (event) => {
