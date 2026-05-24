@@ -68,7 +68,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [MoneyBoxController::class, 'dashboard'])->name('dashboard');
 
     // EventBox (authenticated owner) routes
-    Route::resource('events', EventBoxController::class)->except(['show']);
+    Route::resource('events', EventBoxController::class)->parameters(['events' => 'eventBox'])->except(['show']);
     Route::get('/events/{eventBox}/dashboard', [EventBoxController::class, 'eventDashboard'])->name('events.dashboard');
     Route::post('/events/{eventBox}/status', [EventBoxController::class, 'updateStatus'])->name('events.status');
     Route::post('/events/{eventBox}/tickets/validate', [EventBoxValidationController::class, 'validate'])->name('events.tickets.validate');
