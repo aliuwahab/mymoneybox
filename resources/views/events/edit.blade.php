@@ -200,18 +200,16 @@
                     @endif
 
                     {{-- New image previews --}}
-                    <template x-if="previews.length > 0">
-                        <div>
-                            <div class="text-[11.5px] font-semibold text-[#9C998F] uppercase tracking-wide mb-2">New photos to add</div>
-                            <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                                <template x-for="(src, i) in previews" :key="i">
-                                    <div class="relative rounded-[8px] overflow-hidden bg-[#F3F1EB] ring-2 ring-[#1B6B4E]/30" style="aspect-ratio:1;">
-                                        <img :src="src" class="w-full h-full object-cover">
-                                    </div>
-                                </template>
-                            </div>
+                    <div x-show="previews.length > 0">
+                        <div class="text-[11.5px] font-semibold text-[#9C998F] uppercase tracking-wide mb-2">New photos to add</div>
+                        <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                            <template x-for="(src, i) in previews" :key="i">
+                                <div class="relative rounded-[8px] overflow-hidden bg-[#F3F1EB] ring-2 ring-[#1B6B4E]/30" style="aspect-ratio:1;">
+                                    <img :src="src" class="w-full h-full object-cover">
+                                </div>
+                            </template>
                         </div>
-                    </template>
+                    </div>
 
                     {{-- Upload zone --}}
                     <label class="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-[#E6E3DC] rounded-[8px] px-4 py-5 cursor-pointer hover:border-[#1B6B4E] hover:bg-[#E6F1EB]/30 transition-colors bg-[#FAFAF7]">
