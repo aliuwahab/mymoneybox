@@ -6,6 +6,7 @@
             'capacity'    => $t->capacity ? (string) $t->capacity : '',
             'description' => $t->description ?? '',
         ])->values()->toJson();
+        $coverUrl = $eventBox->getCoverImageUrl();
     @endphp
 
     <div class="page-wrap max-w-[720px] mx-auto w-full">
@@ -15,7 +16,7 @@
             <p class="tiny mt-1.5">{{ $eventBox->title }}</p>
         </div>
 
-        <form method="POST" action="{{ route('events.update', $eventBox) }}" class="space-y-4">
+        <form method="POST" action="{{ route('events.update', $eventBox) }}" class="space-y-4" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -35,6 +36,12 @@
                         <label for="title" class="text-[13px] font-medium text-[#6B6862]">Title <span class="text-red-500">*</span></label>
                         <input type="text" name="title" id="title" required value="{{ old('title', $eventBox->title) }}" class="@error('title') border-red-400 @enderror" />
                         @error('title')<p class="text-[12px] text-red-600">{{ $message }}</p>@enderror
+                    </div>
+
+                    <div class="grid gap-1.5">
+                        <label for="tagline" class="text-[13px] font-medium text-[#6B6862]">Tagline <span class="text-[#9C998F] font-normal">(optional)</span></label>
+                        <input type="text" name="tagline" id="tagline" value="{{ old('tagline', $eventBox->tagline) }}" placeholder="A short, punchy line for your event page" maxlength="180" />
+                        @error('tagline')<p class="text-[12px] text-red-600">{{ $message }}</p>@enderror
                     </div>
 
                     <div class="grid gap-1.5">
@@ -59,6 +66,97 @@
                             <label for="capacity" class="text-[13px] font-medium text-[#6B6862]">Total capacity <span class="text-[#9C998F] font-normal">(optional)</span></label>
                             <input type="number" name="capacity" id="capacity" min="1" value="{{ old('capacity', $eventBox->capacity) }}" placeholder="Unlimited" class="@error('capacity') border-red-400 @enderror" />
                             @error('capacity')<p class="text-[12px] text-red-600">{{ $message }}</p>@enderror
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Design --}}
+            <div class="card" x-data="{ removeCover: false }">
+                <div class="card-head"><span class="card-title">Design & branding</span></div>
+                <div class="card-body space-y-4">
+
+                    {{-- Cover image --}}
+                    <div class="grid gap-1.5">
+                        <label class="text-[13px] font-medium text-[#6B6862]">Cover image <span class="text-[#9C998F] font-normal">(optional · max 5 MB)</span></label>
+
+                        @if($coverUrl)
+                            <div x-show="!removeCover" class="relative rounded-[8px] overflow-hidden bg-[#F3F1EB]" style="aspect-ratio:3/1;">
+                                <img src="{{ $coverUrl }}" alt="Cover" class="w-full h-full object-cover">
+                                <button type="button" @click="removeCover = true"
+                                    class="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white rounded-full w-7 h-7 flex items-center justify-center transition">
+                                    <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                                </button>
+                            </div>
+                            <div x-show="removeCover" class="text-[12px] text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 rounded-[7px] flex items-center justify-between">
+                                <span>Cover image will be removed on save.</span>
+                                <button type="button" @click="removeCover = false" class="underline">Undo</button>
+                            </div>
+                            <input type="hidden" name="remove_cover" :value="removeCover ? '1' : '0'">
+                        @endif
+
+                        <div x-show="{{ $coverUrl ? '!removeCover ? false : true' : 'true' }}">
+                            @if(!$coverUrl)
+                                {{-- no existing cover --}}
+                            @endif
+                        </div>
+
+                        @if(!$coverUrl)
+                            <label class="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-[#E6E3DC] rounded-[8px] px-4 py-6 cursor-pointer hover:border-[#1B6B4E] transition-colors bg-[#FAFAF7]"
+                                   x-data="{ preview: null }"
+                                   @dragover.prevent
+                                   @drop.prevent="preview = URL.createObjectURL($event.dataTransfer.files[0]); $el.querySelector('input').files = $event.dataTransfer.files">
+                                <template x-if="preview">
+                                    <img :src="preview" class="w-full rounded-[6px] object-cover max-h-40">
+                                </template>
+                                <template x-if="!preview">
+                                    <div class="text-center">
+                                        <svg viewBox="0 0 24 24" class="w-8 h-8 text-[#9C998F] mx-auto mb-1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                                        <div class="text-[13px] font-medium text-[#6B6862]">Click to upload or drag & drop</div>
+                                        <div class="text-[11.5px] text-[#9C998F] mt-0.5">PNG, JPG, WebP · Recommended 1500×500</div>
+                                    </div>
+                                </template>
+                                <input type="file" name="cover_image" accept="image/*" class="sr-only" @change="preview = URL.createObjectURL($event.target.files[0])">
+                            </label>
+                        @else
+                            <label x-show="removeCover"
+                                class="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-[#E6E3DC] rounded-[8px] px-4 py-6 cursor-pointer hover:border-[#1B6B4E] transition-colors bg-[#FAFAF7]"
+                                x-data="{ preview: null }"
+                                @dragover.prevent
+                                @drop.prevent="preview = URL.createObjectURL($event.dataTransfer.files[0])">
+                                <template x-if="preview">
+                                    <img :src="preview" class="w-full rounded-[6px] object-cover max-h-40">
+                                </template>
+                                <template x-if="!preview">
+                                    <div class="text-center">
+                                        <svg viewBox="0 0 24 24" class="w-8 h-8 text-[#9C998F] mx-auto mb-1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                                        <div class="text-[13px] font-medium text-[#6B6862]">Upload new cover image</div>
+                                        <div class="text-[11.5px] text-[#9C998F] mt-0.5">PNG, JPG, WebP · Recommended 1500×500</div>
+                                    </div>
+                                </template>
+                                <input type="file" name="cover_image" accept="image/*" class="sr-only" @change="preview = URL.createObjectURL($event.target.files[0])">
+                            </label>
+                        @endif
+                        @error('cover_image')<p class="text-[12px] text-red-600">{{ $message }}</p>@enderror
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="grid gap-1.5">
+                            <label for="organizer_name" class="text-[13px] font-medium text-[#6B6862]">Organizer name <span class="text-[#9C998F] font-normal">(optional)</span></label>
+                            <input type="text" name="organizer_name" id="organizer_name" value="{{ old('organizer_name', $eventBox->organizer_name) }}" placeholder="e.g. Accra Tech Hub" />
+                            <p class="text-[11.5px] text-[#9C998F]">Shown as "Organized by …" on the event page.</p>
+                            @error('organizer_name')<p class="text-[12px] text-red-600">{{ $message }}</p>@enderror
+                        </div>
+                        <div class="grid gap-1.5" x-data="{ color: '{{ old('accent_color', $eventBox->accent_color ?? '#1B6B4E') }}' }">
+                            <label for="accent_color" class="text-[13px] font-medium text-[#6B6862]">Accent colour <span class="text-[#9C998F] font-normal">(optional)</span></label>
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-[6px] border border-[#E6E3DC] flex-none" :style="'background:' + color"></div>
+                                <input type="color" name="accent_color" id="accent_color" x-model="color"
+                                    value="{{ old('accent_color', $eventBox->accent_color ?? '#1B6B4E') }}"
+                                    class="h-8 w-full rounded-[6px] border border-[#E6E3DC] cursor-pointer bg-white px-1" />
+                            </div>
+                            <p class="text-[11.5px] text-[#9C998F]">Used for buttons and highlights on the public page.</p>
+                            @error('accent_color')<p class="text-[12px] text-red-600">{{ $message }}</p>@enderror
                         </div>
                     </div>
                 </div>

@@ -17,9 +17,12 @@ class EventBox extends Model implements HasMedia
     protected $fillable = [
         'user_id',
         'title',
+        'tagline',
         'slug',
         'description',
         'venue',
+        'organizer_name',
+        'accent_color',
         'event_date',
         'capacity',
         'tickets_sold',

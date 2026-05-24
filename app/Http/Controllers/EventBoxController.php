@@ -33,10 +33,14 @@ class EventBoxController extends Controller
     {
         $validated = $request->validate([
             'title'                       => ['required', 'string', 'max:255'],
+            'tagline'                     => ['nullable', 'string', 'max:180'],
             'description'                 => ['nullable', 'string'],
             'venue'                       => ['nullable', 'string', 'max:255'],
+            'organizer_name'              => ['nullable', 'string', 'max:255'],
+            'accent_color'                => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'event_date'                  => ['required', 'date', 'after:now'],
             'capacity'                    => ['nullable', 'integer', 'min:1'],
+            'cover_image'                 => ['nullable', 'image', 'max:5120'],
             'ticket_types'                => ['required', 'array', 'min:1'],
             'ticket_types.*.name'         => ['required', 'string', 'max:100'],
             'ticket_types.*.price'        => ['required', 'numeric', 'min:0'],
@@ -47,14 +51,21 @@ class EventBoxController extends Controller
         $slug = Str::slug($validated['title']) . '-' . Str::random(6);
 
         $eventBox = auth()->user()->eventBoxes()->create([
-            'title'       => $validated['title'],
-            'description' => $validated['description'] ?? null,
-            'venue'       => $validated['venue'] ?? null,
-            'event_date'  => $validated['event_date'],
-            'capacity'    => $validated['capacity'] ?? null,
-            'slug'        => $slug,
-            'status'      => 'draft',
+            'title'          => $validated['title'],
+            'tagline'        => $validated['tagline'] ?? null,
+            'description'    => $validated['description'] ?? null,
+            'venue'          => $validated['venue'] ?? null,
+            'organizer_name' => $validated['organizer_name'] ?? null,
+            'accent_color'   => $validated['accent_color'] ?? null,
+            'event_date'     => $validated['event_date'],
+            'capacity'       => $validated['capacity'] ?? null,
+            'slug'           => $slug,
+            'status'         => 'draft',
         ]);
+
+        if ($request->hasFile('cover_image')) {
+            $eventBox->addMediaFromRequest('cover_image')->toMediaCollection('cover');
+        }
 
         foreach ($validated['ticket_types'] as $index => $typeData) {
             $eventBox->ticketTypes()->create([
@@ -91,10 +102,14 @@ class EventBoxController extends Controller
 
         $validated = $request->validate([
             'title'                       => ['required', 'string', 'max:255'],
+            'tagline'                     => ['nullable', 'string', 'max:180'],
             'description'                 => ['nullable', 'string'],
             'venue'                       => ['nullable', 'string', 'max:255'],
+            'organizer_name'              => ['nullable', 'string', 'max:255'],
+            'accent_color'                => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'event_date'                  => ['required', 'date'],
             'capacity'                    => ['nullable', 'integer', 'min:1'],
+            'cover_image'                 => ['nullable', 'image', 'max:5120'],
             'ticket_types'                => ['required', 'array', 'min:1'],
             'ticket_types.*.name'         => ['required', 'string', 'max:100'],
             'ticket_types.*.price'        => ['required', 'numeric', 'min:0'],
@@ -103,12 +118,21 @@ class EventBoxController extends Controller
         ]);
 
         $eventBox->update([
-            'title'       => $validated['title'],
-            'description' => $validated['description'] ?? null,
-            'venue'       => $validated['venue'] ?? null,
-            'event_date'  => $validated['event_date'],
-            'capacity'    => $validated['capacity'] ?? null,
+            'title'          => $validated['title'],
+            'tagline'        => $validated['tagline'] ?? null,
+            'description'    => $validated['description'] ?? null,
+            'venue'          => $validated['venue'] ?? null,
+            'organizer_name' => $validated['organizer_name'] ?? null,
+            'accent_color'   => $validated['accent_color'] ?? null,
+            'event_date'     => $validated['event_date'],
+            'capacity'       => $validated['capacity'] ?? null,
         ]);
+
+        if ($request->boolean('remove_cover')) {
+            $eventBox->clearMediaCollection('cover');
+        } elseif ($request->hasFile('cover_image')) {
+            $eventBox->addMediaFromRequest('cover_image')->toMediaCollection('cover');
+        }
 
         $eventBox->ticketTypes()->delete();
         foreach ($validated['ticket_types'] as $index => $typeData) {

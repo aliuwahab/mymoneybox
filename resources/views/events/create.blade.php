@@ -71,8 +71,11 @@
             .new-box-page .type-row { display: grid; grid-template-columns: 1fr 120px 90px 1fr 32px; gap: 8px; align-items: end; }
             .new-box-page .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 500; padding: 2px 8px; border-radius: 999px; background: var(--nb-sidebar-2); color: var(--nb-fg-2); }
             .new-box-page .success-mark { width: 56px; height: 56px; margin: 0 auto 12px; border-radius: 14px; background: var(--nb-accent-soft); color: var(--nb-accent); display: grid; place-items: center; }
-            .new-box-page .cover { height: 80px; border-radius: 8px; background: linear-gradient(135deg, #1B6B4E 0%, #2E8E6C 100%); position: relative; overflow: hidden; margin-bottom: 14px; }
-            .new-box-page .cover .glyph { position: absolute; inset: 0; display: grid; place-items: center; color: rgba(255,255,255,.9); font-family: "Instrument Serif", Georgia, serif; font-size: 30px; }
+            .new-box-page .cover-preview { height: 100px; border-radius: 8px; background: linear-gradient(135deg, #1B6B4E 0%, #2E8E6C 100%); position: relative; overflow: hidden; margin-bottom: 14px; transition: background .3s; }
+            .new-box-page .cover-preview img { width: 100%; height: 100%; object-fit: cover; }
+            .new-box-page .cover-preview .glyph { position: absolute; inset: 0; display: grid; place-items: center; color: rgba(255,255,255,.9); font-family: "Instrument Serif", Georgia, serif; font-size: 30px; }
+            .new-box-page .upload-zone { border: 2px dashed var(--nb-border); border-radius: var(--nb-radius-sm); padding: 16px; text-align: center; cursor: pointer; transition: border-color .15s, background .15s; }
+            .new-box-page .upload-zone:hover { border-color: var(--nb-accent); background: var(--nb-accent-soft); }
             @media (max-width: 980px) { .new-box-page .grid-2 { grid-template-columns: 1fr; } }
             @media (max-width: 700px) {
                 .new-box-page .page-head { align-items: flex-start; flex-direction: column; }
@@ -108,14 +111,19 @@
         </div>
 
         <div class="grid-2">
-            <form class="card" @submit.prevent="handleSubmit">
+            <form class="card" @submit.prevent="handleSubmit" x-ref="theForm">
                 <div class="card-body col" style="gap: 18px;">
 
-                    {{-- Step 1: Event Details --}}
+                    {{-- Step 1: Event Details + Design --}}
                     <div x-show="currentStep === 1" x-transition x-cloak class="col" style="gap: 18px;">
                         <div class="field">
                             <label class="label" for="title">Event title <span class="hint">*</span></label>
                             <input id="title" type="text" class="input" x-model="formData.title" required placeholder="e.g. Annual Tech Summit 2026">
+                        </div>
+
+                        <div class="field">
+                            <label class="label" for="tagline">Tagline <span class="hint">optional</span></label>
+                            <input id="tagline" type="text" class="input" x-model="formData.tagline" placeholder="A short, compelling line for your event page" maxlength="180">
                         </div>
 
                         <div class="field">
@@ -137,6 +145,46 @@
                                 <label class="label" for="capacity">Total capacity <span class="hint">optional</span></label>
                                 <input id="capacity" type="number" class="input" x-model="formData.capacity" min="1" placeholder="Unlimited">
                                 <div class="hint">Overall cap across all ticket types.</div>
+                            </div>
+                        </div>
+
+                        {{-- Cover image --}}
+                        <div class="field">
+                            <label class="label">Cover image <span class="hint">optional · max 5 MB</span></label>
+                            <label class="upload-zone" @dragover.prevent @drop.prevent="handleDrop($event)">
+                                <template x-if="coverPreviewUrl">
+                                    <img :src="coverPreviewUrl" style="width:100%;border-radius:6px;object-fit:cover;max-height:140px;">
+                                </template>
+                                <template x-if="!coverPreviewUrl">
+                                    <div>
+                                        <svg viewBox="0 0 24 24" style="width:28px;height:28px;color:#9C998F;margin:0 auto 6px;display:block;" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                                        <div class="muted" style="font-size:13px;font-weight:500;">Click to upload or drag & drop</div>
+                                        <div class="hint" style="margin-top:2px;">PNG, JPG, WebP · Recommended 1500×500</div>
+                                    </div>
+                                </template>
+                                <input type="file" x-ref="coverInput" accept="image/*" style="display:none;" @change="handleCoverChange($event)">
+                            </label>
+                            <template x-if="coverPreviewUrl">
+                                <button type="button" class="btn" style="align-self:flex-start;font-size:12px;" @click="coverPreviewUrl = null; $refs.coverInput.value = ''">
+                                    Remove image
+                                </button>
+                            </template>
+                        </div>
+
+                        {{-- Organizer + Accent colour --}}
+                        <div class="grid-2-equal">
+                            <div class="field">
+                                <label class="label" for="organizer_name">Organizer name <span class="hint">optional</span></label>
+                                <input id="organizer_name" type="text" class="input" x-model="formData.organizer_name" placeholder="e.g. Accra Tech Hub">
+                                <div class="hint">Shown as "Organized by …" on event page.</div>
+                            </div>
+                            <div class="field">
+                                <label class="label">Accent colour <span class="hint">optional</span></label>
+                                <div class="row" style="gap: 8px;">
+                                    <div style="width:32px;height:32px;border-radius:6px;border:1px solid var(--nb-border);flex:none;transition:background .2s;" :style="'background:' + formData.accent_color"></div>
+                                    <input type="color" class="input" x-model="formData.accent_color" style="height:32px;padding:2px 4px;cursor:pointer;">
+                                </div>
+                                <div class="hint">Button & highlight colour on the public page.</div>
                             </div>
                         </div>
                     </div>
@@ -188,14 +236,12 @@
                             </button>
                         </div>
 
-                        <div x-show="isSubmitting === false && ticketTypes.length > 0" x-cloak>
-                            <div style="text-align: center; padding: 12px 8px 4px;">
-                                <div class="success-mark">
-                                    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>
-                                </div>
-                                <div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 22px; margin-bottom: 4px;">Ready to launch</div>
-                                <div class="muted" style="font-size: 13px;">Your event starts as a draft — activate it when you're ready to sell.</div>
+                        <div style="text-align: center; padding: 12px 8px 4px;">
+                            <div class="success-mark">
+                                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>
                             </div>
+                            <div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 22px; margin-bottom: 4px;">Ready to launch</div>
+                            <div class="muted" style="font-size: 13px;">Your event starts as a draft — activate it when you're ready to sell.</div>
                         </div>
                     </div>
 
@@ -226,11 +272,16 @@
                         <span class="tiny">What attendees see</span>
                     </div>
                     <div class="card-body">
-                        <div class="cover">
-                            <div class="glyph" x-text="previewInitial()"></div>
+                        <div class="cover-preview"
+                             :style="coverPreviewUrl
+                                 ? 'background: none;'
+                                 : 'background: linear-gradient(135deg, ' + formData.accent_color + ' 0%, ' + formData.accent_color + 'cc 100%);'">
+                            <img x-show="coverPreviewUrl" :src="coverPreviewUrl" style="width:100%;height:100%;object-fit:cover;">
+                            <div class="glyph" x-show="!coverPreviewUrl" x-text="previewInitial()"></div>
                         </div>
-                        <div style="font-weight: 600; font-size: 15px; margin-bottom: 4px;" x-text="formData.title || 'Your event title'"></div>
-                        <div class="muted" style="font-size: 12.5px; margin-bottom: 10px;" x-text="formData.venue ? '📍 ' + formData.venue : 'Venue TBD'"></div>
+                        <div style="font-weight: 600; font-size: 15px; margin-bottom: 2px;" x-text="formData.title || 'Your event title'"></div>
+                        <div class="muted" style="font-size: 12px; margin-bottom: 2px; font-style: italic;" x-show="formData.tagline" x-text="formData.tagline"></div>
+                        <div class="muted" style="font-size: 12.5px; margin-bottom: 6px;" x-text="formData.venue ? '📍 ' + formData.venue : 'Venue TBD'"></div>
                         <div class="muted" style="font-size: 12.5px; margin-bottom: 14px;" x-text="formData.event_date ? new Date(formData.event_date).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Date TBD'"></div>
                         <template x-if="ticketTypes.length > 0">
                             <div class="col" style="gap: 6px; margin-bottom: 14px;">
@@ -243,7 +294,14 @@
                                 </template>
                             </div>
                         </template>
-                        <button type="button" class="btn primary" style="width: 100%;">Buy Ticket</button>
+                        <button type="button"
+                            class="btn primary" style="width: 100%;"
+                            :style="'background:' + formData.accent_color + ';border-color:' + formData.accent_color">
+                            Buy Ticket
+                        </button>
+                        <div class="tiny" style="margin-top: 8px; text-align: center;" x-show="formData.organizer_name">
+                            Organized by <span x-text="formData.organizer_name" style="font-weight:500;"></span>
+                        </div>
                     </div>
                 </div>
 
@@ -290,6 +348,7 @@
             return {
                 currentStep: 1,
                 isSubmitting: false,
+                coverPreviewUrl: null,
                 steps: [
                     { name: 'Event details' },
                     { name: 'Ticket types' },
@@ -297,8 +356,11 @@
                 defaultNames: ['VIP', 'Regular', 'Student'],
                 formData: {
                     title: '',
+                    tagline: '',
                     description: '',
                     venue: '',
+                    organizer_name: '',
+                    accent_color: '#1B6B4E',
                     event_date: '',
                     capacity: '',
                 },
@@ -307,6 +369,19 @@
                 ],
 
                 init() {},
+
+                handleCoverChange(e) {
+                    const file = e.target.files[0];
+                    if (file) this.coverPreviewUrl = URL.createObjectURL(file);
+                },
+
+                handleDrop(e) {
+                    const file = e.dataTransfer.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        this.$refs.coverInput.files = e.dataTransfer.files;
+                        this.coverPreviewUrl = URL.createObjectURL(file);
+                    }
+                },
 
                 nextStep() {
                     if (this.currentStep === 1) {
@@ -331,32 +406,41 @@
                 },
 
                 async handleSubmit() {
-                    if (this.ticketTypes.filter(t => t.name && t.price).length === 0) {
+                    const validTypes = this.ticketTypes.filter(t => t.name && t.price);
+                    if (validTypes.length === 0) {
                         alert('Please add at least one ticket type with a name and price.');
                         return;
                     }
 
                     this.isSubmitting = true;
                     try {
-                        const payload = {
-                            ...this.formData,
-                            capacity: this.formData.capacity || null,
-                            ticket_types: this.ticketTypes.map(t => ({
-                                name: t.name,
-                                price: t.price,
-                                capacity: t.capacity || null,
-                                description: t.description || null,
-                            })).filter(t => t.name && t.price),
-                        };
+                        const fd = new FormData();
+                        fd.append('title', this.formData.title);
+                        if (this.formData.tagline)        fd.append('tagline', this.formData.tagline);
+                        if (this.formData.description)    fd.append('description', this.formData.description);
+                        if (this.formData.venue)          fd.append('venue', this.formData.venue);
+                        if (this.formData.organizer_name) fd.append('organizer_name', this.formData.organizer_name);
+                        if (this.formData.accent_color)   fd.append('accent_color', this.formData.accent_color);
+                        fd.append('event_date', this.formData.event_date);
+                        if (this.formData.capacity)       fd.append('capacity', this.formData.capacity);
+
+                        validTypes.forEach((type, i) => {
+                            fd.append(`ticket_types[${i}][name]`, type.name);
+                            fd.append(`ticket_types[${i}][price]`, type.price);
+                            if (type.capacity) fd.append(`ticket_types[${i}][capacity]`, type.capacity);
+                            fd.append(`ticket_types[${i}][description]`, type.description || '');
+                        });
+
+                        const coverFile = this.$refs.coverInput?.files?.[0];
+                        if (coverFile) fd.append('cover_image', coverFile);
 
                         const response = await fetch('{{ route("events.store") }}', {
                             method: 'POST',
                             headers: {
-                                'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                                 'Accept': 'application/json',
                             },
-                            body: JSON.stringify(payload),
+                            body: fd,
                         });
 
                         const data = await response.json();
