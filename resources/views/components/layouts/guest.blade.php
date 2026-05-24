@@ -26,8 +26,13 @@
 
                 {{-- Desktop nav --}}
                 <div class="hidden md:flex items-center gap-1">
-                    <a href="{{ route('browse') }}" class="px-3 py-1.5 text-[13px] font-medium text-[#6B6862] hover:text-[#15140F] rounded-[6px] hover:bg-[#F3F1EB] transition-colors duration-100">
+                    <a href="{{ route('browse') }}"
+                       class="px-3 py-1.5 text-[13px] font-medium rounded-[6px] transition-colors duration-100 {{ request()->routeIs('browse') ? 'text-[#15140F] bg-[#F3F1EB]' : 'text-[#6B6862] hover:text-[#15140F] hover:bg-[#F3F1EB]' }}">
                         Browse
+                    </a>
+                    <a href="{{ route('events.public.index') }}"
+                       class="px-3 py-1.5 text-[13px] font-medium rounded-[6px] transition-colors duration-100 {{ request()->routeIs('events.public.index') ? 'text-[#15140F] bg-[#F3F1EB]' : 'text-[#6B6862] hover:text-[#15140F] hover:bg-[#F3F1EB]' }}">
+                        Events
                     </a>
                     <a href="{{ route('about') }}" class="px-3 py-1.5 text-[13px] font-medium text-[#6B6862] hover:text-[#15140F] rounded-[6px] hover:bg-[#F3F1EB] transition-colors duration-100">
                         About
@@ -75,6 +80,7 @@
              x-cloak>
             <div class="px-4 py-3 space-y-1">
                 <a href="{{ route('browse') }}" class="block px-3 py-2 text-[13px] font-medium text-[#6B6862] hover:bg-[#F3F1EB] hover:text-[#15140F] rounded-[6px] transition-colors duration-100">Browse</a>
+                <a href="{{ route('events.public.index') }}" class="block px-3 py-2 text-[13px] font-medium text-[#6B6862] hover:bg-[#F3F1EB] hover:text-[#15140F] rounded-[6px] transition-colors duration-100">Events</a>
                 <a href="{{ route('about') }}" class="block px-3 py-2 text-[13px] font-medium text-[#6B6862] hover:bg-[#F3F1EB] hover:text-[#15140F] rounded-[6px] transition-colors duration-100">About</a>
                 @auth
                     <a href="{{ route('dashboard') }}" class="block px-3 py-2 text-[13px] font-medium text-[#6B6862] hover:bg-[#F3F1EB] hover:text-[#15140F] rounded-[6px] transition-colors duration-100">Dashboard</a>
@@ -106,6 +112,7 @@
                     <h3 class="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#6B6862] mb-4">Platform</h3>
                     <ul class="space-y-2.5 text-[13px]">
                         <li><a href="{{ route('browse') }}" class="hover:text-[#FAFAF7] transition-colors duration-100">Browse PiggyBoxes</a></li>
+                        <li><a href="{{ route('events.public.index') }}" class="hover:text-[#FAFAF7] transition-colors duration-100">Upcoming Events</a></li>
                         <li><a href="{{ route('register') }}" class="hover:text-[#FAFAF7] transition-colors duration-100">Create Account</a></li>
                         <li><a href="{{ route('about') }}" class="hover:text-[#FAFAF7] transition-colors duration-100">About Us</a></li>
                     </ul>

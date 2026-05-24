@@ -213,9 +213,20 @@ class EventBoxController extends Controller
 
     // ── Public: list upcoming events ──────────────────────────────────────────
 
-    public function publicIndex()
+    public function publicIndex(Request $request)
     {
-        $eventBoxes = EventBox::active()->latest('event_date')->paginate(12);
+        $query = EventBox::with(['ticketTypes', 'media'])
+            ->active()
+            ->orderBy('event_date', 'asc');
+
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->search . '%')
+                  ->orWhere('venue', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $eventBoxes = $query->paginate(12);
 
         return view('events.public-index', compact('eventBoxes'));
     }
