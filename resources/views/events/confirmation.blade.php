@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ticket confirmation — {{ $eventBox->title }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.pwa')
 </head>
 <body class="bg-[#F3F1EB] min-h-screen flex flex-col">
 

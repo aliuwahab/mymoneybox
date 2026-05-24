@@ -26,6 +26,9 @@ Route::get('/embed/box/{slug}', [PublicBoxController::class, 'embed'])
     ->name('box.embed')
     ->withoutMiddleware(\Illuminate\Http\Middleware\FrameGuard::class);
 
+// PWA offline fallback
+Route::get('/offline', fn() => response()->view('offline')->header('Cache-Control', 'no-store'))->name('offline');
+
 // Static Pages
 Route::view('/about', 'pages.about')->name('about');
 Route::view('/terms', 'pages.terms')->name('terms');

@@ -1,0 +1,39 @@
+{
+    "name": "MyPiggyBox",
+    "short_name": "MyPiggyBox",
+    "description": "Raise money, sell event tickets, and send piggy gifts — all in one place.",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#F3F1EB",
+    "theme_color": "#15140F",
+    "orientation": "any",
+    "categories": ["finance", "productivity"],
+    "icons": [
+        {
+            "src": "/apple-touch-icon.png",
+            "sizes": "166x166",
+            "type": "image/png"
+        },
+        {
+            "src": "/favicon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Dashboard",
+            "short_name": "Dashboard",
+            "url": "/dashboard",
+            "description": "Open your dashboard"
+        },
+        {
+            "name": "Browse Events",
+            "short_name": "Events",
+            "url": "/events",
+            "description": "Browse upcoming events"
+        }
+    ]
+}

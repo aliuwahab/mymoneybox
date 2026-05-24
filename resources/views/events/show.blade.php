@@ -6,6 +6,7 @@
     <title>{{ $eventBox->title }} — MyPiggyBox</title>
     <meta name="description" content="{{ $eventBox->tagline ?? Str::limit($eventBox->description, 160) }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.pwa')
 
     @php
         $accent      = $eventBox->accent_color ?? '#1B6B4E';
