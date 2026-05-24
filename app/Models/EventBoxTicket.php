@@ -11,6 +11,8 @@ class EventBoxTicket extends Model
 {
     protected $fillable = [
         'event_box_id',
+        'ticket_type_id',
+        'ticket_type_name',
         'buyer_name',
         'buyer_email',
         'buyer_phone',
@@ -37,6 +39,11 @@ class EventBoxTicket extends Model
     public function eventBox(): BelongsTo
     {
         return $this->belongsTo(EventBox::class);
+    }
+
+    public function ticketType(): BelongsTo
+    {
+        return $this->belongsTo(EventBoxTicketType::class, 'ticket_type_id');
     }
 
     public function redeemedBy(): BelongsTo

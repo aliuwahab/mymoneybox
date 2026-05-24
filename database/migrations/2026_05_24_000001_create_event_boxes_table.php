@@ -16,7 +16,6 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('venue')->nullable();
             $table->dateTime('event_date');
-            $table->decimal('ticket_price', 15, 2);
             $table->integer('capacity')->nullable(); // null = unlimited
             $table->integer('tickets_sold')->default(0);
             $table->enum('status', ['draft', 'active', 'sold_out', 'ended', 'cancelled'])->default('draft');

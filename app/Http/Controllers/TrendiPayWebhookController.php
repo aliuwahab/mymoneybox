@@ -214,9 +214,18 @@ class TrendiPayWebhookController extends Controller
             // Increment tickets_sold on the event
             $ticket->eventBox->increment('tickets_sold');
 
-            // Mark sold out if capacity reached
-            $eventBox = $ticket->eventBox->fresh();
-            if ($eventBox->capacity && $eventBox->tickets_sold >= $eventBox->capacity) {
+            // Increment sold count on the ticket type
+            if ($ticket->ticket_type_id) {
+                \App\Models\EventBoxTicketType::where('id', $ticket->ticket_type_id)->increment('sold');
+            }
+
+            // Mark sold out if overall capacity reached, or all ticket types exhausted
+            $eventBox = $ticket->eventBox->fresh()->load('ticketTypes');
+            $overallFull = $eventBox->capacity && $eventBox->tickets_sold >= $eventBox->capacity;
+            $typesFull   = $eventBox->ticketTypes->isNotEmpty()
+                && $eventBox->ticketTypes->every(fn($t) => !$t->isAvailable());
+
+            if ($overallFull || $typesFull) {
                 $eventBox->update(['status' => 'sold_out']);
             }
         }

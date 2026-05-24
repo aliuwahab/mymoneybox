@@ -21,7 +21,6 @@ class EventBox extends Model implements HasMedia
         'description',
         'venue',
         'event_date',
-        'ticket_price',
         'capacity',
         'tickets_sold',
         'status',
@@ -30,7 +29,6 @@ class EventBox extends Model implements HasMedia
 
     protected $casts = [
         'event_date'     => 'datetime',
-        'ticket_price'   => 'decimal:2',
         'fee_percentage' => 'decimal:2',
         'tickets_sold'   => 'integer',
         'capacity'       => 'integer',
@@ -49,6 +47,11 @@ class EventBox extends Model implements HasMedia
         return $this->hasMany(EventBoxTicket::class);
     }
 
+    public function ticketTypes(): HasMany
+    {
+        return $this->hasMany(EventBoxTicketType::class)->orderBy('sort_order');
+    }
+
     // Helper methods
 
     public function isActive(): bool
@@ -59,8 +62,17 @@ class EventBox extends Model implements HasMedia
 
     public function isSoldOut(): bool
     {
-        return $this->capacity !== null
-            && $this->tickets_sold >= $this->capacity;
+        // Overall capacity check
+        if ($this->capacity !== null && $this->tickets_sold >= $this->capacity) {
+            return true;
+        }
+
+        // All ticket types exhausted
+        if ($this->relationLoaded('ticketTypes') && $this->ticketTypes->isNotEmpty()) {
+            return $this->ticketTypes->every(fn($t) => !$t->isAvailable());
+        }
+
+        return false;
     }
 
     public function availableCapacity(): ?int
@@ -80,11 +92,6 @@ class EventBox extends Model implements HasMedia
     public function getPublicUrl(): string
     {
         return route('events.show', $this->slug);
-    }
-
-    public function formatPrice(): string
-    {
-        return 'GH₵ ' . number_format((float) $this->ticket_price, 2);
     }
 
     public function getCoverImageUrl(): ?string

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\EventBox;
 use App\Models\EventBoxTicket;
+use App\Models\EventBoxTicketType;
 use App\Payment\PaymentManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -31,23 +32,45 @@ class EventBoxController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'        => ['required', 'string', 'max:255'],
-            'description'  => ['nullable', 'string'],
-            'venue'        => ['nullable', 'string', 'max:255'],
-            'event_date'   => ['required', 'date', 'after:now'],
-            'ticket_price' => ['required', 'numeric', 'min:0'],
-            'capacity'     => ['nullable', 'integer', 'min:1'],
+            'title'                       => ['required', 'string', 'max:255'],
+            'description'                 => ['nullable', 'string'],
+            'venue'                       => ['nullable', 'string', 'max:255'],
+            'event_date'                  => ['required', 'date', 'after:now'],
+            'capacity'                    => ['nullable', 'integer', 'min:1'],
+            'ticket_types'                => ['required', 'array', 'min:1'],
+            'ticket_types.*.name'         => ['required', 'string', 'max:100'],
+            'ticket_types.*.price'        => ['required', 'numeric', 'min:0'],
+            'ticket_types.*.capacity'     => ['nullable', 'integer', 'min:1'],
+            'ticket_types.*.description'  => ['nullable', 'string', 'max:255'],
         ]);
 
         $slug = Str::slug($validated['title']) . '-' . Str::random(6);
 
         $eventBox = auth()->user()->eventBoxes()->create([
-            ...$validated,
-            'slug'   => $slug,
-            'status' => 'draft',
+            'title'       => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'venue'       => $validated['venue'] ?? null,
+            'event_date'  => $validated['event_date'],
+            'capacity'    => $validated['capacity'] ?? null,
+            'slug'        => $slug,
+            'status'      => 'draft',
         ]);
 
-        return redirect()->route('events.show', $eventBox->slug)
+        foreach ($validated['ticket_types'] as $index => $typeData) {
+            $eventBox->ticketTypes()->create([
+                'name'        => $typeData['name'],
+                'description' => $typeData['description'] ?? null,
+                'price'       => $typeData['price'],
+                'capacity'    => $typeData['capacity'] ?? null,
+                'sort_order'  => $index,
+            ]);
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['id' => $eventBox->id, 'slug' => $eventBox->slug]);
+        }
+
+        return redirect()->route('events.dashboard', $eventBox)
             ->with('success', 'Event created successfully.');
     }
 
@@ -67,17 +90,38 @@ class EventBoxController extends Controller
         abort_if(auth()->id() !== $eventBox->user_id, 403);
 
         $validated = $request->validate([
-            'title'        => ['required', 'string', 'max:255'],
-            'description'  => ['nullable', 'string'],
-            'venue'        => ['nullable', 'string', 'max:255'],
-            'event_date'   => ['required', 'date'],
-            'ticket_price' => ['required', 'numeric', 'min:0'],
-            'capacity'     => ['nullable', 'integer', 'min:1'],
+            'title'                       => ['required', 'string', 'max:255'],
+            'description'                 => ['nullable', 'string'],
+            'venue'                       => ['nullable', 'string', 'max:255'],
+            'event_date'                  => ['required', 'date'],
+            'capacity'                    => ['nullable', 'integer', 'min:1'],
+            'ticket_types'                => ['required', 'array', 'min:1'],
+            'ticket_types.*.name'         => ['required', 'string', 'max:100'],
+            'ticket_types.*.price'        => ['required', 'numeric', 'min:0'],
+            'ticket_types.*.capacity'     => ['nullable', 'integer', 'min:1'],
+            'ticket_types.*.description'  => ['nullable', 'string', 'max:255'],
         ]);
 
-        $eventBox->update($validated);
+        $eventBox->update([
+            'title'       => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'venue'       => $validated['venue'] ?? null,
+            'event_date'  => $validated['event_date'],
+            'capacity'    => $validated['capacity'] ?? null,
+        ]);
 
-        return redirect()->route('events.show', $eventBox->slug)
+        $eventBox->ticketTypes()->delete();
+        foreach ($validated['ticket_types'] as $index => $typeData) {
+            $eventBox->ticketTypes()->create([
+                'name'        => $typeData['name'],
+                'description' => $typeData['description'] ?? null,
+                'price'       => $typeData['price'],
+                'capacity'    => $typeData['capacity'] ?? null,
+                'sort_order'  => $index,
+            ]);
+        }
+
+        return redirect()->route('events.dashboard', $eventBox)
             ->with('success', 'Event updated successfully.');
     }
 
@@ -99,10 +143,11 @@ class EventBoxController extends Controller
     {
         abort_if(auth()->id() !== $eventBox->user_id, 403);
 
-        $tickets = $eventBox->tickets()->with('redeemedBy')->latest()->get();
-        $revenue = $eventBox->tickets_sold * (float) $eventBox->ticket_price;
+        $tickets     = $eventBox->tickets()->with(['redeemedBy', 'ticketType'])->latest()->get();
+        $ticketTypes = $eventBox->ticketTypes()->get();
+        $revenue     = $tickets->where('payment_status', 'completed')->sum('amount');
 
-        return view('events.dashboard', compact('eventBox', 'tickets', 'revenue'));
+        return view('events.dashboard', compact('eventBox', 'tickets', 'ticketTypes', 'revenue'));
     }
 
     // ── Auth: update status ───────────────────────────────────────────────────
@@ -133,7 +178,7 @@ class EventBoxController extends Controller
 
     public function publicShow(string $slug)
     {
-        $eventBox = EventBox::where('slug', $slug)->firstOrFail();
+        $eventBox = EventBox::with('ticketTypes')->where('slug', $slug)->firstOrFail();
 
         return view('events.show', compact('eventBox'));
     }
@@ -142,7 +187,7 @@ class EventBoxController extends Controller
 
     public function purchase(Request $request, string $slug)
     {
-        $eventBox = EventBox::where('slug', $slug)->where('status', 'active')->firstOrFail();
+        $eventBox = EventBox::with('ticketTypes')->where('slug', $slug)->where('status', 'active')->firstOrFail();
 
         if (!$eventBox->canPurchase()) {
             return back()->with('error', $eventBox->isSoldOut()
@@ -151,24 +196,32 @@ class EventBoxController extends Controller
         }
 
         $validated = $request->validate([
-            'buyer_name'  => ['required', 'string', 'max:255'],
-            'buyer_email' => ['required', 'email', 'max:255'],
-            'buyer_phone' => ['nullable', 'string', 'max:30'],
+            'ticket_type_id' => ['required', 'integer'],
+            'buyer_name'     => ['required', 'string', 'max:255'],
+            'buyer_email'    => ['required', 'email', 'max:255'],
+            'buyer_phone'    => ['nullable', 'string', 'max:30'],
         ]);
+
+        $ticketType = $eventBox->ticketTypes()->findOrFail($validated['ticket_type_id']);
+
+        if (!$ticketType->isAvailable()) {
+            return back()->with('error', "'{$ticketType->name}' tickets are sold out.");
+        }
 
         $reference = 'EVT-' . strtoupper(Str::random(16));
 
         $payment = app(PaymentManager::class)->initializePayment([
             'email'       => $validated['buyer_email'],
-            'amount'      => $eventBox->ticket_price,
+            'amount'      => $ticketType->price,
             'currency'    => 'GHS',
             'reference'   => $reference,
             'return_url'  => route('events.confirmation', [$slug, $reference]),
             'webhook_url' => route('trendipay.webhook'),
-            'description' => "Ticket for {$eventBox->title}",
+            'description' => "{$ticketType->name} ticket for {$eventBox->title}",
             'metadata'    => [
-                'event_box_id' => $eventBox->id,
-                'event_title'  => $eventBox->title,
+                'event_box_id'    => $eventBox->id,
+                'event_title'     => $eventBox->title,
+                'ticket_type'     => $ticketType->name,
             ],
         ]);
 
@@ -178,10 +231,12 @@ class EventBoxController extends Controller
 
         EventBoxTicket::create([
             'event_box_id'      => $eventBox->id,
+            'ticket_type_id'    => $ticketType->id,
+            'ticket_type_name'  => $ticketType->name,
             'buyer_name'        => $validated['buyer_name'],
             'buyer_email'       => $validated['buyer_email'],
             'buyer_phone'       => $validated['buyer_phone'] ?? null,
-            'amount'            => $eventBox->ticket_price,
+            'amount'            => $ticketType->price,
             'payment_reference' => $reference,
             'payment_status'    => 'pending',
         ]);

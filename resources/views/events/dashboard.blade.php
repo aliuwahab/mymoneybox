@@ -2,7 +2,7 @@
     <div
         class="page-wrap max-w-[1280px]"
         x-data="{
-            tab: 'overview',
+            tab: 'attendees',
             showValidateModal: false,
             scanTab: 'enter',
             code: '',
@@ -174,9 +174,15 @@
                 <div class="stat-delta">Gross ticket sales</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Ticket price</div>
-                <div class="stat-value">{{ $eventBox->formatPrice() }}</div>
-                <div class="stat-delta">Per ticket</div>
+                <div class="stat-label">Ticket types</div>
+                <div class="stat-value tnum">{{ $ticketTypes->count() }}</div>
+                <div class="stat-delta">
+                    @if($ticketTypes->count() === 1)
+                        GH₵ {{ number_format((float) $ticketTypes->first()->price, 2) }} per ticket
+                    @else
+                        {{ $ticketTypes->count() }} price tiers
+                    @endif
+                </div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Redeemed</div>
@@ -231,6 +237,7 @@
                             <tr>
                                 <th>Name</th>
                                 <th>Email</th>
+                                <th>Type</th>
                                 <th>Ticket code</th>
                                 <th>Status</th>
                                 <th>Redeemed at</th>
@@ -242,6 +249,7 @@
                                 <tr>
                                     <td class="font-medium text-[#15140F]">{{ $ticket->buyer_name }}</td>
                                     <td class="muted text-[12.5px]">{{ $ticket->buyer_email }}</td>
+                                    <td class="text-[12.5px] text-[#6B6862]">{{ $ticket->ticket_type_name ?? '—' }}</td>
                                     <td>
                                         <span class="font-mono text-[12px] font-medium text-[#15140F]">{{ $ticket->code ?? '—' }}</span>
                                     </td>
@@ -273,7 +281,7 @@
 
         {{-- Details tab --}}
         <div x-show="tab === 'details'" x-cloak>
-            <div class="card">
+            <div class="card mb-4">
                 <div class="card-head">
                     <div class="card-title">Event details</div>
                     <a href="{{ route('events.edit', $eventBox) }}" class="btn btn-sm">Edit</a>
@@ -283,7 +291,6 @@
                         <div class="flex justify-between gap-4"><dt class="text-[#6B6862]">Title</dt><dd class="font-medium text-right">{{ $eventBox->title }}</dd></div>
                         <div class="flex justify-between gap-4"><dt class="text-[#6B6862]">Date & time</dt><dd class="font-medium">{{ $eventBox->event_date->format('D, M j, Y · g:ia') }}</dd></div>
                         <div class="flex justify-between gap-4"><dt class="text-[#6B6862]">Venue</dt><dd class="font-medium">{{ $eventBox->venue ?? '—' }}</dd></div>
-                        <div class="flex justify-between gap-4"><dt class="text-[#6B6862]">Ticket price</dt><dd class="font-medium tnum">{{ $eventBox->formatPrice() }}</dd></div>
                         <div class="flex justify-between gap-4"><dt class="text-[#6B6862]">Capacity</dt><dd class="font-medium">{{ $eventBox->capacity ? number_format($eventBox->capacity) . ' seats' : 'Unlimited' }}</dd></div>
                         <div class="flex justify-between gap-4"><dt class="text-[#6B6862]">Status</dt><dd><span class="pill {{ $eventBox->status->color() }}"><span class="pill-dot"></span>{{ $eventBox->status->label() }}</span></dd></div>
                         <div class="flex justify-between gap-4"><dt class="text-[#6B6862]">Public link</dt>
@@ -291,6 +298,50 @@
                         </div>
                     </dl>
                 </div>
+            </div>
+
+            {{-- Ticket type breakdown --}}
+            <div class="card">
+                <div class="card-head">
+                    <div class="card-title">Ticket types</div>
+                </div>
+                @if($ticketTypes->isNotEmpty())
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th class="num">Price</th>
+                                <th class="num">Sold</th>
+                                <th class="num">Capacity</th>
+                                <th class="num">Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($ticketTypes as $type)
+                                @php
+                                    $typeRevenue = $tickets
+                                        ->where('payment_status.value', 'completed')
+                                        ->where('ticket_type_id', $type->id)
+                                        ->sum('amount');
+                                @endphp
+                                <tr>
+                                    <td class="font-medium text-[#15140F]">
+                                        {{ $type->name }}
+                                        @if($type->description)
+                                            <span class="block text-[11.5px] text-[#9C998F] font-normal">{{ $type->description }}</span>
+                                        @endif
+                                    </td>
+                                    <td class="num tnum">GH₵ {{ number_format((float) $type->price, 2) }}</td>
+                                    <td class="num tnum">{{ number_format($type->sold) }}</td>
+                                    <td class="num tnum text-[#6B6862]">{{ $type->capacity ? number_format($type->capacity) : '∞' }}</td>
+                                    <td class="num tnum font-semibold text-[#15140F]">GH₵ {{ number_format((float) $typeRevenue, 2) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @else
+                    <div class="card-body text-center py-8 text-[#9C998F] text-[13px]">No ticket types configured.</div>
+                @endif
             </div>
         </div>
 
