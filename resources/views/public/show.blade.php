@@ -277,10 +277,12 @@
             <div class="pub-right">
 
                 {{-- Campaign cover visual (200px tall per design) --}}
-                <div class="pub-cover {{ $hasImg ? '' : 'cover-emerald' }}">
-                    @if($hasImg)
-                        <img src="{{ $moneyBox->getMainImageUrl() }}" alt="{{ $moneyBox->title }}"
-                             style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;">
+                @php $coverUrl = $moneyBox->getMainImageUrl(); @endphp
+                <div class="pub-cover {{ ($hasImg && $coverUrl) ? '' : 'cover-emerald' }}"
+                     @if($hasImg && $coverUrl)
+                         style="background-image:url('{{ $coverUrl }}');background-size:cover;background-position:center 30%;"
+                     @endif>
+                    @if($hasImg && $coverUrl)
                         <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55) 0%,rgba(0,0,0,.05) 60%,transparent 100%);"></div>
                     @else
                         <div style="position:absolute;inset:0;display:grid;place-items:center;color:rgba(255,255,255,0.95);font-family:'Instrument Serif',Georgia,serif;font-size:56px;letter-spacing:.02em;">
