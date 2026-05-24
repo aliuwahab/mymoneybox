@@ -4,6 +4,7 @@ namespace App\Filament\Resources\EventBoxes\Schemas;
 
 use App\Enums\EventBoxStatus;
 use App\Models\EventBox;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -45,6 +46,25 @@ class EventBoxInfolist
                         ->placeholder('—')
                         ->columnSpanFull(),
                 ]),
+
+            Section::make('Images')
+                ->columns(1)
+                ->schema([
+                    ImageEntry::make('cover_image')
+                        ->label('Cover image')
+                        ->getStateUsing(fn (EventBox $record) => $record->getCoverImageUrl())
+                        ->height(220)
+                        ->extraImgAttributes(['style' => 'object-fit:cover; border-radius:8px;'])
+                        ->placeholder('No cover image'),
+
+                    ImageEntry::make('gallery_images')
+                        ->label('Gallery')
+                        ->getStateUsing(fn (EventBox $record) => collect($record->getGalleryUrls())->pluck('url')->toArray())
+                        ->height(160)
+                        ->extraImgAttributes(['style' => 'object-fit:cover; border-radius:6px;'])
+                        ->placeholder('No gallery images'),
+                ])
+                ->visible(fn (EventBox $record) => $record->getCoverImageUrl() || count($record->getGalleryUrls()) > 0),
 
             Section::make('Organizer & Contact')
                 ->columns(3)
