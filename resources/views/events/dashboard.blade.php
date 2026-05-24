@@ -211,6 +211,7 @@
         <div class="tabs">
             <button class="tab" :class="tab === 'attendees' ? 'active' : ''" @click="tab = 'attendees'">Attendees</button>
             <button class="tab" :class="tab === 'details' ? 'active' : ''" @click="tab = 'details'">Event details</button>
+            <button class="tab" :class="tab === 'images' ? 'active' : ''" @click="tab = 'images'">Images</button>
         </div>
 
         {{-- Attendees tab --}}
@@ -331,6 +332,52 @@
                     <div class="card-body text-center py-8 text-[#9C998F] text-[13px]">No ticket types configured.</div>
                 @endif
             </div>
+        </div>
+
+        {{-- Images tab --}}
+        <div x-show="tab === 'images'" x-cloak>
+
+            {{-- Cover image --}}
+            <div class="card mb-4">
+                <div class="card-head">
+                    <div class="card-title">Cover image</div>
+                    <a href="{{ route('events.edit', $eventBox) }}" class="btn btn-sm">Edit</a>
+                </div>
+                @if($coverUrl)
+                    <div class="p-4">
+                        <img src="{{ $coverUrl }}" alt="Cover" class="w-full max-h-[320px] object-cover rounded-[8px]">
+                    </div>
+                @else
+                    <div class="card-body text-center py-8 text-[#9C998F] text-[13px]">
+                        No cover image uploaded.
+                    </div>
+                @endif
+            </div>
+
+            {{-- Gallery --}}
+            <div class="card">
+                <div class="card-head">
+                    <div class="card-title">Gallery ({{ count($gallery) }} {{ Str::plural('photo', count($gallery)) }})</div>
+                    <a href="{{ route('events.edit', $eventBox) }}" class="btn btn-sm">Edit</a>
+                </div>
+                @if(count($gallery) > 0)
+                    <div class="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                        @foreach($gallery as $item)
+                            <a href="{{ $item['url'] }}" target="_blank" rel="noopener"
+                               class="block rounded-[8px] overflow-hidden bg-[#F3F1EB] hover:opacity-90 transition-opacity"
+                               style="aspect-ratio:1;">
+                                <img src="{{ $item['url'] }}" alt="Gallery photo {{ $loop->iteration }}"
+                                     class="w-full h-full object-cover">
+                            </a>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="card-body text-center py-8 text-[#9C998F] text-[13px]">
+                        No gallery photos uploaded.
+                    </div>
+                @endif
+            </div>
+
         </div>
 
     </div>

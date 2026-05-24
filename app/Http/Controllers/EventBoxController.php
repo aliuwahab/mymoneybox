@@ -200,8 +200,10 @@ class EventBoxController extends Controller
         $tickets     = $eventBox->tickets()->with(['redeemedBy', 'ticketType'])->latest()->get();
         $ticketTypes = $eventBox->ticketTypes()->get();
         $revenue     = $tickets->where('payment_status', 'completed')->sum('amount');
+        $coverUrl    = $eventBox->getCoverImageUrl();
+        $gallery     = $eventBox->getGalleryUrls();
 
-        return view('events.dashboard', compact('eventBox', 'tickets', 'ticketTypes', 'revenue'));
+        return view('events.dashboard', compact('eventBox', 'tickets', 'ticketTypes', 'revenue', 'coverUrl', 'gallery'));
     }
 
     // ── Auth: update status ───────────────────────────────────────────────────
