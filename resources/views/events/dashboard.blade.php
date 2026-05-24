@@ -98,18 +98,6 @@
                 }
             }
         }"
-        x-init="
-            @if(session('success'))
-                $dispatch('toast', '{{ session('success') }}');
-            @endif
-        "
-        @toast.window="
-            let t = document.createElement('div');
-            t.className = 'fixed top-4 right-4 z-50 bg-[#15140F] text-white px-4 py-2.5 rounded-[8px] shadow-lg flex items-center gap-2 text-[13px]';
-            t.innerHTML = '<svg viewBox=\"0 0 24 24\" class=\"w-4 h-4 text-[#1B6B4E] flex-none\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m5 12 5 5L20 7\"/></svg><span>' + $event.detail + '</span>';
-            document.body.appendChild(t);
-            setTimeout(() => t.remove(), 3500);
-        "
     >
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
