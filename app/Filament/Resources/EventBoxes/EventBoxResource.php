@@ -4,13 +4,14 @@ namespace App\Filament\Resources\EventBoxes;
 
 use App\Filament\Resources\EventBoxes\Pages\ListEventBoxes;
 use App\Filament\Resources\EventBoxes\Pages\ViewEventBox;
+use App\Filament\Resources\EventBoxes\RelationManagers\TicketsRelationManager;
+use App\Filament\Resources\EventBoxes\Schemas\EventBoxInfolist;
 use App\Filament\Resources\EventBoxes\Tables\EventBoxesTable;
 use App\Models\EventBox;
 use BackedEnum;
 use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -38,6 +39,11 @@ class EventBoxResource extends Resource
         return $schema->components([]);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return EventBoxInfolist::configure($schema);
+    }
+
     public static function table(Table $table): Table
     {
         return EventBoxesTable::configure($table);
@@ -45,7 +51,9 @@ class EventBoxResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            TicketsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
