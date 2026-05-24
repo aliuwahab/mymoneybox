@@ -3,14 +3,11 @@
 namespace App\Filament\Resources\EventBoxes\Tables;
 
 use App\Enums\EventBoxStatus;
-use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Notifications\Notification;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
@@ -75,26 +72,6 @@ class EventBoxesTable
             ])
             ->recordActions([
                 ViewAction::make(),
-                Action::make('activate')
-                    ->label('Set Active')
-                    ->icon('heroicon-o-play')
-                    ->color('success')
-                    ->requiresConfirmation()
-                    ->action(function ($record) {
-                        $record->update(['status' => EventBoxStatus::Active]);
-                        Notification::make()->success()->title('EventBox set to active')->send();
-                    })
-                    ->visible(fn ($record) => $record->status !== EventBoxStatus::Active && !$record->trashed()),
-                Action::make('cancel')
-                    ->label('Cancel event')
-                    ->icon('heroicon-o-x-circle')
-                    ->color('danger')
-                    ->requiresConfirmation()
-                    ->action(function ($record) {
-                        $record->update(['status' => EventBoxStatus::Cancelled]);
-                        Notification::make()->warning()->title('EventBox cancelled')->send();
-                    })
-                    ->visible(fn ($record) => !in_array($record->status, [EventBoxStatus::Cancelled, EventBoxStatus::Ended]) && !$record->trashed()),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
