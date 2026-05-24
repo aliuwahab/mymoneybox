@@ -14,6 +14,11 @@ class EventBox extends Model implements HasMedia
 {
     use SoftDeletes, InteractsWithMedia;
 
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     protected $fillable = [
         'user_id',
         'title',
