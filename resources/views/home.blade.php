@@ -441,6 +441,51 @@
         .placements-foot { display: flex; justify-content: center; margin-top: 40px; }
         .placements-foot .btn { padding-left: 22px; padding-right: 22px; }
 
+        /* EVENTS SECTION */
+        .events-section { padding: 0 0 100px; }
+        .events-head { display: grid; grid-template-columns: 1fr auto; gap: 40px; align-items: end; margin-bottom: 40px; }
+        .events-head .section-title { margin-top: 12px; max-width: 540px; }
+        .events-sub { color: var(--fg-2); font-size: 15px; max-width: 360px; padding-bottom: 6px; line-height: 1.55; }
+        .events-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+
+        .ev-card { position: relative; border-radius: 14px; border: 1px solid var(--border); background: var(--panel); overflow: hidden; display: flex; flex-direction: column; cursor: pointer; transition: transform .25s cubic-bezier(.2,.7,.2,1), box-shadow .25s, border-color .2s; }
+        .ev-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-2); border-color: var(--border-2); }
+        .ev-cover { position: relative; height: 180px; overflow: hidden; isolation: isolate; }
+        .ev-cover img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s cubic-bezier(.2,.7,.2,1); display: block; }
+        .ev-card:hover .ev-cover img { transform: scale(1.05); }
+        .ev-cover-grad { position: absolute; inset: 0; }
+        .ev-date-chip { position: absolute; top: 14px; left: 14px; background: #fff; border-radius: 8px; padding: 5px 9px; text-align: center; min-width: 42px; box-shadow: 0 2px 8px rgba(0,0,0,.18); z-index: 2; }
+        .ev-date-chip .month { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #9C998F; line-height: 1; }
+        .ev-date-chip .day { font-size: 18px; font-weight: 700; color: #15140F; line-height: 1.1; }
+        .ev-body { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+        .ev-title { font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 21px; line-height: 1.15; letter-spacing: -.01em; margin: 0; }
+        .ev-meta { display: flex; flex-direction: column; gap: 4px; }
+        .ev-meta-row { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--fg-3); }
+        .ev-meta-row svg { flex-none; }
+        .ev-price { margin-top: auto; display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--border); }
+        .ev-price-from { font-size: 11px; color: var(--fg-3); margin-bottom: 1px; }
+        .ev-price-amount { font-size: 16px; font-weight: 700; color: #15140F; }
+        .ev-arrow { width: 30px; height: 30px; border-radius: 50%; background: var(--bg); border: 1px solid var(--border); display: grid; place-items: center; color: var(--fg); transition: background .2s, color .2s, transform .2s; }
+        .ev-card:hover .ev-arrow { background: var(--fg); color: var(--bg); transform: rotate(-45deg); }
+
+        /* Ticket hover overlay */
+        .ev-ticket-overlay { position: absolute; inset: 0; display: flex; align-items: flex-end; padding: 10px; opacity: 0; transform: translateY(16px); transition: opacity .28s ease, transform .28s ease; pointer-events: none; z-index: 10; }
+        .ev-card:hover .ev-ticket-overlay { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .ev-ticket { background: #FAFAF7; border-radius: 10px; width: 100%; box-shadow: 0 8px 32px rgba(20,18,12,.28); overflow: hidden; }
+        .ev-ticket-top { padding: 13px 16px 10px; }
+        .ev-ticket-event { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #9C998F; margin-bottom: 3px; }
+        .ev-ticket-name { font-family: 'Instrument Serif', serif; font-size: 17px; font-weight: 400; color: #15140F; line-height: 1.2; margin-bottom: 8px; }
+        .ev-ticket-info { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .ev-ticket-field { display: flex; flex-direction: column; gap: 1px; }
+        .ev-ticket-label { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: #9C998F; }
+        .ev-ticket-value { font-size: 12px; font-weight: 500; color: #15140F; }
+        .ev-ticket-sep { height: 0; margin: 0 -16px; border-top: 1px dashed #D9D6CE; }
+        .ev-ticket-sep::before, .ev-ticket-sep::after { display: none; }
+        .ev-ticket-bottom { padding: 10px 16px 13px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .ev-barcode { display: flex; align-items: flex-end; gap: 1.5px; height: 36px; }
+        .ev-barcode span { background: #15140F; border-radius: 1px; }
+        .ev-ticket-code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 10.5px; letter-spacing: .12em; color: #6B6862; }
+
         /* RESPONSIVE */
         @media (max-width: 980px) {
             .hero-grid, .section-head, .faq, .quote-grid { grid-template-columns: 1fr; gap: 32px; }
@@ -454,8 +499,8 @@
             .featured { grid-template-columns: 1fr; }
             .featured::before { display: none; }
             .featured-cover { min-height: 340px; }
-            .featured-head, .placements-head { grid-template-columns: 1fr; }
-            .placements-grid { grid-template-columns: 1fr; }
+            .featured-head, .placements-head, .events-head { grid-template-columns: 1fr; }
+            .placements-grid, .events-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 640px) {
             body { font-size: 14px; }
@@ -509,6 +554,8 @@
             .featured-recent { align-items: flex-start; }
             .placements-section { padding-bottom: 72px; }
             .placement { cursor: pointer; }
+            .events-section { padding-bottom: 72px; }
+            .ev-ticket-overlay { display: none; }
             .foot-grid { grid-template-columns: 1fr; gap: 28px; margin-bottom: 36px; }
             .foot-bot { flex-direction: column; align-items: flex-start; gap: 14px; }
             .foot-bot .legal { flex-wrap: wrap; gap: 14px; }
@@ -530,6 +577,7 @@
             <a href="#how">How it works</a>
             <a href="#cases">Use cases</a>
             <a href="{{ route('browse') }}">Campaigns</a>
+            <a href="/events">Events</a>
             <a href="#pricing">Pricing</a>
             <a href="#faq">FAQ</a>
         </div>
@@ -906,6 +954,131 @@
 
 <!-- PLACEMENT CAMPAIGNS -->
 <livewire:placement-campaigns />
+
+<!-- EVENTS -->
+@if(isset($featuredEvents) && $featuredEvents->count() > 0)
+<section class="events-section">
+    <div class="wrap">
+        <div class="events-head">
+            <div>
+                <span class="kicker">Upcoming Events</span>
+                <h2 class="section-title">Don't miss what's happening near you.</h2>
+                <p class="events-sub">Discover live events, buy tickets, and attend in person — all through MyPiggyBox.</p>
+            </div>
+            <div>
+                <a href="/events" class="btn">View all events
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </a>
+            </div>
+        </div>
+
+        <div class="events-grid">
+            @foreach($featuredEvents as $event)
+            @php
+                $coverUrl = $event->getCoverImageUrl();
+                $eventDate = $event->event_date instanceof \Carbon\Carbon
+                    ? $event->event_date
+                    : \Carbon\Carbon::parse($event->event_date);
+                $minPrice = $event->ticketTypes->min('price');
+                $displayCode = strtoupper(substr(md5($event->slug), 0, 4) . '-' . substr(md5($event->slug), 4, 4) . '-' . substr(md5($event->slug), 8, 4));
+                $barsHtml = '';
+                $slugLen = strlen($event->slug);
+                for ($bi = 0; $bi < 32; $bi++) {
+                    $char = ord($event->slug[$bi % $slugLen]);
+                    $w = ($char % 3) + 1;
+                    $h = 18 + ($bi % 5 === 0 ? 14 : ($bi % 3 === 0 ? 8 : ($bi % 2 === 0 ? 4 : 0)));
+                    $barsHtml .= "<span style=\"width:{$w}px;height:{$h}px\"></span>";
+                }
+            @endphp
+            <a href="/events/{{ $event->slug }}" class="ev-card" style="text-decoration:none;color:inherit">
+                {{-- Cover --}}
+                <div class="ev-cover">
+                    @if($coverUrl)
+                        <img src="{{ $coverUrl }}" alt="{{ $event->title }}" loading="lazy">
+                    @else
+                        <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1B3A6B 0%,#2a5298 55%,#1B6B4E 100%)"></div>
+                    @endif
+                    <div class="ev-cover-grad" style="background:linear-gradient(to top,rgba(15,14,8,.68) 0%,transparent 60%)"></div>
+                    <div class="ev-date-chip">
+                        <div class="month">{{ $eventDate->format('M') }}</div>
+                        <div class="day">{{ $eventDate->format('d') }}</div>
+                    </div>
+                </div>
+
+                {{-- Body --}}
+                <div class="ev-body">
+                    <h3 class="ev-title">{{ $event->title }}</h3>
+                    <div class="ev-meta">
+                        <div class="ev-meta-row">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                            {{ $event->venue ?? 'Venue TBA' }}
+                        </div>
+                        <div class="ev-meta-row">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            {{ $eventDate->format('D, d M Y') }} &middot; {{ $eventDate->format('g:ia') }}
+                        </div>
+                    </div>
+                    <div class="ev-price">
+                        <div>
+                            <div class="ev-price-from">From</div>
+                            <div class="ev-price-amount">
+                                @if($minPrice && $minPrice > 0)
+                                    ₵{{ number_format($minPrice, 2) }}
+                                @else
+                                    Free
+                                @endif
+                            </div>
+                        </div>
+                        <div class="ev-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Ticket hover overlay --}}
+                <div class="ev-ticket-overlay">
+                    <div class="ev-ticket">
+                        <div class="ev-ticket-top">
+                            <div class="ev-ticket-event">Event Ticket</div>
+                            <div class="ev-ticket-name">{{ Str::limit($event->title, 38) }}</div>
+                            <div class="ev-ticket-info">
+                                <div class="ev-ticket-field">
+                                    <div class="ev-ticket-label">Date</div>
+                                    <div class="ev-ticket-value">{{ $eventDate->format('d M Y') }}</div>
+                                </div>
+                                <div class="ev-ticket-field">
+                                    <div class="ev-ticket-label">Time</div>
+                                    <div class="ev-ticket-value">{{ $eventDate->format('g:i A') }}</div>
+                                </div>
+                                <div class="ev-ticket-field">
+                                    <div class="ev-ticket-label">Venue</div>
+                                    <div class="ev-ticket-value">{{ Str::limit($event->venue ?? 'TBA', 18) }}</div>
+                                </div>
+                                <div class="ev-ticket-field">
+                                    <div class="ev-ticket-label">Price</div>
+                                    <div class="ev-ticket-value">@if($minPrice && $minPrice > 0)₵{{ number_format($minPrice, 2) }}@else Free @endif</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ev-ticket-sep"></div>
+                        <div class="ev-ticket-bottom">
+                            <div class="ev-barcode">{!! $barsHtml !!}</div>
+                            <div class="ev-ticket-code">{{ $displayCode }}</div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            @endforeach
+        </div>
+
+        <div class="placements-foot">
+            <a href="/events" class="btn">Browse all events
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+        </div>
+    </div>
+</section>
+@endif
 
 <!-- FINAL CTA -->
 <section class="final-cta">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\EventBox;
 use App\Models\MoneyBox;
 use App\Models\TrustedLogo;
 use Illuminate\Http\Request;
@@ -27,7 +28,14 @@ class PublicBoxController extends Controller
             ->ordered()
             ->get();
 
-        return view('home', compact('featuredMoneyBoxes', 'trustedLogos'));
+        $featuredEvents = EventBox::with(['ticketTypes'])
+            ->where('status', 'active')
+            ->where('event_date', '>', now())
+            ->orderBy('event_date', 'asc')
+            ->limit(3)
+            ->get();
+
+        return view('home', compact('featuredMoneyBoxes', 'trustedLogos', 'featuredEvents'));
     }
 
     /**
