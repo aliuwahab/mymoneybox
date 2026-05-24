@@ -54,16 +54,6 @@
                     @endif
                 </flux:navlist.item>
 
-                <flux:navlist.item
-                    icon="plus-circle"
-                    :href="route('money-boxes.create')"
-                    :current="request()->routeIs('money-boxes.create')"
-                    wire:navigate
-                    class="mmb-nav-item"
-                >
-                    New PiggyBox
-                </flux:navlist.item>
-
             <flux:navlist.item
                     icon="users"
                     :href="route('contributors.index')"
@@ -92,6 +82,27 @@
                     class="mmb-nav-item"
                 >
                     Withdrawals
+                </flux:navlist.item>
+            </flux:navlist>
+
+            {{-- Events nav --}}
+            <div class="text-[10.5px] font-medium uppercase tracking-[0.08em] text-[#9C998F] px-2.5 pt-4 pb-1.5">
+                Events
+            </div>
+
+            <flux:navlist>
+                <flux:navlist.item
+                    icon="ticket"
+                    :href="route('events.index')"
+                    :current="request()->routeIs('events.*')"
+                    wire:navigate
+                    class="mmb-nav-item"
+                >
+                    <span class="flex-1">My EventBoxes</span>
+                    @php $eventCount = auth()->user()->eventBoxes()->whereIn('status', ['active', 'draft'])->count(); @endphp
+                    @if($eventCount > 0)
+                        <span class="ml-auto text-[11px] text-[#154F3A] bg-[#E6F1EB] px-1.5 py-0.5 rounded-full tabular-nums">{{ $eventCount }}</span>
+                    @endif
                 </flux:navlist.item>
             </flux:navlist>
 
@@ -211,6 +222,10 @@
                         request()->routeIs('contributors.index') => ['Workspace', 'Contributors'],
                         request()->routeIs('analytics.index') => ['Workspace', 'Analytics'],
                         request()->routeIs('withdrawals.*') => ['Workspace', 'Withdrawals'],
+                        request()->routeIs('events.index') => ['Events', 'My EventBoxes'],
+                        request()->routeIs('events.create') => ['Events', 'My EventBoxes', 'Create Event'],
+                        request()->routeIs('events.edit') => ['Events', 'My EventBoxes', 'Edit Event'],
+                        request()->routeIs('events.dashboard') => ['Events', 'My EventBoxes', 'Dashboard'],
                         request()->routeIs('piggy.my-piggy-box') => ['Account', 'My Piggy Wallet'],
                         request()->routeIs('browse') => ['Account', 'Browse'],
                         request()->routeIs('profile.edit') || request()->routeIs('user-password.edit') || request()->routeIs('settings.*') || request()->routeIs('two-factor.show') || request()->routeIs('appearance.edit') => ['Account', 'Settings'],
