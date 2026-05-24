@@ -678,7 +678,9 @@
     </div>
 </section>
 
-@php($trustedLogos = $trustedLogos ?? collect())
+@php
+    $trustedLogos = $trustedLogos ?? collect();
+@endphp
 
 @if($trustedLogos->isNotEmpty())
     <!-- TRUST LOGOS -->
