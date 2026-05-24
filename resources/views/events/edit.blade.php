@@ -185,9 +185,9 @@
 
                     {{-- Existing images --}}
                     @if(count($gallery) > 0)
-                        <div class="grid grid-cols-3 sm:grid-cols-4 gap-2" id="gallery-grid">
+                        <div class="flex flex-row gap-2 overflow-x-auto pb-1" id="gallery-grid">
                             @foreach($gallery as $item)
-                                <div class="relative group rounded-[8px] overflow-hidden bg-[#F3F1EB]" style="aspect-ratio:1;" data-media-id="{{ $item['id'] }}">
+                                <div class="relative group rounded-[8px] overflow-hidden bg-[#F3F1EB] flex-none" style="width:120px;height:120px;" data-media-id="{{ $item['id'] }}">
                                     <img src="{{ $item['url'] }}" alt="" class="w-full h-full object-cover">
                                     <button type="button"
                                         @click="removeImage({{ $item['id'] }}, $el.closest('[data-media-id]'))"
@@ -202,9 +202,9 @@
                     {{-- New image previews --}}
                     <div x-show="previews.length > 0">
                         <div class="text-[11.5px] font-semibold text-[#9C998F] uppercase tracking-wide mb-2">New photos to add</div>
-                        <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                        <div class="flex flex-row gap-2 overflow-x-auto pb-1">
                             <template x-for="(src, i) in previews" :key="src">
-                                <div class="relative rounded-[8px] overflow-hidden bg-[#F3F1EB] ring-2 ring-[#1B6B4E]/30 group" style="aspect-ratio:1;">
+                                <div class="relative rounded-[8px] overflow-hidden bg-[#F3F1EB] ring-2 ring-[#1B6B4E]/30 group flex-none" style="width:120px;height:120px;">
                                     <img :src="src" class="w-full h-full object-cover">
                                     <button type="button" @click="removePending(i)"
                                         class="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
