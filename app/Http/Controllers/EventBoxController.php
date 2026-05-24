@@ -171,6 +171,7 @@ class EventBoxController extends Controller
     public function destroy(EventBox $eventBox)
     {
         abort_if(auth()->id() !== $eventBox->user_id, 403);
+        abort_if($eventBox->tickets_sold > 0, 422, 'Cannot delete an event with purchased tickets.');
 
         $eventBox->delete();
 

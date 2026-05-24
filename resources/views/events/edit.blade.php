@@ -301,14 +301,23 @@
 
         {{-- Actions (outside the update form to avoid nesting) --}}
         <div class="flex items-center justify-between gap-3">
+            @php $hasSales = $eventBox->tickets_sold > 0; @endphp
             <form id="delete-form" method="POST" action="{{ route('events.destroy', $eventBox) }}" class="inline">
                 @csrf
                 @method('DELETE')
-                <button type="button"
-                    onclick="if(confirm('Delete this event? Existing tickets remain in the database.')) document.getElementById('delete-form').submit();"
-                    class="btn bg-red-50 border-red-200 text-red-700 hover:bg-red-100 hover:border-red-300">
-                    Delete event
-                </button>
+                @if($hasSales)
+                    <button type="button" disabled
+                        title="{{ $eventBox->tickets_sold }} ticket(s) sold — event cannot be deleted"
+                        class="btn bg-[#F3F1EB] border-[#E6E3DC] text-[#9C998F] cursor-not-allowed opacity-60">
+                        Delete event
+                    </button>
+                @else
+                    <button type="button"
+                        onclick="if(confirm('Delete this event? This cannot be undone.')) document.getElementById('delete-form').submit();"
+                        class="btn bg-red-50 border-red-200 text-red-700 hover:bg-red-100 hover:border-red-300">
+                        Delete event
+                    </button>
+                @endif
             </form>
 
             <div class="flex items-center gap-2">
