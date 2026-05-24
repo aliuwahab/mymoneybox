@@ -826,7 +826,7 @@
                 <div class="plan-name">Personal</div>
                 <h3>Starter</h3>
                 <p>For one-off events and personal causes.</p>
-                <div class="price"><span class="price-num">2.9%</span><span class="price-unit">+ ₵1 per contribution</span></div>
+                <div class="price"><span class="price-num">1.5%</span><span class="price-unit">per contribution</span></div>
                 <ul>
                     <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Unlimited PiggyBoxes</li>
                     <li><span class="ic-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span> Mobile money + card payments</li>
@@ -866,7 +866,7 @@
             <div>
                 <span class="kicker">Common questions</span>
                 <h2 class="section-title" style="margin-top:12px">Everything you'd want to ask, before signing up.</h2>
-                <p class="section-sub" style="margin-top:18px">Still curious? Reach our team at <a style="color:var(--accent); font-weight:500" href="{{ route('contact') }}">sales@mypiggybox.com</a> — we usually reply quickly.</p>
+                <p class="section-sub" style="margin-top:18px">Still curious? Reach our team at <a style="color:var(--accent); font-weight:500" href="{{ route('contact') }}">support@mypiggybox.com</a> — we usually reply quickly.</p>
             </div>
             <div class="faq-list">
                 <details class="faq-item" open>
