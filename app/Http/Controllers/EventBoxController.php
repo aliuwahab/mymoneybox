@@ -16,7 +16,7 @@ class EventBoxController extends Controller
 
     public function index()
     {
-        $eventBoxes = auth()->user()->eventBoxes()->latest()->paginate(12);
+        $eventBoxes = auth()->user()->eventBoxes()->with('media')->latest()->paginate(12);
 
         return view('events.index', compact('eventBoxes'));
     }
