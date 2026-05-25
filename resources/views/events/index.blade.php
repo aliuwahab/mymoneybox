@@ -29,11 +29,18 @@
                 @foreach($eventBoxes as $event)
                     <div class="card overflow-hidden">
                         {{-- Cover / header band --}}
-                        <div class="h-[70px] bg-gradient-to-br from-[#1B6B4E] to-[#154F3A] relative p-3.5 pb-0">
-                            <div class="absolute inset-0 flex items-center justify-center text-white/80 font-serif text-[28px]">
-                                {{ substr($event->title, 0, 1) }}
+                        @php $coverUrl = $event->getCoverImageUrl(); @endphp
+                        @if($coverUrl)
+                            <div class="h-[70px] relative overflow-hidden">
+                                <img src="{{ $coverUrl }}" alt="{{ $event->title }}" class="w-full h-full object-cover">
                             </div>
-                        </div>
+                        @else
+                            <div class="h-[70px] bg-gradient-to-br from-[#1B6B4E] to-[#154F3A] relative p-3.5 pb-0">
+                                <div class="absolute inset-0 flex items-center justify-center text-white/80 font-serif text-[28px]">
+                                    {{ substr($event->title, 0, 1) }}
+                                </div>
+                            </div>
+                        @endif
 
                         <div class="p-4">
                             {{-- Status badge --}}
