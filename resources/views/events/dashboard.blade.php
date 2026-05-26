@@ -11,12 +11,18 @@
             redeemLoading: false,
             redeemDone: false,
             scanner: null,
+            scannerControls: null,
+            scannerStarting: false,
+            scannerStatus: 'idle',
+            scannerError: '',
 
             openModal() {
                 this.showValidateModal = true;
                 this.result = null;
                 this.code = '';
                 this.redeemDone = false;
+                this.scannerError = '';
+                this.scannerStatus = 'idle';
             },
             closeModal() {
                 this.showValidateModal = false;
@@ -30,34 +36,91 @@
                     this.stopScanner();
                 }
             },
-            startScanner() {
-                if (!window.ZXingBrowser) return;
+            async startScanner() {
+                if (this.scannerStarting || this.scannerControls) return;
+
+                this.scannerError = '';
+                this.scannerStatus = 'starting';
+
+                if (!window.isSecureContext) {
+                    this.scannerStatus = 'error';
+                    this.scannerError = 'Camera access requires HTTPS. Open this page on the secure site to scan tickets.';
+                    return;
+                }
+
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    this.scannerStatus = 'error';
+                    this.scannerError = 'This browser does not support camera access. Enter the ticket code instead.';
+                    return;
+                }
+
+                if (!window.ZXingBrowser || !window.ZXingBrowser.BrowserQRCodeReader) {
+                    this.scannerStatus = 'error';
+                    this.scannerError = 'The QR scanner could not load. Refresh the page and try again.';
+                    return;
+                }
+
                 const videoEl = document.getElementById('qr-video');
                 if (!videoEl) return;
-                const hints = new Map();
-                const formats = [window.ZXingBrowser.BarcodeFormat.QR_CODE];
-                hints.set(window.ZXingBrowser.DecodeHintType.POSSIBLE_FORMATS, formats);
-                this.scanner = new window.ZXingBrowser.BrowserQRCodeReader(hints);
-                this.scanner.decodeFromConstraints(
-                    { video: { facingMode: { ideal: 'environment' } } },
-                    'qr-video',
-                    (res, err, controls) => {
-                    if (res) {
-                        this.code = res.getText();
-                        controls.stop();
-                        this.scanTab = 'enter';
-                        this.$nextTick(() => this.validateCode());
+
+                this.scannerStarting = true;
+                this.scanner = new window.ZXingBrowser.BrowserQRCodeReader();
+
+                try {
+                    this.scannerControls = await this.scanner.decodeFromConstraints(
+                        { video: { facingMode: { ideal: 'environment' } }, audio: false },
+                        videoEl,
+                        (res, err, controls) => {
+                            if (!res) return;
+
+                            this.code = res.getText();
+                            this.scannerStatus = 'detected';
+                            try { controls.stop(); } catch(e) {}
+                            this.scannerControls = null;
+                            this.scanTab = 'enter';
+                            this.$nextTick(() => this.validateCode());
+                        }
+                    );
+
+                    this.scannerStatus = 'ready';
+                } catch(e) {
+                    this.stopScanner();
+                    this.scannerStatus = 'error';
+
+                    if (e && (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError')) {
+                        this.scannerError = 'Camera permission was blocked. Allow camera access for this site and try again.';
+                    } else if (e && (e.name === 'NotFoundError' || e.name === 'DevicesNotFoundError')) {
+                        this.scannerError = 'No camera was found on this device. Enter the ticket code instead.';
+                    } else if (e && (e.name === 'NotReadableError' || e.name === 'TrackStartError')) {
+                        this.scannerError = 'The camera is already in use by another app. Close it and try again.';
+                    } else {
+                        this.scannerError = 'Could not start the camera. Enter the ticket code or refresh and try again.';
                     }
-                }).catch(() => {});
+                } finally {
+                    this.scannerStarting = false;
+                }
             },
             stopScanner() {
-                if (this.scanner) {
-                    try { this.scanner.reset(); } catch(e) {}
-                    this.scanner = null;
+                if (this.scannerControls) {
+                    try { this.scannerControls.stop(); } catch(e) {}
+                }
+                this.scannerControls = null;
+                this.scanner = null;
+                this.scannerStarting = false;
+
+                const videoEl = document.getElementById('qr-video');
+                if (videoEl && videoEl.srcObject) {
+                    videoEl.srcObject.getTracks().forEach((track) => track.stop());
+                    videoEl.srcObject = null;
+                }
+
+                if (this.scannerStatus !== 'error' && this.scannerStatus !== 'detected') {
+                    this.scannerStatus = 'idle';
                 }
             },
             async validateCode() {
                 if (!this.code.trim()) return;
+                this.stopScanner();
                 this.loading = true;
                 this.result = null;
                 this.redeemDone = false;
@@ -492,9 +555,20 @@
 
                 {{-- Scan QR tab --}}
                 <div x-show="scanTab === 'scan'">
-                    <div class="rounded-[8px] overflow-hidden bg-black mb-3 aspect-square">
+                    <div class="relative rounded-[8px] overflow-hidden bg-black mb-3 aspect-square">
                         <video id="qr-video" class="w-full h-full object-cover" autoplay muted playsinline></video>
+                        <div
+                            x-show="scannerStatus === 'starting'"
+                            class="absolute inset-0 flex items-center justify-center bg-black/70 text-white text-[13px] font-medium"
+                        >
+                            Starting camera...
+                        </div>
                     </div>
+                    <template x-if="scannerStatus === 'error'">
+                        <div class="bg-red-50 border border-red-200 rounded-[8px] px-3 py-2 mb-3">
+                            <p class="text-[12px] text-red-700" x-text="scannerError"></p>
+                        </div>
+                    </template>
                     <p class="text-[12px] text-[#9C998F] text-center">Point the camera at the attendee's QR code. It will be detected automatically.</p>
                 </div>
 
@@ -562,7 +636,7 @@
                     {{-- Try another --}}
                     <div x-show="result !== null" class="mt-3">
                         <button
-                            @click="result = null; code = ''; redeemDone = false;"
+                            @click="result = null; code = ''; redeemDone = false; scannerError = ''; scannerStatus = scanTab === 'scan' ? 'idle' : scannerStatus; if (scanTab === 'scan') $nextTick(() => startScanner());"
                             class="text-[13px] text-[#6B6862] hover:text-[#15140F] underline"
                         >
                             Check another ticket
@@ -575,5 +649,4 @@
 
     </div>{{-- end page-wrap x-data --}}
 
-    <script src="https://unpkg.com/@zxing/browser@latest/umd/index.min.js"></script>
 </x-layouts.app>
