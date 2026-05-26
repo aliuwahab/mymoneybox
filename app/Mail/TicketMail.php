@@ -19,7 +19,7 @@ class TicketMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public string $qrCodeBase64;
+    public string $qrCodeData;
 
     public function __construct(public EventBoxTicket $ticket)
     {
@@ -35,8 +35,7 @@ class TicketMail extends Mailable
         );
 
         $writer = new PngWriter();
-        $result = $writer->write($qrCode);
-        $this->qrCodeBase64 = base64_encode($result->getString());
+        $this->qrCodeData = $writer->write($qrCode)->getString();
     }
 
     public function envelope(): Envelope
@@ -51,9 +50,9 @@ class TicketMail extends Mailable
         return new Content(
             view: 'emails.ticket',
             with: [
-                'ticket'        => $this->ticket,
-                'eventBox'      => $this->ticket->eventBox,
-                'qrCodeBase64'  => $this->qrCodeBase64,
+                'ticket'      => $this->ticket,
+                'eventBox'    => $this->ticket->eventBox,
+                'qrCodeData'  => $this->qrCodeData,
             ],
         );
     }

@@ -75,7 +75,7 @@
     </div>
 
     <div class="qr-section">
-      <img src="data:image/png;base64,{{ $qrCodeBase64 }}" width="200" height="200" alt="Ticket QR Code" />
+      <img src="{{ $message->embedData($qrCodeData, 'ticket-qr.png', 'image/png') }}" width="200" height="200" alt="Ticket QR Code" />
       <p style="margin-top:10px;font-size:12px;color:#9C998F;">Scan this code at the entrance</p>
     </div>
 

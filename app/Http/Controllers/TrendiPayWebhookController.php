@@ -210,10 +210,6 @@ class TrendiPayWebhookController extends Controller
         };
 
         foreach ($tickets as $ticket) {
-            if ($ticket->payment_status === \App\Enums\PaymentStatus::Completed) {
-                continue; // already handled in a previous webhook delivery
-            }
-
             $updates = [
                 'payment_status'   => $paymentStatus,
                 'payment_metadata' => $webhookData['raw_data'] ?? null,
@@ -222,17 +218,24 @@ class TrendiPayWebhookController extends Controller
             if ($paymentStatus === \App\Enums\PaymentStatus::Completed) {
                 $updates['code']   = \App\Models\EventBoxTicket::generateCode();
                 $updates['status'] = 'unused';
+            }
 
+            // Atomic: skip if another concurrent webhook call already completed this ticket
+            $affected = \App\Models\EventBoxTicket::where('id', $ticket->id)
+                ->where('payment_status', '!=', \App\Enums\PaymentStatus::Completed)
+                ->update($updates);
+
+            if (! $affected) {
+                continue;
+            }
+
+            if ($paymentStatus === \App\Enums\PaymentStatus::Completed) {
                 $ticket->eventBox->increment('tickets_sold');
 
                 if ($ticket->ticket_type_id) {
                     \App\Models\EventBoxTicketType::where('id', $ticket->ticket_type_id)->increment('sold');
                 }
-            }
 
-            $ticket->update($updates);
-
-            if ($paymentStatus === \App\Enums\PaymentStatus::Completed) {
                 event(new \App\Events\TicketIssued($ticket->fresh()));
             }
         }
