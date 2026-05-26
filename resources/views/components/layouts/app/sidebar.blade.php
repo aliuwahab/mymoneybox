@@ -2,7 +2,17 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         @include('partials.head')
-        <style>[x-cloak]{display:none!important}</style>
+        <style>
+            [x-cloak]{display:none!important}
+            /* Sidebar hidden on mobile by default — before Alpine loads */
+            #app-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+            }
+            @media (min-width: 1024px) {
+                #app-sidebar { transform: translateX(0); }
+            }
+        </style>
     </head>
     <body class="min-h-screen bg-[#FAFAF7]" x-data="{ sidebarOpen: false }">
 
@@ -21,8 +31,9 @@
 
         {{-- Sidebar --}}
         <aside
-            class="fixed inset-y-0 left-0 z-40 flex w-[248px] flex-col overflow-y-auto border-r border-[#CFCABD] bg-[#F7F5EF] shadow-[18px_0_44px_-28px_rgba(20,18,12,.36)] transition-transform duration-300 ease-in-out lg:translate-x-0"
-            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+            id="app-sidebar"
+            class="fixed inset-y-0 left-0 z-40 flex w-[248px] flex-col overflow-y-auto border-r border-[#CFCABD] bg-[#F7F5EF] shadow-[18px_0_44px_-28px_rgba(20,18,12,.36)]"
+            :style="sidebarOpen ? 'transform: translateX(0)' : ''"
         >
             {{-- Mobile close --}}
             <div class="flex justify-end px-3 pt-3 lg:hidden">
