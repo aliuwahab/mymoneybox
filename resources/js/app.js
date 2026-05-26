@@ -1,10 +1,3 @@
-import Alpine from 'alpinejs';
-
-if (!window.Alpine) {
-    window.Alpine = Alpine;
-}
-
-if (!window.Alpine.__mpbStarted) {
-    window.Alpine.__mpbStarted = true;
-    window.Alpine.start();
-}
+// Alpine is provided by Livewire because every app layout includes @fluxScripts.
+// Keep this bundle free of a second Alpine instance so Flux/Livewire controls
+// are initialized exactly once.
