@@ -233,10 +233,10 @@
         </div>
 
         {{-- Stat grid --}}
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 mb-6">
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-3.5 mb-6">
             <div class="stat-card">
                 <div class="stat-label">Tickets sold</div>
-                <div class="stat-value tnum">{{ number_format($eventBox->tickets_sold) }}</div>
+                <div class="stat-value tnum">{{ number_format($completedTickets->count()) }}</div>
                 @if($eventBox->capacity)
                     <div class="stat-delta">of {{ number_format($eventBox->capacity) }} capacity</div>
                 @else
@@ -247,6 +247,11 @@
                 <div class="stat-label">Revenue</div>
                 <div class="stat-value tnum text-primary-600">GH₵ {{ number_format($revenue, 2) }}</div>
                 <div class="stat-delta">Gross ticket sales</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Net payout</div>
+                <div class="stat-value tnum">GH₵ {{ number_format($netPayout, 2) }}</div>
+                <div class="stat-delta">After {{ number_format($feePercentage, 2) }}% platform fee</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Ticket types</div>
@@ -261,7 +266,7 @@
             </div>
             <div class="stat-card">
                 <div class="stat-label">Redeemed</div>
-                <div class="stat-value tnum">{{ $tickets->where('status.value', 'redeemed')->count() }}</div>
+                <div class="stat-value tnum">{{ $redeemedTickets->count() }}</div>
                 <div class="stat-delta">Checked in</div>
             </div>
         </div>
@@ -297,6 +302,7 @@
         {{-- Tabs --}}
         <div class="tabs">
             <button class="tab" :class="tab === 'attendees' ? 'active' : ''" @click="tab = 'attendees'">Attendees</button>
+            <button class="tab" :class="tab === 'revenue' ? 'active' : ''" @click="tab = 'revenue'">Revenue report</button>
             <button class="tab" :class="tab === 'details' ? 'active' : ''" @click="tab = 'details'">Event details</button>
             <button class="tab" :class="tab === 'images' ? 'active' : ''" @click="tab = 'images'">Images</button>
         </div>
@@ -305,9 +311,9 @@
         <div x-show="tab === 'attendees'" x-cloak>
             <div class="card">
                 <div class="card-head">
-                    <div class="card-title">Attendees ({{ $tickets->where('payment_status.value', 'completed')->count() }} confirmed)</div>
+                    <div class="card-title">Attendees ({{ $completedTickets->count() }} confirmed)</div>
                 </div>
-                @if($tickets->where('payment_status.value', 'completed')->count() > 0)
+                @if($completedTickets->count() > 0)
                     <table class="data-table">
                         <thead>
                             <tr>
@@ -322,7 +328,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($tickets->where('payment_status.value', 'completed') as $ticket)
+                            @foreach($completedTickets as $ticket)
                                 <tr>
                                     <td class="font-medium text-[#15140F]">{{ $ticket->buyer_name }}</td>
                                     <td class="muted text-[12.5px]">{{ $ticket->buyer_email }}</td>
@@ -366,6 +372,100 @@
             </div>
         </div>
 
+        {{-- Revenue report tab --}}
+        <div x-show="tab === 'revenue'" x-cloak>
+            <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-4">
+                <div class="card">
+                    <div class="card-head">
+                        <div class="card-title">Ticket sales by type</div>
+                    </div>
+                    @if($ticketTypes->isNotEmpty())
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th class="num">Sold</th>
+                                    <th class="num">Redeemed</th>
+                                    <th class="num">Gross</th>
+                                    <th class="num">Net estimate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($ticketTypes as $type)
+                                    @php
+                                        $typeTickets = $completedTickets->where('ticket_type_id', $type->id);
+                                        $typeRevenue = (float) $typeTickets->sum('amount');
+                                        $typeFee = round($typeRevenue * ($feePercentage / 100), 2);
+                                    @endphp
+                                    <tr>
+                                        <td class="font-medium text-[#15140F]">
+                                            {{ $type->name }}
+                                            <span class="block text-[11.5px] text-[#9C998F] font-normal">GH₵ {{ number_format((float) $type->price, 2) }} per ticket</span>
+                                        </td>
+                                        <td class="num tnum">{{ number_format($typeTickets->count()) }}</td>
+                                        <td class="num tnum">{{ number_format($typeTickets->where('status.value', 'redeemed')->count()) }}</td>
+                                        <td class="num tnum font-semibold text-[#15140F]">GH₵ {{ number_format($typeRevenue, 2) }}</td>
+                                        <td class="num tnum text-primary-600 font-semibold">GH₵ {{ number_format(max(0, $typeRevenue - $typeFee), 2) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @else
+                        <div class="card-body text-center py-8 text-[#9C998F] text-[13px]">No ticket types configured.</div>
+                    @endif
+                </div>
+
+                <div class="space-y-4">
+                    <div class="card">
+                        <div class="card-head">
+                            <div class="card-title">Settlement estimate</div>
+                        </div>
+                        <div class="card-body space-y-3">
+                            <div class="flex justify-between gap-4 text-[13px]">
+                                <span class="text-[#6B6862]">Gross ticket sales</span>
+                                <span class="tnum font-semibold text-[#15140F]">GH₵ {{ number_format($revenue, 2) }}</span>
+                            </div>
+                            <div class="flex justify-between gap-4 text-[13px]">
+                                <span class="text-[#6B6862]">Platform fee ({{ number_format($feePercentage, 2) }}%)</span>
+                                <span class="tnum font-semibold text-[#15140F]">GH₵ {{ number_format($platformFee, 2) }}</span>
+                            </div>
+                            <div class="border-t border-[#E6E3DC] pt-3 flex justify-between gap-4 text-[14px]">
+                                <span class="font-semibold text-[#15140F]">Organizer payout</span>
+                                <span class="tnum font-semibold text-primary-600">GH₵ {{ number_format($netPayout, 2) }}</span>
+                            </div>
+                            <p class="tiny leading-relaxed">
+                                This estimate uses confirmed ticket payments only. Voided and pending tickets are excluded from payout calculations.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-head">
+                            <div class="card-title">Ticket status</div>
+                        </div>
+                        <div class="card-body grid grid-cols-2 gap-3">
+                            <div class="rounded-[8px] bg-[#FBFAF6] border border-[#E6E3DC] p-3">
+                                <div class="stat-label">Confirmed</div>
+                                <div class="tnum text-[22px] font-semibold text-[#15140F]">{{ number_format($completedTickets->count()) }}</div>
+                            </div>
+                            <div class="rounded-[8px] bg-[#FBFAF6] border border-[#E6E3DC] p-3">
+                                <div class="stat-label">Pending</div>
+                                <div class="tnum text-[22px] font-semibold text-[#15140F]">{{ number_format($pendingTickets->count()) }}</div>
+                            </div>
+                            <div class="rounded-[8px] bg-[#FBFAF6] border border-[#E6E3DC] p-3">
+                                <div class="stat-label">Redeemed</div>
+                                <div class="tnum text-[22px] font-semibold text-[#15140F]">{{ number_format($redeemedTickets->count()) }}</div>
+                            </div>
+                            <div class="rounded-[8px] bg-[#FBFAF6] border border-[#E6E3DC] p-3">
+                                <div class="stat-label">Voided</div>
+                                <div class="tnum text-[22px] font-semibold text-[#15140F]">{{ number_format($voidedTickets->count()) }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {{-- Details tab --}}
         <div x-show="tab === 'details'" x-cloak>
             <div class="card mb-4">
@@ -406,10 +506,7 @@
                         <tbody>
                             @foreach($ticketTypes as $type)
                                 @php
-                                    $typeRevenue = $tickets
-                                        ->where('payment_status.value', 'completed')
-                                        ->where('ticket_type_id', $type->id)
-                                        ->sum('amount');
+                                    $typeRevenue = $completedTickets->where('ticket_type_id', $type->id)->sum('amount');
                                 @endphp
                                 <tr>
                                     <td class="font-medium text-[#15140F]">
@@ -443,7 +540,9 @@
                 </div>
                 @if($coverUrl)
                     <div class="p-4">
-                        <img src="{{ $coverUrl }}" alt="Cover" class="w-full max-h-[320px] object-cover rounded-[8px]">
+                        <div class="w-full min-h-[220px] max-h-[420px] bg-[#F3F1EB] rounded-[8px] border border-[#E6E3DC] flex items-center justify-center overflow-hidden" style="aspect-ratio: 16 / 9;">
+                            <img src="{{ $coverUrl }}" alt="Cover" class="w-full h-full max-h-[420px] object-contain">
+                        </div>
                     </div>
                 @else
                     <div class="card-body text-center py-8 text-[#9C998F] text-[13px]">
@@ -465,7 +564,7 @@
                                class="block rounded-[8px] overflow-hidden bg-[#F3F1EB] hover:opacity-90 transition-opacity"
                                style="aspect-ratio:1;">
                                 <img src="{{ $item['url'] }}" alt="Gallery photo {{ $loop->iteration }}"
-                                     class="w-full h-full object-cover">
+                                     class="w-full h-full object-contain">
                             </a>
                         @endforeach
                     </div>

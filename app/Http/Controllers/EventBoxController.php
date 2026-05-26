@@ -223,13 +223,34 @@ class EventBoxController extends Controller
     {
         abort_if(auth()->id() !== $eventBox->user_id, 403);
 
-        $tickets     = $eventBox->tickets()->with(['redeemedBy', 'ticketType'])->latest()->get();
-        $ticketTypes = $eventBox->ticketTypes()->get();
-        $revenue     = $tickets->where('payment_status', 'completed')->sum('amount');
-        $coverUrl    = $eventBox->getCoverImageUrl();
-        $gallery     = $eventBox->getGalleryUrls();
+        $tickets          = $eventBox->tickets()->with(['redeemedBy', 'ticketType'])->latest()->get();
+        $ticketTypes      = $eventBox->ticketTypes()->get();
+        $completedTickets = $tickets->where('payment_status.value', 'completed');
+        $pendingTickets   = $tickets->where('payment_status.value', 'pending');
+        $voidedTickets    = $tickets->where('status.value', 'voided');
+        $redeemedTickets  = $tickets->where('status.value', 'redeemed');
+        $revenue          = (float) $completedTickets->sum('amount');
+        $feePercentage    = $eventBox->getEffectiveFeePercentage();
+        $platformFee      = round($revenue * ($feePercentage / 100), 2);
+        $netPayout        = max(0, round($revenue - $platformFee, 2));
+        $coverUrl         = $eventBox->getCoverImageUrl();
+        $gallery          = $eventBox->getGalleryUrls();
 
-        return view('events.dashboard', compact('eventBox', 'tickets', 'ticketTypes', 'revenue', 'coverUrl', 'gallery'));
+        return view('events.dashboard', compact(
+            'eventBox',
+            'tickets',
+            'ticketTypes',
+            'completedTickets',
+            'pendingTickets',
+            'voidedTickets',
+            'redeemedTickets',
+            'revenue',
+            'feePercentage',
+            'platformFee',
+            'netPayout',
+            'coverUrl',
+            'gallery',
+        ));
     }
 
     // ── Auth: update status ───────────────────────────────────────────────────

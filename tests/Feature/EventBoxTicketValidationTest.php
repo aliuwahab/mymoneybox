@@ -62,3 +62,28 @@ it('redeems a validated event ticket and records who redeemed it', function () {
         ->and($ticket->redeemed_by)->toBe($owner->id)
         ->and($ticket->redeemed_at)->not->toBeNull();
 });
+
+it('shows event revenue, fee, and organizer payout reporting', function () {
+    ['owner' => $owner, 'eventBox' => $eventBox] = createEventBoxTicketValidationFixture();
+
+    $eventBox->update(['fee_percentage' => 10]);
+
+    $this->actingAs($owner)
+        ->get(route('events.dashboard', $eventBox))
+        ->assertOk()
+        ->assertSee('Revenue report')
+        ->assertSee('Gross ticket sales')
+        ->assertSee('Platform fee (10.00%)')
+        ->assertSee('GH₵ 2.50')
+        ->assertSee('Organizer payout')
+        ->assertSee('GH₵ 22.50');
+});
+
+it('loads Alpine support on the public event ticket page', function () {
+    ['eventBox' => $eventBox] = createEventBoxTicketValidationFixture();
+
+    $this->get(route('events.show', $eventBox->slug))
+        ->assertOk()
+        ->assertSee('x-data="ticketPanel()"', false)
+        ->assertSee('flux.min.js', false);
+});
