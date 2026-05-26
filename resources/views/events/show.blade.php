@@ -51,13 +51,66 @@
             background: rgba(var(--evt-accent-rgb), 0.10);
             border: 1px solid rgba(var(--evt-accent-rgb), 0.25);
         }
+        .evt-hero {
+            background:
+                radial-gradient(circle at top left, rgba(var(--evt-accent-rgb), 0.12), transparent 34rem),
+                #FAFAF7;
+            border-bottom: 1px solid #E6E3DC;
+        }
+        .evt-hero-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(320px, 430px);
+            gap: 2rem;
+            align-items: center;
+        }
+        .evt-cover-frame {
+            background: #F3F1EB;
+            border: 1px solid #E6E3DC;
+            border-radius: 16px;
+            min-height: 320px;
+            max-height: 520px;
+            aspect-ratio: 4 / 3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 16px 48px rgba(21, 20, 15, 0.10);
+        }
+        .evt-cover-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .evt-cover-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FAFAF7;
+            background: linear-gradient(135deg, var(--evt-accent), var(--evt-accent-dark));
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: clamp(3rem, 10vw, 7rem);
+        }
+        @media (max-width: 900px) {
+            .evt-hero-grid {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+            .evt-cover-frame {
+                min-height: 240px;
+                max-height: none;
+                aspect-ratio: 16 / 11;
+                order: -1;
+            }
+        }
     </style>
 </head>
 <body class="bg-[#F3F1EB] min-h-screen">
 
     {{-- Nav --}}
     <nav class="bg-[#15140F]/95 backdrop-blur-sm sticky top-0 z-40 border-b border-white/5">
-        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
             <a href="{{ route('home') }}" class="flex items-center gap-2.5">
                 <span style="display:inline-block;width:26px;height:26px;background:var(--evt-accent);border-radius:5px;text-align:center;line-height:26px;font-weight:700;font-size:13px;color:#FAFAF7;font-family:Arial,sans-serif;">M</span>
                 <span class="text-[#FAFAF7] font-semibold text-[14px]">MyPiggyBox</span>
@@ -71,69 +124,88 @@
     </nav>
 
     {{-- Hero --}}
-    <div class="relative overflow-hidden" style="min-height: 340px;">
-        @if($coverUrl)
-            <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('{{ $coverUrl }}');"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10"></div>
-        @else
-            <div class="absolute inset-0" style="background: linear-gradient(135deg, {{ $accent }} 0%, {{ $accentDark }} 100%);"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-        @endif
+    <div class="evt-hero">
+        <div class="max-w-6xl mx-auto px-4 py-8 sm:py-10">
+            <div class="evt-hero-grid">
+                <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-2 mb-5">
+                        @if($eventBox->status->value === 'active' && $eventBox->event_date->isFuture())
+                            <span class="evt-badge inline-flex items-center gap-1.5 text-[11.5px] font-semibold px-2.5 py-1 rounded-full">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>On Sale
+                            </span>
+                        @elseif($eventBox->isSoldOut())
+                            <span class="inline-flex items-center gap-1.5 text-[11.5px] font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Sold Out
+                            </span>
+                        @elseif($eventBox->status->value === 'ended')
+                            <span class="inline-flex items-center gap-1.5 text-[11.5px] font-semibold px-2.5 py-1 rounded-full bg-[#ECEAE3] text-[#6B6862] border border-[#D9D6CE]">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#9C998F]"></span>Ended
+                            </span>
+                        @endif
 
-        <div class="relative z-10 max-w-5xl mx-auto px-4 pt-12 pb-10 flex flex-col justify-end" style="min-height: 340px;">
-            {{-- Status + date badges --}}
-            <div class="flex flex-wrap items-center gap-2 mb-4">
-                @if($eventBox->status->value === 'active' && $eventBox->event_date->isFuture())
-                    <span class="inline-flex items-center gap-1.5 text-[11.5px] font-semibold px-2.5 py-1 rounded-full bg-white/15 text-white border border-white/25 backdrop-blur-sm">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>On Sale
-                    </span>
-                @elseif($eventBox->isSoldOut())
-                    <span class="inline-flex items-center gap-1.5 text-[11.5px] font-semibold px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-200 border border-amber-400/30">
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>Sold Out
-                    </span>
-                @elseif($eventBox->status->value === 'ended')
-                    <span class="inline-flex items-center gap-1.5 text-[11.5px] font-semibold px-2.5 py-1 rounded-full bg-white/10 text-white/60 border border-white/15">
-                        <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>Ended
-                    </span>
-                @endif
+                        @if($eventBox->organizer_name)
+                            <span class="inline-flex items-center gap-1.5 text-[11.5px] font-medium px-2.5 py-1 rounded-full bg-white text-[#6B6862] border border-[#E6E3DC]">
+                                Organized by <span class="text-[#15140F] font-semibold">{{ $eventBox->organizer_name }}</span>
+                            </span>
+                        @endif
+                    </div>
 
-                <span class="inline-flex items-center gap-1.5 text-[11.5px] font-medium px-2.5 py-1 rounded-full bg-white/10 text-white/80 border border-white/15 backdrop-blur-sm">
-                    <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
-                    {{ $eventBox->event_date->format('D, M j, Y · g:ia') }}
-                </span>
+                    <h1 style="font-family: Georgia,'Times New Roman',serif; font-size: clamp(2.25rem, 7vw, 4.75rem); font-weight: 400; color: #15140F; letter-spacing: 0; line-height: 0.98; margin: 0 0 16px;">
+                        {{ $eventBox->title }}
+                    </h1>
 
-                @if($eventBox->venue)
-                    <span class="inline-flex items-center gap-1.5 text-[11.5px] font-medium px-2.5 py-1 rounded-full bg-white/10 text-white/80 border border-white/15 backdrop-blur-sm">
-                        <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="3"/><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                        {{ $eventBox->venue }}
-                    </span>
-                @endif
-            </div>
+                    @if($eventBox->tagline)
+                        <p style="font-size: clamp(1rem, 2vw, 1.2rem); color: #6B6862; margin: 0 0 24px; line-height: 1.55; max-width: 620px;">
+                            {{ $eventBox->tagline }}
+                        </p>
+                    @elseif($eventBox->description)
+                        <p style="font-size: clamp(1rem, 2vw, 1.2rem); color: #6B6862; margin: 0 0 24px; line-height: 1.55; max-width: 620px;">
+                            {{ Str::limit($eventBox->description, 170) }}
+                        </p>
+                    @endif
 
-            {{-- Title --}}
-            <h1 style="font-family: Georgia,'Times New Roman',serif; font-size: clamp(1.75rem, 5vw, 3rem); font-weight: 400; color: #fff; letter-spacing: -0.02em; line-height: 1.15; margin: 0 0 10px; text-shadow: 0 2px 12px rgba(0,0,0,.3);">
-                {{ $eventBox->title }}
-            </h1>
+                    <div class="grid sm:grid-cols-2 gap-3 max-w-[680px]">
+                        <div class="bg-white border border-[#E6E3DC] rounded-[12px] p-4">
+                            <div class="flex items-start gap-3">
+                                <div class="w-9 h-9 rounded-[9px] flex items-center justify-center flex-none" style="background: rgba(var(--evt-accent-rgb), 0.10);">
+                                    <svg viewBox="0 0 24 24" class="w-4 h-4" style="color: var(--evt-accent);" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+                                </div>
+                                <div>
+                                    <div class="text-[13px] font-semibold text-[#15140F]">{{ $eventBox->event_date->format('D, M j, Y') }}</div>
+                                    <div class="text-[12.5px] text-[#6B6862]">{{ $eventBox->event_date->format('g:ia') }}</div>
+                                </div>
+                            </div>
+                        </div>
 
-            {{-- Tagline --}}
-            @if($eventBox->tagline)
-                <p style="font-size: 1.05rem; color: rgba(255,255,255,0.80); margin: 0 0 12px; line-height: 1.5; max-width: 600px; text-shadow: 0 1px 6px rgba(0,0,0,.25);">
-                    {{ $eventBox->tagline }}
-                </p>
-            @endif
-
-            {{-- Organizer --}}
-            @if($eventBox->organizer_name)
-                <div class="flex items-center gap-2 text-white/65 text-[13px]">
-                    <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 flex-none" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-                    Organized by <span class="text-white/90 font-medium">{{ $eventBox->organizer_name }}</span>
+                        @if($eventBox->venue)
+                            <div class="bg-white border border-[#E6E3DC] rounded-[12px] p-4">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-9 h-9 rounded-[9px] flex items-center justify-center flex-none" style="background: rgba(var(--evt-accent-rgb), 0.10);">
+                                        <svg viewBox="0 0 24 24" class="w-4 h-4" style="color: var(--evt-accent);" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="3"/><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <div class="text-[13px] font-semibold text-[#15140F] break-words">{{ $eventBox->venue }}</div>
+                                        <div class="text-[12.5px] text-[#6B6862]">Venue</div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
                 </div>
-            @endif
+
+                <div class="evt-cover-frame">
+                    @if($coverUrl)
+                        <img src="{{ $coverUrl }}" alt="{{ $eventBox->title }} cover image">
+                    @else
+                        <div class="evt-cover-placeholder">{{ substr($eventBox->title, 0, 1) }}</div>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
 
     {{-- Flash messages --}}
-    <div class="max-w-5xl mx-auto px-4 pt-5">
+    <div class="max-w-6xl mx-auto px-4 pt-5">
         @if(session('error'))
             <div class="mb-4 flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 text-[13px] px-4 py-3 rounded-[8px]">
                 <svg viewBox="0 0 24 24" class="w-4 h-4 flex-none" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
@@ -149,7 +221,7 @@
     </div>
 
     {{-- Body --}}
-    <div class="max-w-5xl mx-auto px-4 py-6 pb-16">
+    <div class="max-w-6xl mx-auto px-4 py-6 pb-16">
         <div class="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 items-start">
 
             {{-- Left: About + details --}}
@@ -191,7 +263,7 @@
                                         @click="open = 0"
                                         class="rounded-[8px] overflow-hidden bg-[#F3F1EB] hover:opacity-95 transition-opacity focus:outline-none"
                                         style="grid-row: span 2; aspect-ratio: 1;">
-                                        <img src="{{ $first['url'] }}" alt="" class="w-full h-full object-cover">
+                                        <img src="{{ $first['url'] }}" alt="" class="w-full h-full object-contain">
                                     </button>
 
                                     {{-- Next 4 in 2×2 --}}
@@ -200,7 +272,7 @@
                                             @click="open = {{ $idx + 1 }}"
                                             class="relative rounded-[8px] overflow-hidden bg-[#F3F1EB] hover:opacity-95 transition-opacity focus:outline-none"
                                             style="aspect-ratio: 1;">
-                                            <img src="{{ $item['url'] }}" alt="" class="w-full h-full object-cover">
+                                            <img src="{{ $item['url'] }}" alt="" class="w-full h-full object-contain">
                                             @if($hasMore && $idx === 3)
                                                 <div class="absolute inset-0 bg-black/55 flex items-center justify-center">
                                                     <span class="text-white font-semibold text-[15px]">+{{ $extra + 1 }}</span>
@@ -255,7 +327,7 @@
                                             class="flex-none w-12 h-12 rounded-[5px] overflow-hidden transition-all"
                                             :class="open === {{ $idx }} ? 'ring-2 opacity-100' : 'opacity-45 hover:opacity-70'"
                                             :style="open === {{ $idx }} ? 'ring-color: var(--evt-accent)' : ''">
-                                            <img src="{{ $item['url'] }}" alt="" class="w-full h-full object-cover">
+                                            <img src="{{ $item['url'] }}" alt="" class="w-full h-full object-contain">
                                         </button>
                                     @endforeach
                                 </div>
