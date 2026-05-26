@@ -457,6 +457,43 @@ html.dark [data-flux-modal] {
     color: var(--color-sand-700) !important;
 }
 
+html.dark [data-flux-menu] *,
+html.dark [data-flux-menu] a,
+html.dark [data-flux-menu] button,
+html.dark [data-flux-menu] [role="menuitem"],
+html.dark [data-flux-menu] [data-flux-menu-item] {
+    color: var(--color-sand-700) !important;
+    -webkit-text-fill-color: var(--color-sand-700);
+}
+
+html.dark [data-flux-menu] svg {
+    color: var(--color-sand-600) !important;
+    stroke: currentColor;
+    -webkit-text-fill-color: initial;
+}
+
+html.dark [data-flux-menu] [data-flux-menu-separator],
+html.dark [data-flux-menu] hr {
+    background-color: var(--color-sand-300) !important;
+    border-color: var(--color-sand-300) !important;
+}
+
+html.dark [data-flux-menu] a:hover,
+html.dark [data-flux-menu] button:hover,
+html.dark [data-flux-menu] [role="menuitem"]:hover,
+html.dark [data-flux-menu] [data-flux-menu-item]:hover {
+    background-color: #FBFAF6 !important;
+    color: var(--color-sand-700) !important;
+    -webkit-text-fill-color: var(--color-sand-700);
+}
+
+html.dark [data-flux-menu] [data-active],
+html.dark [data-flux-menu] [aria-current="page"] {
+    background-color: var(--color-primary-50) !important;
+    color: var(--color-primary-700) !important;
+    -webkit-text-fill-color: var(--color-primary-700);
+}
+
 html.dark .card-head,
 html.dark .data-table th,
 html.dark .data-table td {
