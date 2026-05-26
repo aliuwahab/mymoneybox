@@ -1,2 +1,10 @@
-// Alpine and Flux are managed by Livewire (inject_assets) and @fluxScripts respectively.
-// Do not import or start Alpine here — it causes duplicate instances.
+import Alpine from 'alpinejs';
+
+if (!window.Alpine) {
+    window.Alpine = Alpine;
+}
+
+if (!window.Alpine.__mpbStarted) {
+    window.Alpine.__mpbStarted = true;
+    window.Alpine.start();
+}
