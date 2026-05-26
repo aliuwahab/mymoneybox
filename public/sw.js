@@ -1,4 +1,4 @@
-const CACHE = 'mpb-v2';
+const CACHE = 'mpb-v3';
 
 // ── Install: pre-cache the offline fallback ───────────────────────────────────
 self.addEventListener('install', (event) => {
@@ -35,7 +35,8 @@ self.addEventListener('fetch', (event) => {
                 if (hit) return hit;
                 return fetch(req).then((res) => {
                     if (res.ok) {
-                        caches.open(CACHE).then((c) => c.put(req, res.clone()));
+                        const clone = res.clone();
+                        caches.open(CACHE).then((c) => c.put(req, clone));
                     }
                     return res;
                 });

@@ -277,6 +277,8 @@
 
         {{ $slot }}
 
+        @fluxScripts
+
         <script>
             const SwalTheme = Swal.mixin({
                 customClass: {
