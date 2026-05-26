@@ -78,3 +78,12 @@ it('shows event revenue, fee, and organizer payout reporting', function () {
         ->assertSee('Organizer payout')
         ->assertSee('GH₵ 22.50');
 });
+
+it('loads Alpine support on the public event ticket page', function () {
+    ['eventBox' => $eventBox] = createEventBoxTicketValidationFixture();
+
+    $this->get(route('events.show', $eventBox->slug))
+        ->assertOk()
+        ->assertSee('x-data="ticketPanel()"', false)
+        ->assertSee('flux.min.js', false);
+});

@@ -548,6 +548,7 @@
             };
         }
     </script>
+    @fluxScripts
 
 </body>
 </html>
