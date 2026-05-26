@@ -81,7 +81,7 @@
             async redeemTicket(ticketId) {
                 this.redeemLoading = true;
                 try {
-                    const resp = await fetch(`/events/{{ $eventBox->id }}/tickets/${ticketId}/redeem`, {
+                    const resp = await fetch(`/events/{{ $eventBox->slug }}/tickets/${ticketId}/redeem`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -103,7 +103,7 @@
             async voidTicket(ticketId) {
                 if (!confirm('Void this ticket? It will be marked refunded and can no longer be used.')) return;
                 try {
-                    const resp = await fetch(`/events/{{ $eventBox->id }}/tickets/${ticketId}/void`, {
+                    const resp = await fetch(`/events/{{ $eventBox->slug }}/tickets/${ticketId}/void`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
