@@ -28,6 +28,7 @@ return [
         'merchant_external_id' => env('TRENDIPAY_MERCHANT_EXTERNAL_ID'),
         'checkout_terminal_id' => env('TRENDIPAY_CHECKOUT_TERMINAL_ID'),
         'api_terminal_id' => env('TRENDIPAY_API_TERMINAL_ID'),
+        'webhook_secret' => env('TRENDIPAY_WEBHOOK_SECRET'),
         'checkout_base_url' => env('TRENDIPAY_CHECKOUT_BASE_URL', 'https://test-api.bsl.com.gh'),
         'api_base_url' => env('TRENDIPAY_API_BASE_URL', 'https://test-api.bsl.com.gh'),
     ],

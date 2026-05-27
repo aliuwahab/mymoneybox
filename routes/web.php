@@ -84,6 +84,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Contributors & Analytics
     Route::get('/contributors', [MoneyBoxController::class, 'contributors'])->name('contributors.index');
+    Route::get('/contributors/export', [MoneyBoxController::class, 'exportAllContributions'])->name('contributors.export');
     Route::get('/analytics', [MoneyBoxController::class, 'analytics'])->name('analytics.index');
 
     // User Withdrawal History
@@ -97,6 +98,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Additional Piggy Box Routes
     Route::get('/money-boxes/{moneyBox}/statistics', [MoneyBoxController::class, 'statistics'])
         ->name('money-boxes.statistics');
+    Route::get('/money-boxes/{moneyBox}/contributions/export', [MoneyBoxController::class, 'exportContributions'])
+        ->name('money-boxes.contributions.export');
+    Route::post('/money-boxes/{moneyBox}/contributions/{contribution}/verify', [MoneyBoxController::class, 'verifyContribution'])
+        ->name('money-boxes.contributions.verify');
+    Route::post('/money-boxes/{moneyBox}/contributions/{contribution}/resend-receipt', [MoneyBoxController::class, 'resendContributionReceipt'])
+        ->name('money-boxes.contributions.resend-receipt');
     Route::get('/money-boxes/{moneyBox}/share', [MoneyBoxController::class, 'share'])
         ->name('money-boxes.share');
     Route::post('/money-boxes/{moneyBox}/generate-qr', [MoneyBoxController::class, 'generateQrCode'])

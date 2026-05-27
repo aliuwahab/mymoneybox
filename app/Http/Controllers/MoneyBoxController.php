@@ -3,9 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Actions\CreateMoneyBoxAction;
+use App\Enums\PaymentStatus;
+use App\Events\ContributionProcessed;
+use App\Mail\ContributionThankYouMail;
 use App\Models\Category;
+use App\Models\Contribution;
 use App\Models\MoneyBox;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class MoneyBoxController extends Controller
 {
@@ -43,6 +50,7 @@ class MoneyBoxController extends Controller
     public function create()
     {
         $categories = Category::active()->ordered()->get();
+
         return view('money-boxes.create-steps', compact('categories'));
     }
 
@@ -78,7 +86,7 @@ class MoneyBoxController extends Controller
             return response()->json([
                 'success' => true,
                 'id' => $moneyBox->id,
-                'message' => 'PiggyBox created successfully!'
+                'message' => 'PiggyBox created successfully!',
             ]);
         }
 
@@ -97,16 +105,193 @@ class MoneyBoxController extends Controller
         $moneyBox->load([
             'category',
             'contributions' => function ($query) {
-                $query->completed()->recent()->limit(10);
+                $query->recent()->limit(50);
             },
             'withdrawals' => function ($query) {
                 $query->with(['withdrawalAccount', 'processedBy'])
                     ->latest()
                     ->limit(10);
-            }
+            },
         ]);
 
         return view('money-boxes.show', compact('moneyBox'));
+    }
+
+    public function exportContributions(MoneyBox $moneyBox)
+    {
+        $this->authorize('view', $moneyBox);
+
+        $filename = Str::slug($moneyBox->title).'-contributions-'.now()->format('Ymd-His').'.csv';
+
+        return $this->streamContributionCsv($moneyBox->contributions(), $filename);
+    }
+
+    public function exportAllContributions()
+    {
+        $boxIds = auth()->user()->moneyBoxes()->pluck('id');
+        $filename = 'piggybox-contributions-'.now()->format('Ymd-His').'.csv';
+
+        return $this->streamContributionCsv(
+            Contribution::query()->whereIn('money_box_id', $boxIds)->with('moneyBox'),
+            $filename,
+            includeBox: true,
+        );
+    }
+
+    private function streamContributionCsv($query, string $filename, bool $includeBox = false)
+    {
+        return response()->streamDownload(function () use ($query, $includeBox) {
+            $handle = fopen('php://output', 'w');
+
+            $headings = [
+                'Contributor name',
+                'Contributor email',
+                'Contributor phone',
+            ];
+
+            if ($includeBox) {
+                $headings[] = 'PiggyBox';
+            }
+
+            fputcsv($handle, array_merge($headings, [
+                'Amount',
+                'Currency',
+                'Status',
+                'Payment method',
+                'Payment reference',
+                'Transaction RRN',
+                'Message',
+                'Anonymous',
+                'Webhook attempts',
+                'Last webhook at',
+                'Last webhook status',
+                'Last signature valid',
+                'Receipt sent at',
+                'Receipt resent at',
+                'Created at',
+            ]), ',', '"', '\\', "\n");
+
+            $query
+                ->reorder()
+                ->chunkById(500, function ($contributions) use ($handle, $includeBox) {
+                    foreach ($contributions as $contribution) {
+                        $row = [
+                            $contribution->getDisplayName(),
+                            $contribution->contributor_email,
+                            $contribution->contributor_phone,
+                        ];
+
+                        if ($includeBox) {
+                            $row[] = $contribution->moneyBox?->title;
+                        }
+
+                        fputcsv($handle, array_merge($row, [
+                            (float) $contribution->amount,
+                            $contribution->currency_code,
+                            $contribution->payment_status->value,
+                            $contribution->payment_method,
+                            $contribution->payment_reference,
+                            $contribution->transaction_rrn,
+                            $contribution->message,
+                            $contribution->is_anonymous ? 'yes' : 'no',
+                            $contribution->webhook_attempts,
+                            $contribution->webhook_last_received_at?->toDateTimeString(),
+                            $contribution->webhook_last_status,
+                            is_bool($contribution->webhook_last_signature_valid) ? ($contribution->webhook_last_signature_valid ? 'yes' : 'no') : '',
+                            $contribution->receipt_sent_at?->toDateTimeString(),
+                            $contribution->receipt_resent_at?->toDateTimeString(),
+                            $contribution->created_at?->toDateTimeString(),
+                        ]), ',', '"', '\\', "\n");
+                    }
+                });
+
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    public function verifyContribution(MoneyBox $moneyBox, Contribution $contribution)
+    {
+        $this->authorize('view', $moneyBox);
+        abort_if($contribution->money_box_id !== $moneyBox->id, 404);
+
+        if ($contribution->payment_status === PaymentStatus::Completed) {
+            return back()->with('success', 'Contribution is already completed.');
+        }
+
+        $verification = app(\App\Payment\PaymentManager::class)->verifyPayment($contribution->payment_reference);
+        $previousStatus = $contribution->payment_status;
+        $paymentStatus = match ($verification['status'] ?? 'failed') {
+            'completed' => PaymentStatus::Completed,
+            'pending' => PaymentStatus::Pending,
+            default => PaymentStatus::Failed,
+        };
+
+        $amountMatches = $contribution->matchesPaidAmount($verification['amount'] ?? null);
+
+        if ($paymentStatus === PaymentStatus::Completed && ! $amountMatches) {
+            Log::warning('Contribution recovery amount mismatch', [
+                'contribution_id' => $contribution->id,
+                'reference' => $contribution->payment_reference,
+                'expected_amount' => (float) $contribution->amount,
+                'verified_amount' => (float) $verification['amount'],
+            ]);
+
+            $paymentStatus = PaymentStatus::Failed;
+        }
+
+        $contribution->update([
+            'payment_status' => $paymentStatus,
+            'transaction_rrn' => $verification['transaction_rrn'] ?? $contribution->transaction_rrn,
+            'payment_metadata' => array_merge($contribution->payment_metadata ?? [], [
+                'manual_verification' => [
+                    'at' => now()->toDateTimeString(),
+                    'status' => $verification['status'] ?? null,
+                    'success' => $verification['success'] ?? null,
+                    'message' => $verification['message'] ?? null,
+                    'raw_data' => $verification['raw_data'] ?? null,
+                    'amount_mismatch' => ! $amountMatches,
+                ],
+            ]),
+        ]);
+
+        if ($previousStatus !== PaymentStatus::Completed && $paymentStatus === PaymentStatus::Completed) {
+            app(\App\Actions\UpdateMoneyBoxStatsAction::class)->execute($moneyBox, $contribution->fresh());
+            event(new ContributionProcessed($contribution->fresh(), $moneyBox));
+        }
+
+        return back()->with(
+            $paymentStatus === PaymentStatus::Completed ? 'success' : 'error',
+            $paymentStatus === PaymentStatus::Completed
+                ? 'Contribution verified and marked completed.'
+                : 'Contribution is still not completed.'
+        );
+    }
+
+    public function resendContributionReceipt(MoneyBox $moneyBox, Contribution $contribution)
+    {
+        $this->authorize('view', $moneyBox);
+        abort_if($contribution->money_box_id !== $moneyBox->id, 404);
+
+        if ($contribution->payment_status !== PaymentStatus::Completed) {
+            return back()->with('error', 'Receipts can only be sent for completed contributions.');
+        }
+
+        if (! $contribution->contributor_email || $contribution->contributor_email === 'noreply@mypiggybox.com') {
+            return back()->with('error', 'This contribution does not have a donor email.');
+        }
+
+        Mail::to($contribution->contributor_email)
+            ->send(new ContributionThankYouMail($contribution, $moneyBox));
+
+        $contribution->forceFill([
+            'receipt_sent_at' => $contribution->receipt_sent_at ?? now(),
+            'receipt_resent_at' => now(),
+            'receipt_resend_count' => $contribution->receipt_resend_count + 1,
+        ])->save();
+
+        return back()->with('success', 'Receipt resent to donor.');
     }
 
     /**
@@ -117,6 +302,7 @@ class MoneyBoxController extends Controller
         $this->authorize('update', $moneyBox);
 
         $categories = Category::active()->ordered()->get();
+
         return view('money-boxes.edit', compact('moneyBox', 'categories'));
     }
 
@@ -151,7 +337,7 @@ class MoneyBoxController extends Controller
 
         // Update only non-media fields
         $isOngoing = $validated['is_ongoing'] ?? false;
-        
+
         $moneyBox->update([
             'title' => $validated['title'],
             'description' => $validated['description'] ?? null,
@@ -351,14 +537,14 @@ class MoneyBoxController extends Controller
         $this->authorize('view', $moneyBox);
 
         // Generate QR code if it doesn't exist
-        if (!$moneyBox->hasQrCode()) {
+        if (! $moneyBox->hasQrCode()) {
             $generateQRCodeAction = app(\App\Actions\GenerateQRCodeAction::class);
             $generateQRCodeAction->execute($moneyBox);
         }
 
         $media = $moneyBox->getFirstMedia('qr_code');
-        
-        if (!$media) {
+
+        if (! $media) {
             return redirect()->back()->with('error', 'QR Code not found.');
         }
 
@@ -367,9 +553,10 @@ class MoneyBoxController extends Controller
         // For S3/remote files, stream the content
         if ($media->getDiskDriverName() === 's3') {
             $contents = \Storage::disk($media->disk)->get($media->getPath());
+
             return response($contents, 200)
                 ->header('Content-Type', 'image/png')
-                ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+                ->header('Content-Disposition', 'attachment; filename="'.$filename.'"');
         }
 
         // For local files, use regular download
@@ -407,7 +594,7 @@ class MoneyBoxController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Images uploaded successfully!'
+                'message' => 'Images uploaded successfully!',
             ]);
         } catch (\Exception $e) {
             \Log::error('Media upload error', [
@@ -417,10 +604,10 @@ class MoneyBoxController extends Controller
                 'has_main_image' => $request->hasFile('main_image'),
                 'has_gallery' => $request->hasFile('gallery'),
             ]);
-            
+
             return response()->json([
                 'success' => false,
-                'message' => 'Error uploading images: ' . $e->getMessage()
+                'message' => 'Error uploading images: '.$e->getMessage(),
             ], 500);
         }
     }
