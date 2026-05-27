@@ -41,6 +41,7 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $input['password'],
             'country_id' => $ghanaCountryId,
             'piggy_code' => User::generateUniquePiggyCode(),
+            'ip_address' => request()->ip(),
         ]);
 
         // Auto-create personal piggy box for the new user

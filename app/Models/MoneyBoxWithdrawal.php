@@ -134,6 +134,16 @@ class MoneyBoxWithdrawal extends Model
         return $this->moneyBox->formatAmount($this->net_amount);
     }
 
+    public function getFormattedNetAmount(): string
+    {
+        return $this->formatNetAmount();
+    }
+
+    public function getFormattedAmount(): string
+    {
+        return $this->formatAmount();
+    }
+
     public function formatFee(): string
     {
         return $this->moneyBox->formatAmount($this->fee);
@@ -142,6 +152,6 @@ class MoneyBoxWithdrawal extends Model
     // Generate unique reference
     public static function generateReference(): string
     {
-        return 'MB-WD-' . strtoupper(uniqid());
+        return 'MB-WD-'.strtoupper(uniqid());
     }
 }

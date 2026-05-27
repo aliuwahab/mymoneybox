@@ -11,7 +11,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Artisan::command('mail:test {email}', function (string $email) {
-    $mailId = 'mpb-' . Str::lower(Str::random(10));
+    $mailId = 'mpb-'.Str::lower(Str::random(10));
     $mailer = config('mail.default');
     $from = config('mail.from.address');
     $host = config("mail.mailers.{$mailer}.host", 'n/a');
@@ -26,7 +26,7 @@ Artisan::command('mail:test {email}', function (string $email) {
     $this->line("Queue connection: {$queue}");
 
     Mail::raw(
-        "This is a MyPiggyBox production email test.\n\nTest ID: {$mailId}\nSent at: " . now()->toIso8601String(),
+        "This is a MyPiggyBox production email test.\n\nTest ID: {$mailId}\nSent at: ".now()->toIso8601String(),
         function (Message $message) use ($email, $from, $mailId) {
             $message->to($email)
                 ->from($from, config('mail.from.name'))
@@ -40,8 +40,8 @@ Artisan::command('mail:test {email}', function (string $email) {
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schedule;
 
-Schedule::call(fn() => Log::info('Scheduler: heartbeat', ['at' => now()->toDateTimeString()]))->everyMinute();
+Schedule::call(fn () => Log::info('Scheduler: heartbeat', ['at' => now()->toDateTimeString()]))->everyMinute();
 
 Schedule::command('app:send-marketing-emails')->dailyAt('08:00');
 Schedule::command('tickets:recover')->everyFiveMinutes();
-
+Schedule::command('events:process-ticket-refunds')->cron('0 2 */2 * *')->withoutOverlapping();

@@ -27,7 +27,7 @@ Route::get('/embed/box/{slug}', [PublicBoxController::class, 'embed'])
     ->withoutMiddleware(\Illuminate\Http\Middleware\FrameGuard::class);
 
 // PWA offline fallback
-Route::get('/offline', fn() => response()->view('offline')->header('Cache-Control', 'no-store'))->name('offline');
+Route::get('/offline', fn () => response()->view('offline')->header('Cache-Control', 'no-store'))->name('offline');
 
 // Static Pages
 Route::view('/about', 'pages.about')->name('about');
@@ -75,6 +75,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/my-events', [EventBoxController::class, 'index'])->name('events.index');
     Route::resource('events', EventBoxController::class)->parameters(['events' => 'eventBox'])->except(['show', 'index']);
     Route::get('/events/{eventBox}/dashboard', [EventBoxController::class, 'eventDashboard'])->name('events.dashboard');
+    Route::get('/events/{eventBox}/attendees/export', [EventBoxController::class, 'exportAttendees'])->name('events.attendees.export');
     Route::post('/events/{eventBox}/status', [EventBoxController::class, 'updateStatus'])->name('events.status');
     Route::post('/events/{eventBox}/tickets/validate', [EventBoxValidationController::class, 'validate'])->name('events.tickets.validate');
     Route::post('/events/{eventBox}/tickets/{ticket}/redeem', [EventBoxValidationController::class, 'redeem'])->name('events.tickets.redeem');
