@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\CreateEventBoxTicketRefundAction;
 use App\Enums\PaymentStatus;
 use App\Enums\TicketStatus;
+use App\Events\TicketIssued;
 use App\Models\EventBox;
 use App\Models\EventBoxTicket;
 use Illuminate\Http\JsonResponse;
@@ -147,5 +148,30 @@ class EventBoxValidationController extends Controller
             'status' => 'redeemed',
             'message' => 'Ticket redeemed successfully',
         ]);
+    }
+
+    /**
+     * Resend the ticket confirmation email (owner only).
+     */
+    public function resendEmail(Request $request, EventBox $eventBox, EventBoxTicket $ticket): JsonResponse
+    {
+        abort_if(auth()->id() !== $eventBox->user_id, 403);
+
+        if ($ticket->event_box_id !== $eventBox->id) {
+            return response()->json(['status' => 'error', 'message' => 'Ticket does not belong to this event.'], 422);
+        }
+
+        if ($ticket->payment_status !== PaymentStatus::Completed || ! $ticket->code) {
+            return response()->json(['status' => 'error', 'message' => 'Only paid tickets with a code can have their email resent.'], 422);
+        }
+
+        $ticket->update([
+            'ticket_email_sending_at' => null,
+            'ticket_email_sent_at'    => null,
+        ]);
+
+        event(new TicketIssued($ticket->fresh(['eventBox'])));
+
+        return response()->json(['status' => 'success', 'message' => 'Ticket email queued for resend.']);
     }
 }

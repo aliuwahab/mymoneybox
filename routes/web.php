@@ -80,6 +80,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/events/{eventBox}/tickets/validate', [EventBoxValidationController::class, 'validate'])->name('events.tickets.validate');
     Route::post('/events/{eventBox}/tickets/{ticket}/redeem', [EventBoxValidationController::class, 'redeem'])->name('events.tickets.redeem');
     Route::post('/events/{eventBox}/tickets/{ticket}/void', [EventBoxValidationController::class, 'void'])->name('events.tickets.void');
+    Route::post('/events/{eventBox}/tickets/{ticket}/resend-email', [EventBoxValidationController::class, 'resendEmail'])->name('events.tickets.resend-email');
     Route::delete('/events/{eventBox}/gallery/{mediaId}', [EventBoxController::class, 'removeGalleryImage'])->name('events.gallery.remove');
 
     // Contributors & Analytics

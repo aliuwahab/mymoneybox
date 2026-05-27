@@ -7,6 +7,7 @@ use App\Filament\Resources\EventBoxes\EventBoxResource;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Support\Facades\Auth;
 
 class ViewEventBox extends ViewRecord
 {
@@ -50,6 +51,13 @@ class ViewEventBox extends ViewRecord
                     Notification::make()->warning()->title('EventBox cancelled')->send();
                 })
                 ->visible(fn () => !in_array($this->record->status, [EventBoxStatus::Cancelled, EventBoxStatus::Ended]) && !$this->record->trashed()),
+
+            Action::make('exportAttendees')
+                ->label('Export check-in list')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('gray')
+                ->url(fn () => route('events.attendees.export', $this->record))
+                ->openUrlInNewTab(),
         ];
     }
 }

@@ -2,10 +2,14 @@
 
 namespace App\Filament\Resources\EventBoxes\RelationManagers;
 
+use App\Actions\VerifyEventTicketPaymentAction;
 use App\Enums\PaymentStatus;
 use App\Enums\TicketStatus;
+use App\Events\TicketIssued;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -82,6 +86,46 @@ class TicketsRelationManager extends RelationManager
                         'redeemed' => 'Redeemed',
                         'voided'   => 'Voided',
                     ]),
+            ])
+            ->recordActions([
+                Action::make('verifyPayment')
+                    ->label('Verify payment')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('primary')
+                    ->requiresConfirmation()
+                    ->modalHeading('Verify Ticket Payment')
+                    ->modalDescription('Checks the payment provider and completes the ticket(s) if the payment is confirmed. Group purchases are completed together.')
+                    ->action(function ($record, VerifyEventTicketPaymentAction $action) {
+                        $result = $action->execute($record);
+
+                        if ($result['success'] && $result['completed'] > 0) {
+                            Notification::make()->success()->title($result['message'])->send();
+                        } elseif ($result['success']) {
+                            Notification::make()->info()->title($result['message'])->send();
+                        } else {
+                            Notification::make()->warning()->title($result['message'])->send();
+                        }
+                    })
+                    ->visible(fn ($record) => $record->payment_status === PaymentStatus::Pending),
+
+                Action::make('resendEmail')
+                    ->label('Resend ticket email')
+                    ->icon('heroicon-o-envelope')
+                    ->color('gray')
+                    ->requiresConfirmation()
+                    ->modalHeading('Resend Ticket Email')
+                    ->modalDescription('This will queue the ticket email to be sent again to the buyer\'s email address.')
+                    ->action(function ($record) {
+                        $record->update([
+                            'ticket_email_sending_at' => null,
+                            'ticket_email_sent_at'    => null,
+                        ]);
+
+                        event(new TicketIssued($record->fresh(['eventBox'])));
+
+                        Notification::make()->success()->title('Ticket email queued for resend')->send();
+                    })
+                    ->visible(fn ($record) => $record->payment_status === PaymentStatus::Completed && $record->code !== null),
             ]);
     }
 }
