@@ -67,27 +67,6 @@ class PiggyWebhookController extends Controller
                 default => PaymentStatus::Pending,
             };
 
-            if (in_array($paymentStatus, [PaymentStatus::Completed, PaymentStatus::Failed], true)) {
-                $webhookData = $this->withVerifiedCollectionTransaction($webhookData);
-
-                if (($webhookData['provider_verified'] ?? true) === false) {
-                    $donation->forceFill([
-                        'transaction_rrn' => $webhookData['transaction_rrn'] ?? $donation->transaction_rrn,
-                        'payment_metadata' => array_merge($donation->payment_metadata ?? [], [
-                            'webhook' => $webhookData['raw_data'] ?? [],
-                        ]),
-                    ])->save();
-
-                    return response()->json(['status' => 'pending', 'message' => 'Payment verification pending'], 202);
-                }
-
-                $paymentStatus = match ($webhookData['status']) {
-                    'completed' => PaymentStatus::Completed,
-                    'failed' => PaymentStatus::Failed,
-                    default => PaymentStatus::Pending,
-                };
-            }
-
             if ($paymentStatus === PaymentStatus::Completed) {
                 $donation = $this->completeDonation->execute($donation, $webhookData, 'webhook');
                 $paymentStatus = $donation->payment_status;
@@ -125,53 +104,6 @@ class PiggyWebhookController extends Controller
                 'message' => 'Internal error processing webhook',
             ], 500);
         }
-    }
-
-    private function withVerifiedCollectionTransaction(array $webhookData): array
-    {
-        $verification = $this->trendiPayProvider->verifyCollectionTransaction(
-            (string) ($webhookData['transaction_rrn'] ?? ''),
-            $webhookData['reference'] ?? null,
-        );
-
-        $rawData = array_merge($webhookData['raw_data'] ?? [], [
-            'provider_verification' => $verification['raw_data'] ?? $verification,
-            'provider_verified' => $verification['verified'] ?? false,
-            'provider_verified_at' => now()->toDateTimeString(),
-        ]);
-
-        if (($verification['verified'] ?? false) !== true) {
-            Log::warning('TrendiPay Piggy Webhook: provider verification failed', [
-                'reference' => $webhookData['reference'] ?? null,
-                'rrn' => $webhookData['transaction_rrn'] ?? null,
-                'message' => $verification['message'] ?? null,
-            ]);
-
-            return array_merge($webhookData, [
-                'success' => false,
-                'status' => 'pending',
-                'provider_verified' => false,
-                'provider_verification' => $verification,
-                'raw_data' => $rawData,
-            ]);
-        }
-
-        return array_merge($webhookData, [
-            'success' => $verification['success'] ?? false,
-            'status' => $verification['status'] ?? 'pending',
-            'amount' => $verification['amount'] ?? $webhookData['amount'] ?? 0,
-            'reference' => $verification['reference'] ?? $webhookData['reference'] ?? null,
-            'transaction_rrn' => $verification['transaction_rrn'] ?? $webhookData['transaction_rrn'] ?? null,
-            'transaction_id' => $verification['transaction_id'] ?? $webhookData['transaction_id'] ?? null,
-            'external_id' => $verification['external_id'] ?? $webhookData['external_id'] ?? null,
-            'account_number' => $verification['account_number'] ?? $webhookData['account_number'] ?? null,
-            'payment_method' => $verification['payment_method'] ?? $webhookData['payment_method'] ?? null,
-            'response_code' => $verification['response_code'] ?? $webhookData['response_code'] ?? null,
-            'reason' => $verification['reason'] ?? $webhookData['reason'] ?? null,
-            'provider_verified' => true,
-            'provider_verification' => $verification,
-            'raw_data' => $rawData,
-        ]);
     }
 
     /**

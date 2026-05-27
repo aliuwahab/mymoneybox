@@ -151,14 +151,6 @@ class TrendiPayProvider implements PaymentProviderInterface
     public function verifyCollectionTransaction(string $rrn, ?string $expectedReference = null): array
     {
         if (trim($rrn) === '') {
-            if ($expectedReference) {
-                Log::info('TrendiPay [get-transaction] RRN missing, falling back to reference verification', [
-                    'reference' => $expectedReference,
-                ]);
-
-                return $this->verifyCollectionByReference($expectedReference);
-            }
-
             return [
                 'verified' => false,
                 'success' => false,
@@ -306,42 +298,6 @@ class TrendiPayProvider implements PaymentProviderInterface
             'reason' => $data['reason'] ?? null,
             'currency' => 'GHS',
             'paid_at' => now()->toDateTimeString(),
-            'raw_data' => $data,
-        ];
-    }
-
-    private function verifyCollectionByReference(string $reference): array
-    {
-        $result = $this->verifyPayment($reference);
-        $status = $result['status'] ?? 'pending';
-
-        if (! $result['success']) {
-            return [
-                'verified' => false,
-                'success' => false,
-                'status' => $status,
-                'message' => $result['message'] ?? 'Reference-based verification failed.',
-                'raw_data' => $result['raw_data'] ?? [],
-            ];
-        }
-
-        $data = $result['raw_data'] ?? [];
-
-        return [
-            'verified' => true,
-            'success' => true,
-            'status' => $status,
-            'amount' => $result['amount'] ?? 0,
-            'reference' => $result['reference'] ?? $reference,
-            'transaction_rrn' => $result['transaction_rrn'] ?? null,
-            'transaction_id' => $data['internalId'] ?? null,
-            'external_id' => $data['externalId'] ?? null,
-            'account_number' => $data['accountNumber'] ?? null,
-            'payment_method' => $data['rSwitch'] ?? null,
-            'response_code' => $data['responseCode'] ?? $data['code'] ?? null,
-            'reason' => $data['reason'] ?? null,
-            'currency' => 'GHS',
-            'paid_at' => $data['lastUpdated'] ?? $result['paid_at'] ?? now()->toDateTimeString(),
             'raw_data' => $data,
         ];
     }

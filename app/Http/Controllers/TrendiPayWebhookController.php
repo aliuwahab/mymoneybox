@@ -87,17 +87,6 @@ class TrendiPayWebhookController extends Controller
                 return response()->json(['status' => 'success', 'message' => 'Already processed'], 200);
             }
 
-            $webhookData = $this->withVerifiedCollectionTransaction($webhookData);
-
-            if (($webhookData['provider_verified'] ?? true) === false) {
-                $contribution->update([
-                    'transaction_rrn' => $webhookData['transaction_rrn'] ?? $contribution->transaction_rrn,
-                    'payment_metadata' => $webhookData['raw_data'] ?? null,
-                ]);
-
-                return response()->json(['status' => 'pending', 'message' => 'Payment verification pending'], 202);
-            }
-
             $paymentStatus = match ($webhookData['status']) {
                 'completed' => PaymentStatus::Completed,
                 'failed' => PaymentStatus::Failed,
@@ -179,57 +168,6 @@ class TrendiPayWebhookController extends Controller
             'webhook_last_status' => $status,
             'webhook_last_event_hash' => $eventHash,
         ])->save();
-    }
-
-    private function withVerifiedCollectionTransaction(array $webhookData): array
-    {
-        if (! in_array($webhookData['status'] ?? null, ['completed', 'failed'], true)) {
-            return $webhookData + ['provider_verified' => null];
-        }
-
-        $verification = $this->trendiPayProvider->verifyCollectionTransaction(
-            (string) ($webhookData['transaction_rrn'] ?? ''),
-            $webhookData['reference'] ?? null,
-        );
-
-        $rawData = array_merge($webhookData['raw_data'] ?? [], [
-            'provider_verification' => $verification['raw_data'] ?? $verification,
-            'provider_verified' => $verification['verified'] ?? false,
-            'provider_verified_at' => now()->toDateTimeString(),
-        ]);
-
-        if (($verification['verified'] ?? false) !== true) {
-            Log::warning('TrendiPay webhook: provider verification failed', [
-                'reference' => $webhookData['reference'] ?? null,
-                'rrn' => $webhookData['transaction_rrn'] ?? null,
-                'message' => $verification['message'] ?? null,
-            ]);
-
-            return array_merge($webhookData, [
-                'success' => false,
-                'status' => 'pending',
-                'provider_verified' => false,
-                'provider_verification' => $verification,
-                'raw_data' => $rawData,
-            ]);
-        }
-
-        return array_merge($webhookData, [
-            'success' => $verification['success'] ?? false,
-            'status' => $verification['status'] ?? 'pending',
-            'amount' => $verification['amount'] ?? $webhookData['amount'] ?? 0,
-            'reference' => $verification['reference'] ?? $webhookData['reference'] ?? null,
-            'transaction_rrn' => $verification['transaction_rrn'] ?? $webhookData['transaction_rrn'] ?? null,
-            'transaction_id' => $verification['transaction_id'] ?? $webhookData['transaction_id'] ?? null,
-            'external_id' => $verification['external_id'] ?? $webhookData['external_id'] ?? null,
-            'account_number' => $verification['account_number'] ?? $webhookData['account_number'] ?? null,
-            'payment_method' => $verification['payment_method'] ?? $webhookData['payment_method'] ?? null,
-            'response_code' => $verification['response_code'] ?? $webhookData['response_code'] ?? null,
-            'reason' => $verification['reason'] ?? $webhookData['reason'] ?? null,
-            'provider_verified' => true,
-            'provider_verification' => $verification,
-            'raw_data' => $rawData,
-        ]);
     }
 
     /**
@@ -326,20 +264,6 @@ class TrendiPayWebhookController extends Controller
             'failed' => \App\Enums\PaymentStatus::Failed,
             default => \App\Enums\PaymentStatus::Pending,
         };
-
-        if (in_array($paymentStatus, [PaymentStatus::Completed, PaymentStatus::Failed], true)) {
-            $webhookData = $this->withVerifiedCollectionTransaction($webhookData);
-
-            if (($webhookData['provider_verified'] ?? true) === false) {
-                return response()->json(['status' => 'pending', 'message' => 'Payment verification pending'], 202);
-            }
-
-            $paymentStatus = match ($webhookData['status']) {
-                'completed' => \App\Enums\PaymentStatus::Completed,
-                'failed' => \App\Enums\PaymentStatus::Failed,
-                default => \App\Enums\PaymentStatus::Pending,
-            };
-        }
 
         $expectedAmount = (float) $tickets->sum('amount');
         if ($paymentStatus === PaymentStatus::Completed && isset($webhookData['amount']) && (float) $webhookData['amount'] > 0 && (int) round((float) $webhookData['amount'] * 100) !== (int) round($expectedAmount * 100)) {
