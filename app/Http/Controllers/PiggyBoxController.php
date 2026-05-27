@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CompletePiggyDonationAction;
 use App\Actions\CreatePiggyBoxForUser;
 use App\Enums\PaymentStatus;
 use App\Models\PiggyBox;
@@ -9,6 +10,7 @@ use App\Models\PiggyDonation;
 use App\Models\User;
 use App\Payment\PaymentManager;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class PiggyBoxController extends Controller
 {
@@ -34,16 +36,16 @@ class PiggyBoxController extends Controller
         ]);
 
         $code = strtoupper(trim($request->piggy_code));
-        
+
         $user = User::where('piggy_code', $code)
             ->with(['piggyBox', 'country'])
             ->first();
 
-        if (!$user || !$user->piggyBox) {
+        if (! $user || ! $user->piggyBox) {
             return back()->with('error', 'Invalid piggy code. Please check and try again.');
         }
 
-        if (!$user->piggyBox->canReceiveDonations()) {
+        if (! $user->piggyBox->canReceiveDonations()) {
             return back()->with('error', 'This Piggy Wallet is not currently accepting gifts.');
         }
 
@@ -60,7 +62,7 @@ class PiggyBoxController extends Controller
     {
         $piggyBox = $user->piggyBox;
 
-        if (!$piggyBox || !$piggyBox->canReceiveDonations()) {
+        if (! $piggyBox || ! $piggyBox->canReceiveDonations()) {
             return back()->with('error', 'This Piggy Wallet is not accepting gifts.');
         }
 
@@ -85,7 +87,7 @@ class PiggyBoxController extends Controller
             'email' => $validated['donor_email'],
             'amount' => $validated['amount'],
             'currency' => $piggyBox->currency_code,
-            'reference' => 'piggy_' . uniqid(),
+            'reference' => 'piggy_'.uniqid(),
             'return_url' => route('piggy.callback'),
             'webhook_url' => route('piggy.webhook'),
             'metadata' => [
@@ -99,7 +101,7 @@ class PiggyBoxController extends Controller
 
         $payment = $this->paymentManager->initializePayment($paymentData);
 
-        if (!$payment['success']) {
+        if (! $payment['success']) {
             return back()->with('error', $payment['message'] ?? 'Payment initialization failed.');
         }
 
@@ -131,7 +133,7 @@ class PiggyBoxController extends Controller
     {
         $reference = $request->query('reference');
 
-        if (!$reference) {
+        if (! $reference) {
             return redirect()->route('piggy.lookup')->with('error', 'Invalid payment reference.');
         }
 
@@ -139,7 +141,7 @@ class PiggyBoxController extends Controller
             ->with('piggyBox.user')
             ->first();
 
-        if (!$donation || !$donation->piggyBox?->user) {
+        if (! $donation || ! $donation->piggyBox?->user) {
             return redirect()->route('piggy.lookup')->with('error', 'Donation not found.');
         }
 
@@ -148,7 +150,7 @@ class PiggyBoxController extends Controller
         // Verify payment
         $verification = $this->paymentManager->verifyPayment($reference);
 
-        if (!$verification['success']) {
+        if (! $verification['success']) {
             return redirect($walletUrl)->with('error', 'Payment verification failed.');
         }
 
@@ -157,18 +159,15 @@ class PiggyBoxController extends Controller
                 ->with('success', 'Thank you for your gift!');
         }
 
-        // Update donation status
-        $donation->update([
-            'payment_status' => PaymentStatus::Completed,
-        ]);
-
-        // Update piggy box stats
+        $donation = app(CompletePiggyDonationAction::class)->execute($donation, $verification, 'callback');
         $piggyBox = $donation->piggyBox;
-        $piggyBox->increment('total_received', $donation->amount);
-        $piggyBox->increment('donation_count');
+
+        if ($donation->payment_status !== PaymentStatus::Completed) {
+            return redirect($walletUrl)->with('error', 'Payment could not be confirmed.');
+        }
 
         return redirect($walletUrl)
-            ->with('success', 'Thank you for your gift to ' . $piggyBox->user->name . '!');
+            ->with('success', 'Thank you for your gift to '.$piggyBox->user->name.'!');
     }
 
     /**
@@ -194,6 +193,8 @@ class PiggyBoxController extends Controller
             ->limit(10)
             ->get();
 
+        $ledgerEntries = $this->walletLedgerEntries($piggyBox);
+
         // Generate shareable URL
         $shareUrl = route('piggy.show', $user->piggy_code);
 
@@ -201,8 +202,49 @@ class PiggyBoxController extends Controller
             'piggyBox' => $piggyBox,
             'recentDonations' => $recentDonations,
             'withdrawals' => $withdrawals,
+            'ledgerEntries' => $ledgerEntries,
             'shareUrl' => $shareUrl,
         ]);
+    }
+
+    private function walletLedgerEntries(PiggyBox $piggyBox): Collection
+    {
+        $donations = $piggyBox->donations()
+            ->recent()
+            ->limit(25)
+            ->get()
+            ->map(fn (PiggyDonation $donation) => [
+                'type' => 'Gift',
+                'label' => $donation->getDisplayName(),
+                'reference' => $donation->payment_reference,
+                'status' => $donation->payment_status->value,
+                'amount' => (float) $donation->amount,
+                'direction' => 'credit',
+                'occurred_at' => $donation->credited_at ?? $donation->created_at,
+                'note' => $donation->message,
+            ]);
+
+        $withdrawals = $piggyBox->withdrawals()
+            ->with('withdrawalAccount')
+            ->latest()
+            ->limit(25)
+            ->get()
+            ->map(fn ($withdrawal) => [
+                'type' => 'Withdrawal',
+                'label' => $withdrawal->withdrawalAccount?->getDisplayName() ?? 'Payout request',
+                'reference' => $withdrawal->reference,
+                'status' => $withdrawal->status->value,
+                'amount' => -1 * (float) $withdrawal->amount,
+                'direction' => 'debit',
+                'occurred_at' => $withdrawal->disbursed_at ?? $withdrawal->created_at,
+                'note' => $withdrawal->user_note,
+            ]);
+
+        return $donations
+            ->merge($withdrawals)
+            ->sortByDesc('occurred_at')
+            ->take(25)
+            ->values();
     }
 
     /**
@@ -211,17 +253,17 @@ class PiggyBoxController extends Controller
     public function showByCode(string $code)
     {
         $code = strtoupper(trim($code));
-        
+
         $user = User::where('piggy_code', $code)
             ->with(['piggyBox', 'country'])
             ->first();
 
-        if (!$user || !$user->piggyBox) {
+        if (! $user || ! $user->piggyBox) {
             return redirect()->route('piggy.lookup')
                 ->with('error', 'Invalid piggy code. Please check and try again.');
         }
 
-        if (!$user->piggyBox->canReceiveDonations()) {
+        if (! $user->piggyBox->canReceiveDonations()) {
             return redirect()->route('piggy.lookup')
                 ->with('error', 'This Piggy Wallet is not currently accepting gifts.');
         }
@@ -240,7 +282,7 @@ class PiggyBoxController extends Controller
         $user = auth()->user();
         $piggyBox = $user->piggyBox;
 
-        if (!$piggyBox) {
+        if (! $piggyBox) {
             return redirect()->back()->with('error', 'Piggy Wallet not found.');
         }
 
@@ -259,19 +301,19 @@ class PiggyBoxController extends Controller
         $user = auth()->user();
         $piggyBox = $user->piggyBox;
 
-        if (!$piggyBox) {
+        if (! $piggyBox) {
             return redirect()->back()->with('error', 'Piggy Wallet not found.');
         }
 
         // Generate QR code if it doesn't exist
-        if (!$piggyBox->hasQrCode()) {
+        if (! $piggyBox->hasQrCode()) {
             $generateQRCodeAction = app(\App\Actions\GeneratePiggyQRCodeAction::class);
             $generateQRCodeAction->execute($piggyBox);
         }
 
         $media = $piggyBox->getFirstMedia('qr_code');
-        
-        if (!$media) {
+
+        if (! $media) {
             return redirect()->back()->with('error', 'QR Code not found.');
         }
 
@@ -280,9 +322,10 @@ class PiggyBoxController extends Controller
         // For S3/remote files, stream the content
         if ($media->getDiskDriverName() === 's3') {
             $contents = \Storage::disk($media->disk)->get($media->getPath());
+
             return response($contents, 200)
                 ->header('Content-Type', 'image/png')
-                ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+                ->header('Content-Disposition', 'attachment; filename="'.$filename.'"');
         }
 
         // For local files, use regular download

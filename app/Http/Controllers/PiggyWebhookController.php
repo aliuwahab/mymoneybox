@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CompletePiggyDonationAction;
 use App\Enums\PaymentStatus;
 use App\Models\PiggyDonation;
 use App\Payment\Providers\TrendiPayProvider;
@@ -12,7 +13,8 @@ use Illuminate\Support\Facades\Log;
 class PiggyWebhookController extends Controller
 {
     public function __construct(
-        protected TrendiPayProvider $trendiPayProvider
+        protected TrendiPayProvider $trendiPayProvider,
+        protected CompletePiggyDonationAction $completeDonation,
     ) {}
 
     /**
@@ -24,7 +26,7 @@ class PiggyWebhookController extends Controller
     {
         Log::info('TrendiPay Piggy Webhook received', [
             'payload' => $request->all(),
-            'headers' => $request->headers->all()
+            'headers' => $request->headers->all(),
         ]);
 
         $payload = $request->all();
@@ -43,43 +45,50 @@ class PiggyWebhookController extends Controller
             // Find the piggy donation
             $donation = PiggyDonation::query()->where('payment_reference', $reference)->first();
 
-            if (!$donation) {
+            if (! $donation) {
                 Log::warning('TrendiPay Piggy Webhook: Donation not found', ['reference' => $reference]);
+
                 return response()->json(['status' => 'error', 'message' => 'Donation not found'], 404);
             }
 
             // Idempotency: terminal states should not be reprocessed
             if (in_array($donation->payment_status, [PaymentStatus::Completed, PaymentStatus::Failed])) {
                 Log::info('TrendiPay Piggy Webhook: already processed, skipping', [
-                    'reference'      => $reference,
+                    'reference' => $reference,
                     'current_status' => $donation->payment_status->value,
                 ]);
+
                 return response()->json(['status' => 'success', 'message' => 'Already processed'], 200);
             }
 
-            $paymentStatus = match($webhookData['status']) {
+            $paymentStatus = match ($webhookData['status']) {
                 'completed' => PaymentStatus::Completed,
-                'failed'    => PaymentStatus::Failed,
-                default     => PaymentStatus::Pending,
+                'failed' => PaymentStatus::Failed,
+                default => PaymentStatus::Pending,
             };
 
-            $donation->update([
-                'payment_status'   => $paymentStatus,
-                'transaction_rrn'  => $webhookData['transaction_rrn'] ?? null,
-                'payment_metadata' => $webhookData['raw_data'] ?? null,
-            ]);
+            if ($paymentStatus === PaymentStatus::Completed) {
+                $donation = $this->completeDonation->execute($donation, $webhookData, 'webhook');
+                $paymentStatus = $donation->payment_status;
+            } else {
+                $donation->forceFill([
+                    'payment_status' => $paymentStatus,
+                    'transaction_rrn' => $webhookData['transaction_rrn'] ?? null,
+                    'payment_metadata' => array_merge($donation->payment_metadata ?? [], [
+                        'webhook' => [
+                            'at' => now()->toDateTimeString(),
+                            'status' => $webhookData['status'],
+                            'raw_data' => $webhookData['raw_data'] ?? null,
+                        ],
+                    ]),
+                ])->save();
+            }
 
             Log::info('TrendiPay Piggy Webhook: status updated', [
                 'donation_id' => $donation->id,
-                'reference'   => $reference,
-                'status'      => $paymentStatus->value,
+                'reference' => $reference,
+                'status' => $paymentStatus->value,
             ]);
-
-            if ($paymentStatus === PaymentStatus::Completed) {
-                $piggyBox = $donation->piggyBox;
-                $piggyBox->increment('total_received', $donation->amount);
-                $piggyBox->increment('donation_count');
-            }
 
             return response()->json(['status' => 'success', 'message' => 'Piggy payment processed successfully'], 200);
 
@@ -87,16 +96,15 @@ class PiggyWebhookController extends Controller
             Log::error('TrendiPay Piggy Webhook: Processing error', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
-                'payload' => $request->all()
+                'payload' => $request->all(),
             ]);
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Internal error processing webhook'
+                'message' => 'Internal error processing webhook',
             ], 500);
         }
     }
-
 
     /**
      * Validate webhook payload structure
@@ -105,39 +113,39 @@ class PiggyWebhookController extends Controller
      */
     protected function validateWebhookPayload(array $payload): ?JsonResponse
     {
-        if (!isset($payload['data'])) {
+        if (! isset($payload['data'])) {
             Log::warning('TrendiPay Piggy Webhook: Invalid payload - missing data field', [
-                'payload' => $payload
+                'payload' => $payload,
             ]);
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Invalid webhook payload: missing data field'
+                'message' => 'Invalid webhook payload: missing data field',
             ], 400);
         }
 
         $data = $payload['data'];
 
         // Check for required fields
-        if (!isset($data['reference'])) {
+        if (! isset($data['reference'])) {
             Log::warning('TrendiPay Piggy Webhook: Invalid payload - missing reference', [
-                'payload' => $payload
+                'payload' => $payload,
             ]);
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Invalid webhook payload: missing reference'
+                'message' => 'Invalid webhook payload: missing reference',
             ], 400);
         }
 
-        if (!isset($data['status'])) {
+        if (! isset($data['status'])) {
             Log::warning('TrendiPay Piggy Webhook: Invalid payload - missing status', [
-                'payload' => $payload
+                'payload' => $payload,
             ]);
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Invalid webhook payload: missing status'
+                'message' => 'Invalid webhook payload: missing status',
             ], 400);
         }
 
