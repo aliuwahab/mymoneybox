@@ -51,8 +51,41 @@ class ContributionInfolist
                 TextEntry::make('transaction_rrn')
                     ->placeholder('-'),
                 KeyValueEntry::make('payment_metadata')
+                    ->formatStateUsing(fn (?array $state): array => self::stringifyKeyValueState($state))
                     ->placeholder('-')
                     ->columnSpanFull(),
             ]);
+    }
+
+    public static function stringifyKeyValueState(?array $state): array
+    {
+        if (empty($state)) {
+            return [];
+        }
+
+        return collect($state)
+            ->mapWithKeys(fn (mixed $value, string|int $key): array => [
+                $key => self::stringifyValue($value),
+            ])
+            ->all();
+    }
+
+    private static function stringifyValue(mixed $value): string
+    {
+        if ($value === null) {
+            return '';
+        }
+
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
+        if (is_scalar($value)) {
+            return (string) $value;
+        }
+
+        $encoded = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        return $encoded === false ? '' : $encoded;
     }
 }
