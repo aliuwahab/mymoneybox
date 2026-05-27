@@ -466,6 +466,10 @@
                         </div>
                     </div>
 
+                    @if (session('success'))
+                        <div class="success-box" style="margin-bottom: 16px;">{{ session('success') }}</div>
+                    @endif
+
                     @if (session('error'))
                         <div class="error-box" style="margin-bottom: 16px;">{{ session('error') }}</div>
                     @endif

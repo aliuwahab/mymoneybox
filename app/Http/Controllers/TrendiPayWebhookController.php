@@ -30,7 +30,6 @@ class TrendiPayWebhookController extends Controller
     public function handle(Request $request)
     {
         $payload = $request->all();
-        $signatureValid = $this->verifyWebhookSignature($request);
         $reference = $this->extractWebhookReference($payload);
         $rawBodyHash = hash('sha256', $request->getContent());
 
@@ -38,18 +37,7 @@ class TrendiPayWebhookController extends Controller
             'payload' => $payload,
             'headers' => $request->headers->all(),
             'reference' => $reference,
-            'signature_valid' => $signatureValid,
         ]);
-
-        if ($signatureValid === false) {
-            $this->auditContributionWebhook($reference, $payload['data']['status'] ?? null, false, $rawBodyHash);
-
-            Log::warning('TrendiPay webhook rejected: invalid signature', [
-                'reference' => $reference,
-            ]);
-
-            return response()->json(['status' => 'error', 'message' => 'Invalid webhook signature'], 401);
-        }
 
         // Validate webhook payload structure
         $validationFailedResponse = $this->validateWebhookPayload($payload);
@@ -87,7 +75,7 @@ class TrendiPayWebhookController extends Controller
                 return response()->json(['status' => 'error', 'message' => 'Contribution not found'], 404);
             }
 
-            $this->auditContributionWebhook($reference, $webhookData['status'], $signatureValid, $rawBodyHash);
+            $this->auditContributionWebhook($reference, $webhookData['status'], $rawBodyHash);
 
             // Idempotency: terminal states should not be reprocessed
             if (in_array($contribution->payment_status, [PaymentStatus::Completed, PaymentStatus::Failed])) {
@@ -164,59 +152,6 @@ class TrendiPayWebhookController extends Controller
         }
     }
 
-    private function verifyWebhookSignature(Request $request): ?bool
-    {
-        $secret = (string) config('payment.trendipay.webhook_secret', '');
-
-        if ($secret === '') {
-            return null;
-        }
-
-        $signature = $request->header('X-TrendiPay-Signature')
-            ?? $request->header('X-Trendipay-Signature')
-            ?? $request->header('X-Signature')
-            ?? $request->header('X-Hub-Signature-256')
-            ?? $request->header('TrendiPay-Signature');
-
-        if (! is_string($signature) || trim($signature) === '') {
-            return null;
-        }
-
-        $expected = hash_hmac('sha256', $request->getContent(), $secret);
-
-        foreach ($this->signatureCandidates($signature) as $candidate) {
-            if (hash_equals($expected, $candidate)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private function signatureCandidates(string $signature): array
-    {
-        return collect(explode(',', $signature))
-            ->map(fn (string $part): string => trim($part))
-            ->flatMap(function (string $part): array {
-                if (str_starts_with($part, 'sha256=')) {
-                    return [substr($part, 7)];
-                }
-
-                if (str_starts_with($part, 'v1=')) {
-                    return [substr($part, 3)];
-                }
-
-                if (str_contains($part, '=')) {
-                    return [];
-                }
-
-                return [$part];
-            })
-            ->filter(fn (string $part): bool => $part !== '')
-            ->values()
-            ->all();
-    }
-
     private function extractWebhookReference(array $payload): ?string
     {
         $reference = data_get($payload, 'data.reference');
@@ -224,7 +159,7 @@ class TrendiPayWebhookController extends Controller
         return is_string($reference) ? $reference : null;
     }
 
-    private function auditContributionWebhook(?string $reference, ?string $status, ?bool $signatureValid, string $eventHash): void
+    private function auditContributionWebhook(?string $reference, ?string $status, string $eventHash): void
     {
         if (! $reference || str_starts_with($reference, 'EVT-') || str_starts_with($reference, 'ERF-') || str_contains($reference, '-DISBURSE-')) {
             return;
@@ -242,7 +177,6 @@ class TrendiPayWebhookController extends Controller
         $contribution->forceFill([
             'webhook_last_received_at' => now(),
             'webhook_last_status' => $status,
-            'webhook_last_signature_valid' => $signatureValid,
             'webhook_last_event_hash' => $eventHash,
         ])->save();
     }

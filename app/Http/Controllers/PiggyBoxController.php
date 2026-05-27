@@ -83,12 +83,13 @@ class PiggyBoxController extends Controller
         }
 
         // Initialize payment
+        $reference = 'piggy_'.uniqid();
         $paymentData = [
             'email' => $validated['donor_email'],
             'amount' => $validated['amount'],
             'currency' => $piggyBox->currency_code,
-            'reference' => 'piggy_'.uniqid(),
-            'return_url' => route('piggy.callback'),
+            'reference' => $reference,
+            'return_url' => route('piggy.callback', ['reference' => $reference]),
             'webhook_url' => route('piggy.webhook'),
             'metadata' => [
                 'piggy_box_id' => $piggyBox->id,
@@ -147,27 +148,26 @@ class PiggyBoxController extends Controller
 
         $walletUrl = route('piggy.show', $donation->piggyBox->user->piggy_code);
 
-        // Verify payment
+        // Webhook may have already completed the donation before the user returns
+        if ($donation->payment_status === PaymentStatus::Completed) {
+            return redirect($walletUrl)->with('success', 'Thank you for your gift!');
+        }
+
+        // Try to verify and complete immediately; if it fails the webhook will finish it
         $verification = $this->paymentManager->verifyPayment($reference);
 
-        if (! $verification['success']) {
-            return redirect($walletUrl)->with('error', 'Payment verification failed.');
-        }
+        if ($verification['success']) {
+            $donation = app(CompletePiggyDonationAction::class)->execute($donation, $verification, 'callback');
+            $piggyBox = $donation->piggyBox;
 
-        if ($donation->payment_status === PaymentStatus::Completed) {
-            return redirect($walletUrl)
-                ->with('success', 'Thank you for your gift!');
-        }
-
-        $donation = app(CompletePiggyDonationAction::class)->execute($donation, $verification, 'callback');
-        $piggyBox = $donation->piggyBox;
-
-        if ($donation->payment_status !== PaymentStatus::Completed) {
-            return redirect($walletUrl)->with('error', 'Payment could not be confirmed.');
+            if ($donation->payment_status === PaymentStatus::Completed) {
+                return redirect($walletUrl)
+                    ->with('success', 'Thank you for your gift to '.$piggyBox->user->name.'!');
+            }
         }
 
         return redirect($walletUrl)
-            ->with('success', 'Thank you for your gift to '.$piggyBox->user->name.'!');
+            ->with('success', 'Your gift is on its way! It will appear on the wallet shortly.');
     }
 
     /**
