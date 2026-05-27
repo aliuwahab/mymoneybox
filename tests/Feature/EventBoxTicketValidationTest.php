@@ -189,6 +189,25 @@ it('shows attendee filters, csv export, void modal, and audit tab on the dashboa
         ->assertSee('Audit log');
 });
 
+it('exports attendees as a native streamed csv', function () {
+    ['owner' => $owner, 'eventBox' => $eventBox, 'ticket' => $ticket] = createEventBoxTicketValidationFixture();
+
+    $response = $this->actingAs($owner)
+        ->get(route('events.attendees.export', [
+            'eventBox' => $eventBox,
+            'q' => 'Ama',
+        ]));
+
+    $response->assertOk()
+        ->assertHeader('content-type', 'text/csv; charset=UTF-8');
+
+    $csv = $response->streamedContent();
+
+    expect($csv)->toContain('"Buyer name","Buyer email","Buyer phone"')
+        ->and($csv)->toContain('"Ama Attendee",ama@example.com,0240000000')
+        ->and($csv)->toContain($ticket->code);
+});
+
 it('submits pending ticket refunds through the scheduled refund command', function () {
     ['owner' => $owner, 'eventBox' => $eventBox, 'ticket' => $ticket] = createEventBoxTicketValidationFixture();
 

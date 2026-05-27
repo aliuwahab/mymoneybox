@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\EventBoxAttendeesExport;
 use App\Models\EventBox;
 use App\Models\EventBoxTicket;
 use App\Payment\PaymentManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Maatwebsite\Excel\Excel as ExcelWriter;
-use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Activitylog\Models\Activity;
 
 class EventBoxController extends Controller
@@ -339,7 +336,56 @@ class EventBoxController extends Controller
 
         $filename = Str::slug($eventBox->title).'-attendees-'.now()->format('Ymd-His').'.csv';
 
-        return Excel::download(new EventBoxAttendeesExport($eventBox, $filters), $filename, ExcelWriter::CSV);
+        return response()->streamDownload(function () use ($eventBox, $filters) {
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, [
+                'Buyer name',
+                'Buyer email',
+                'Buyer phone',
+                'Ticket type',
+                'Ticket code',
+                'Status',
+                'Redeemed at',
+                'Voided at',
+                'Gross amount',
+                'Refund amount',
+                'Refund status',
+                'Payment reference',
+                'Payment method',
+                'Payment account',
+                'Purchased at',
+            ], ',', '"', '\\', "\n");
+
+            $this->eventAttendeesQuery($eventBox, $filters)
+                ->with(['ticketType', 'refund'])
+                ->reorder()
+                ->chunkById(500, function ($tickets) use ($handle) {
+                    foreach ($tickets as $ticket) {
+                        fputcsv($handle, [
+                            $ticket->buyer_name,
+                            $ticket->buyer_email,
+                            $ticket->buyer_phone,
+                            $ticket->ticket_type_name ?? $ticket->ticketType?->name,
+                            $ticket->code,
+                            $ticket->status->label(),
+                            $ticket->redeemed_at?->toDateTimeString(),
+                            $ticket->voided_at?->toDateTimeString(),
+                            (float) $ticket->amount,
+                            $ticket->refund ? (float) $ticket->refund->refund_amount : null,
+                            $ticket->refund?->status->label(),
+                            $ticket->payment_reference,
+                            $ticket->payment_method,
+                            $ticket->payment_account_number,
+                            $ticket->created_at?->toDateTimeString(),
+                        ], ',', '"', '\\', "\n");
+                    }
+                });
+
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
     }
 
     // ── Public: list upcoming events ──────────────────────────────────────────
