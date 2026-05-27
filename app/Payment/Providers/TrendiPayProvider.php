@@ -148,6 +148,115 @@ class TrendiPayProvider implements PaymentProviderInterface
         }
     }
 
+    public function verifyCollectionTransaction(string $rrn, ?string $expectedReference = null): array
+    {
+        if (trim($rrn) === '') {
+            return [
+                'verified' => false,
+                'success' => false,
+                'status' => 'pending',
+                'message' => 'Transaction RRN is missing.',
+            ];
+        }
+
+        if ($this->merchantExternalId === '') {
+            return [
+                'verified' => false,
+                'success' => false,
+                'status' => 'pending',
+                'message' => 'TrendiPay merchant external ID is not configured.',
+            ];
+        }
+
+        $url = "{$this->apiBaseUrl}/v1/merchants/{$this->merchantExternalId}/transactions/{$rrn}";
+
+        Log::info('TrendiPay [get-transaction] request', [
+            'url' => $url,
+            'rrn' => $rrn,
+            'expected_reference' => $expectedReference,
+        ]);
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer '.($this->apiKey ?: $this->merchantExternalId),
+                'Accept' => 'application/json',
+            ])->get($url);
+
+            $result = $response->json();
+
+            Log::info('TrendiPay [get-transaction] response', [
+                'url' => $url,
+                'status' => $response->status(),
+                'rrn' => $rrn,
+                'data' => $result['data'] ?? null,
+            ]);
+
+            if (! $response->successful() || ! ($result['success'] ?? false) || ! isset($result['data'])) {
+                return [
+                    'verified' => false,
+                    'success' => false,
+                    'status' => 'pending',
+                    'message' => $result['message'] ?? 'Unable to verify transaction.',
+                    'raw_data' => $result,
+                ];
+            }
+
+            $data = $result['data'];
+            $reference = $data['reference'] ?? null;
+
+            if ($expectedReference && $reference !== $expectedReference) {
+                Log::warning('TrendiPay [get-transaction] reference mismatch', [
+                    'rrn' => $rrn,
+                    'expected_reference' => $expectedReference,
+                    'actual_reference' => $reference,
+                ]);
+
+                return [
+                    'verified' => false,
+                    'success' => false,
+                    'status' => 'failed',
+                    'message' => 'Verified transaction reference does not match webhook reference.',
+                    'reference' => $reference,
+                    'transaction_rrn' => $data['rrn'] ?? $rrn,
+                    'raw_data' => $data,
+                ];
+            }
+
+            $status = $this->normalizeTransactionStatus($data['status'] ?? null);
+
+            return [
+                'verified' => true,
+                'success' => $status === 'completed',
+                'status' => $status,
+                'amount' => ($data['amount'] ?? 0) / 100,
+                'reference' => $reference ?? $expectedReference,
+                'transaction_rrn' => $data['rrn'] ?? $rrn,
+                'transaction_id' => $data['internalId'] ?? null,
+                'external_id' => $data['externalId'] ?? null,
+                'account_number' => $data['accountNumber'] ?? null,
+                'payment_method' => $data['rSwitch'] ?? null,
+                'response_code' => $data['responseCode'] ?? $data['code'] ?? null,
+                'reason' => $data['reason'] ?? null,
+                'currency' => 'GHS',
+                'paid_at' => $data['lastUpdated'] ?? now()->toDateTimeString(),
+                'raw_data' => $data,
+            ];
+        } catch (\Exception $e) {
+            Log::error('TrendiPay [get-transaction] exception', [
+                'error' => $e->getMessage(),
+                'rrn' => $rrn,
+                'expected_reference' => $expectedReference,
+            ]);
+
+            return [
+                'verified' => false,
+                'success' => false,
+                'status' => 'pending',
+                'message' => 'Transaction verification failed. Please retry later.',
+            ];
+        }
+    }
+
     public function handleWebhook(array $payload): array
     {
         if (! isset($payload['data'])) {
@@ -191,6 +300,15 @@ class TrendiPayProvider implements PaymentProviderInterface
             'paid_at' => now()->toDateTimeString(),
             'raw_data' => $data,
         ];
+    }
+
+    private function normalizeTransactionStatus(?string $status): string
+    {
+        return match (strtolower((string) $status)) {
+            'success', 'successful', 'completed', 'paid' => 'completed',
+            'failed', 'cancelled', 'canceled', 'expired', 'reversed' => 'failed',
+            default => 'pending',
+        };
     }
 
     public function getBalance(): array

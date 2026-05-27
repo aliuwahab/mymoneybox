@@ -195,6 +195,64 @@
                     @endif
                 </div>
 
+                {{-- Wallet ledger --}}
+                <div class="card">
+                    <div class="card-head">
+                        <h2 class="card-title">Wallet ledger</h2>
+                        @if($ledgerEntries->count() > 0)
+                            <span class="pill">{{ $ledgerEntries->count() }} entries</span>
+                        @endif
+                    </div>
+                    @if($ledgerEntries->count() > 0)
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Entry</th>
+                                        <th>Reference</th>
+                                        <th>Status</th>
+                                        <th class="num">Amount</th>
+                                        <th>When</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($ledgerEntries as $entry)
+                                        <tr>
+                                            <td>
+                                                <div class="font-medium text-[#15140F]">{{ $entry['type'] }} · {{ $entry['label'] }}</div>
+                                                @if($entry['note'])
+                                                    <div class="text-[11.5px] text-[#9C998F] italic mt-0.5">"{{ Str::limit($entry['note'], 48) }}"</div>
+                                                @endif
+                                            </td>
+                                            <td><code class="text-[11.5px] font-mono text-[#6B6862]">{{ $entry['reference'] }}</code></td>
+                                            <td>
+                                                <span class="pill {{ match($entry['status']) {
+                                                    'completed','disbursed' => 'pill-ok',
+                                                    'failed','rejected' => 'pill-danger',
+                                                    'approved','processing' => 'pill-info',
+                                                    default => 'pill-warn',
+                                                } }}">
+                                                    <span class="pill-dot"></span>
+                                                    {{ Str::headline($entry['status']) }}
+                                                </span>
+                                            </td>
+                                            <td class="num font-semibold {{ $entry['direction'] === 'credit' ? 'text-primary-600' : 'text-[#6B6862]' }}">
+                                                {{ $entry['direction'] === 'credit' ? '+' : '-' }}{{ $piggyBox->formatAmount(abs($entry['amount'])) }}
+                                            </td>
+                                            <td class="text-[#6B6862]">{{ $entry['occurred_at']?->format('M d, Y') }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="card-body text-center py-8">
+                            <div class="text-[14px] font-medium text-[#15140F] mb-1">No wallet activity yet</div>
+                            <p class="tiny">Gifts and withdrawals will appear here when they happen.</p>
+                        </div>
+                    @endif
+                </div>
+
                 {{-- Withdrawals --}}
                 @if($withdrawals->count() > 0)
                 <div class="card">

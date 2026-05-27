@@ -32,6 +32,25 @@ class PiggyDonationInfolist
                 TextEntry::make('payment_reference'),
                 TextEntry::make('payment_status')
                     ->badge(),
+                TextEntry::make('transaction_rrn')
+                    ->label('Transaction RRN')
+                    ->placeholder('-'),
+                TextEntry::make('credited_at')
+                    ->dateTime()
+                    ->placeholder('-'),
+                TextEntry::make('receipt_sent_at')
+                    ->dateTime()
+                    ->placeholder('-'),
+                TextEntry::make('manual_verified_at')
+                    ->dateTime()
+                    ->placeholder('-'),
+                TextEntry::make('manualVerifier.name')
+                    ->label('Manual verifier')
+                    ->placeholder('-'),
+                TextEntry::make('payment_metadata')
+                    ->formatStateUsing(fn ($state) => is_array($state) ? json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) : $state)
+                    ->placeholder('-')
+                    ->columnSpanFull(),
                 TextEntry::make('ip_address')
                     ->placeholder('-'),
                 TextEntry::make('user_agent')
