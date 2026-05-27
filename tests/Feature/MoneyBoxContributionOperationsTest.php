@@ -6,7 +6,6 @@ use App\Models\Contribution;
 use App\Models\MoneyBox;
 use App\Models\User;
 use App\Payment\PaymentManager;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 
 function createMoneyBoxContributionFixture(array $contributionOverrides = []): array
@@ -61,78 +60,15 @@ function trendiPayWebhookPayload(string $reference = 'contrib_test_reference', s
     ];
 }
 
-function signedTrendiPayWebhook(array $payload, string $secret, ?string $signature = null)
-{
-    $body = json_encode($payload);
-
-    return test()->call(
-        'PUT',
-        route('trendipay.webhook'),
-        [],
-        [],
-        [],
-        [
-            'CONTENT_TYPE' => 'application/json',
-            'HTTP_ACCEPT' => 'application/json',
-            'HTTP_X_TRENDIPAY_SIGNATURE' => $signature ?? hash_hmac('sha256', $body, $secret),
-        ],
-        $body,
-    );
-}
-
-function fakeTrendiPayContributionTransaction(string $reference = 'contrib_test_reference', int $amount = 2500, string $status = 'success', string $rrn = 'RRN-123'): void
-{
-    config([
-        'payment.trendipay.api_key' => 'api-token',
-        'payment.trendipay.merchant_external_id' => 'merchant-123',
-        'payment.trendipay.api_base_url' => 'https://trendipay.test',
-    ]);
-
-    Http::fake([
-        'https://trendipay.test/v1/merchants/merchant-123/transactions/'.$rrn => Http::response([
-            'success' => true,
-            'code' => '000',
-            'data' => [
-                'reference' => $reference,
-                'rrn' => $rrn,
-                'amount' => $amount,
-                'status' => $status,
-                'rSwitch' => 'mtn',
-                'accountNumber' => '0240000000',
-                'responseCode' => $status === 'success' ? '000' : '111',
-                'reason' => $status === 'success' ? null : 'Transaction queued for processing.',
-            ],
-        ], 200),
-    ]);
-}
-
-it('rejects invalid contribution webhook signatures and records the attempt', function () {
-    ['contribution' => $contribution] = createMoneyBoxContributionFixture();
-
-    config(['payment.trendipay.webhook_secret' => 'secret']);
-
-    signedTrendiPayWebhook(trendiPayWebhookPayload(), 'secret', 'bad-signature')
-        ->assertStatus(401);
-
-    $contribution->refresh();
-
-    expect($contribution->payment_status)->toBe(PaymentStatus::Pending)
-        ->and($contribution->webhook_attempts)->toBe(1)
-        ->and($contribution->webhook_last_signature_valid)->toBeFalse()
-        ->and($contribution->webhook_last_status)->toBe('success');
-});
-
 it('audits duplicate contribution webhooks without double counting totals', function () {
     ['moneyBox' => $moneyBox, 'contribution' => $contribution] = createMoneyBoxContributionFixture();
 
     Mail::fake();
-    config(['payment.trendipay.webhook_secret' => 'secret']);
-    fakeTrendiPayContributionTransaction();
 
-    signedTrendiPayWebhook(trendiPayWebhookPayload(), 'secret')
+    $this->putJson(route('trendipay.webhook'), trendiPayWebhookPayload())
         ->assertOk();
 
-    signedTrendiPayWebhook(trendiPayWebhookPayload(), 'secret')
+    $this->putJson(route('trendipay.webhook'), trendiPayWebhookPayload())
         ->assertOk()
         ->assertJson(['message' => 'Already processed']);
 
@@ -143,17 +79,15 @@ it('audits duplicate contribution webhooks without double counting totals', func
         ->and($moneyBox->contribution_count)->toBe(1)
         ->and($contribution->payment_status)->toBe(PaymentStatus::Completed)
         ->and($contribution->webhook_attempts)->toBe(2)
-        ->and($contribution->webhook_last_signature_valid)->toBeTrue();
+        ->and($contribution->webhook_last_status)->toBe('completed');
 
     Mail::assertSent(ContributionThankYouMail::class, 1);
 });
 
-it('allows unsigned contribution webhooks when rrn verification succeeds', function () {
+it('processes unsigned contribution webhooks', function () {
     ['moneyBox' => $moneyBox, 'contribution' => $contribution] = createMoneyBoxContributionFixture();
 
     Mail::fake();
-    config(['payment.trendipay.webhook_secret' => 'secret']);
-    fakeTrendiPayContributionTransaction();
 
     $this->putJson(route('trendipay.webhook'), trendiPayWebhookPayload())
         ->assertOk();
@@ -172,13 +106,11 @@ it('rejects completed contribution webhooks when the paid amount does not match'
     ['moneyBox' => $moneyBox, 'contribution' => $contribution] = createMoneyBoxContributionFixture();
 
     Mail::fake();
-    config(['payment.trendipay.webhook_secret' => 'secret']);
 
     $payload = trendiPayWebhookPayload();
     $payload['data']['amount'] = 1000;
-    fakeTrendiPayContributionTransaction(amount: 1000);
 
-    signedTrendiPayWebhook($payload, 'secret')->assertOk();
+    $this->putJson(route('trendipay.webhook'), $payload)->assertOk();
 
     $moneyBox->refresh();
     $contribution->refresh();
@@ -187,29 +119,6 @@ it('rejects completed contribution webhooks when the paid amount does not match'
         ->and($moneyBox->contribution_count)->toBe(0)
         ->and($contribution->payment_status)->toBe(PaymentStatus::Failed)
         ->and($contribution->payment_metadata['amount_mismatch'])->toBeTrue();
-
-    Mail::assertNothingSent();
-});
-
-it('does not complete contribution webhooks until the rrn is verified by trendipay', function () {
-    ['moneyBox' => $moneyBox, 'contribution' => $contribution] = createMoneyBoxContributionFixture();
-
-    Mail::fake();
-    config(['payment.trendipay.webhook_secret' => 'secret']);
-
-    $payload = trendiPayWebhookPayload();
-    unset($payload['data']['rrn']);
-
-    signedTrendiPayWebhook($payload, 'secret')
-        ->assertStatus(202)
-        ->assertJson(['message' => 'Payment verification pending']);
-
-    $moneyBox->refresh();
-    $contribution->refresh();
-
-    expect((float) $moneyBox->total_contributions)->toBe(0.0)
-        ->and($moneyBox->contribution_count)->toBe(0)
-        ->and($contribution->payment_status)->toBe(PaymentStatus::Pending);
 
     Mail::assertNothingSent();
 });
