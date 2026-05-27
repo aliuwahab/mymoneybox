@@ -1,11 +1,15 @@
 <?php
 
+use App\Events\TicketIssued;
+use App\Listeners\SendTicketEmail;
+use App\Mail\TicketMail;
 use App\Models\EventBox;
 use App\Models\EventBoxTicket;
 use App\Models\EventBoxTicketRefund;
 use App\Models\EventBoxTicketType;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 
 function createEventBoxTicketValidationFixture(): array
 {
@@ -59,6 +63,22 @@ it('validates an unused paid event ticket for the owner', function () {
             'ticket_id' => $ticket->id,
             'holder_name' => 'Ama Attendee',
         ]);
+});
+
+it('sends only one confirmation email for the same issued ticket', function () {
+    ['ticket' => $ticket] = createEventBoxTicketValidationFixture();
+
+    Mail::fake();
+
+    $listener = app(SendTicketEmail::class);
+
+    $listener->handle(new TicketIssued($ticket));
+    $listener->handle(new TicketIssued($ticket->fresh()));
+
+    Mail::assertSent(TicketMail::class, 1);
+
+    expect($ticket->fresh()->ticket_email_sent_at)->not->toBeNull()
+        ->and($ticket->fresh()->ticket_email_sending_at)->toBeNull();
 });
 
 it('redeems a validated event ticket and records who redeemed it', function () {

@@ -35,6 +35,8 @@ class EventBoxTicket extends Model
         'payment_metadata',
         'purchase_ip_address',
         'purchase_user_agent',
+        'ticket_email_sending_at',
+        'ticket_email_sent_at',
     ];
 
     protected $casts = [
@@ -44,6 +46,8 @@ class EventBoxTicket extends Model
         'payment_metadata' => 'array',
         'redeemed_at' => 'datetime',
         'voided_at' => 'datetime',
+        'ticket_email_sending_at' => 'datetime',
+        'ticket_email_sent_at' => 'datetime',
     ];
 
     // Relationships
