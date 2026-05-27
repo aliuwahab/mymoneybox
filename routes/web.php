@@ -60,9 +60,9 @@ Route::put('/webhooks/piggy', [PiggyWebhookController::class, 'handle'])->name('
 // Piggy Box Routes (Public)
 Route::get('/piggy-someone', [PiggyBoxController::class, 'lookup'])->name('piggy.lookup');
 Route::post('/piggy-someone/find', [PiggyBoxController::class, 'findByCode'])->middleware('throttle:piggy-lookup')->name('piggy.find');
+Route::get('/piggy/callback', [PiggyBoxController::class, 'callback'])->name('piggy.callback');
 Route::get('/piggy/{code}', [PiggyBoxController::class, 'showByCode'])->middleware('throttle:piggy-public')->name('piggy.show');
 Route::post('/piggy/{user}/donate', [PiggyBoxController::class, 'donate'])->middleware('throttle:10,1')->name('piggy.donate');
-Route::get('/piggy/callback', [PiggyBoxController::class, 'callback'])->name('piggy.callback');
 
 // Webhook Routes (Provider-Specific)
 
