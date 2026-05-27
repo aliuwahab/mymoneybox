@@ -51,7 +51,7 @@ class ContributionInfolist
                 TextEntry::make('transaction_rrn')
                     ->placeholder('-'),
                 KeyValueEntry::make('payment_metadata')
-                    ->formatStateUsing(fn (?array $state): array => self::stringifyKeyValueState($state))
+                    ->state(fn ($record): array => self::stringifyKeyValueState($record->payment_metadata))
                     ->placeholder('-')
                     ->columnSpanFull(),
             ]);
