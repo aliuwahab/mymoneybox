@@ -9,6 +9,7 @@ use App\Models\PiggyDonation;
 use App\Models\User;
 use App\Models\WithdrawalAccount;
 use App\Payment\PaymentManager;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 
 function createPiggyWalletFixture(array $donationOverrides = []): array
@@ -60,10 +61,37 @@ function piggyWebhookPayload(string $reference = 'piggy_test_reference', string 
     ];
 }
 
+function fakeTrendiPayPiggyTransaction(string $reference = 'piggy_test_reference', int $amount = 3000, string $status = 'success', string $rrn = 'RRN-PIGGY-123'): void
+{
+    config([
+        'payment.trendipay.api_key' => 'api-token',
+        'payment.trendipay.merchant_external_id' => 'merchant-123',
+        'payment.trendipay.api_base_url' => 'https://trendipay.test',
+    ]);
+
+    Http::fake([
+        'https://trendipay.test/v1/merchants/merchant-123/transactions/'.$rrn => Http::response([
+            'success' => true,
+            'code' => '000',
+            'data' => [
+                'reference' => $reference,
+                'rrn' => $rrn,
+                'amount' => $amount,
+                'status' => $status,
+                'rSwitch' => 'mtn',
+                'accountNumber' => '0240000000',
+                'responseCode' => $status === 'success' ? '000' : '111',
+                'reason' => $status === 'success' ? null : 'Transaction queued for processing.',
+            ],
+        ], 200),
+    ]);
+}
+
 it('sends one receipt and credits the wallet once for duplicate piggy donation webhooks', function () {
     ['piggyBox' => $piggyBox, 'donation' => $donation] = createPiggyWalletFixture();
 
     Mail::fake();
+    fakeTrendiPayPiggyTransaction();
 
     $this->putJson(route('piggy.webhook'), piggyWebhookPayload())->assertOk();
     $this->putJson(route('piggy.webhook'), piggyWebhookPayload())
@@ -85,6 +113,7 @@ it('does not credit mismatched piggy donation payments', function () {
     ['piggyBox' => $piggyBox, 'donation' => $donation] = createPiggyWalletFixture();
 
     Mail::fake();
+    fakeTrendiPayPiggyTransaction(amount: 1000);
 
     $this->putJson(route('piggy.webhook'), piggyWebhookPayload(amount: 1000))->assertOk();
 
@@ -95,6 +124,28 @@ it('does not credit mismatched piggy donation payments', function () {
         ->and($piggyBox->donation_count)->toBe(0)
         ->and($donation->payment_status)->toBe(PaymentStatus::Failed)
         ->and($donation->payment_metadata['webhook']['amount_mismatch'])->toBeTrue();
+
+    Mail::assertNothingSent();
+});
+
+it('does not credit piggy donation webhooks until the rrn is verified by trendipay', function () {
+    ['piggyBox' => $piggyBox, 'donation' => $donation] = createPiggyWalletFixture();
+
+    Mail::fake();
+
+    $payload = piggyWebhookPayload();
+    unset($payload['data']['rrn']);
+
+    $this->putJson(route('piggy.webhook'), $payload)
+        ->assertStatus(202)
+        ->assertJson(['message' => 'Payment verification pending']);
+
+    $piggyBox->refresh();
+    $donation->refresh();
+
+    expect((float) $piggyBox->total_received)->toBe(0.0)
+        ->and($piggyBox->donation_count)->toBe(0)
+        ->and($donation->payment_status)->toBe(PaymentStatus::Pending);
 
     Mail::assertNothingSent();
 });
