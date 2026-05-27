@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Actions\UpdateMoneyBoxStatsAction;
 use App\Enums\PaymentStatus;
+use App\Enums\RefundStatus;
 use App\Enums\WithdrawalStatus;
 use App\Models\Contribution;
+use App\Models\EventBoxTicketRefund;
 use App\Models\MoneyBoxWithdrawal;
 use App\Models\PiggyBoxWithdrawal;
-use App\Models\PiggyDonation;
 use App\Payment\Providers\TrendiPayProvider;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -30,7 +31,7 @@ class TrendiPayWebhookController extends Controller
     {
         Log::info('TrendiPay webhook received', [
             'payload' => $request->all(),
-            'headers' => $request->headers->all()
+            'headers' => $request->headers->all(),
         ]);
 
         $payload = $request->all();
@@ -56,13 +57,18 @@ class TrendiPayWebhookController extends Controller
                 return $this->handleEventTicketCallback($webhookData, $reference);
             }
 
+            if (str_starts_with($reference, 'ERF-')) {
+                return $this->handleEventTicketRefundCallback($webhookData, $reference);
+            }
+
             // Find the contribution
             $contribution = Contribution::query()->where('payment_reference', $reference)->first();
 
-            if (!$contribution) {
+            if (! $contribution) {
                 Log::warning('TrendiPay webhook: Contribution not found', [
                     'reference' => $reference,
                 ]);
+
                 return response()->json(['status' => 'error', 'message' => 'Contribution not found'], 404);
             }
 
@@ -72,25 +78,26 @@ class TrendiPayWebhookController extends Controller
                     'reference' => $reference,
                     'current_status' => $contribution->payment_status->value,
                 ]);
+
                 return response()->json(['status' => 'success', 'message' => 'Already processed'], 200);
             }
 
-            $paymentStatus = match($webhookData['status']) {
+            $paymentStatus = match ($webhookData['status']) {
                 'completed' => PaymentStatus::Completed,
-                'failed'    => PaymentStatus::Failed,
-                default     => PaymentStatus::Pending,
+                'failed' => PaymentStatus::Failed,
+                default => PaymentStatus::Pending,
             };
 
             $contribution->update([
-                'payment_status'   => $paymentStatus,
-                'transaction_rrn'  => $webhookData['transaction_rrn'] ?? null,
+                'payment_status' => $paymentStatus,
+                'transaction_rrn' => $webhookData['transaction_rrn'] ?? null,
                 'payment_metadata' => $webhookData['raw_data'] ?? null,
             ]);
 
             Log::info('TrendiPay webhook: status updated', [
                 'contribution_id' => $contribution->id,
-                'reference'       => $reference,
-                'status'          => $paymentStatus->value,
+                'reference' => $reference,
+                'status' => $paymentStatus->value,
             ]);
 
             if ($paymentStatus === PaymentStatus::Completed) {
@@ -104,16 +111,15 @@ class TrendiPayWebhookController extends Controller
             Log::error('TrendiPay webhook: Processing error', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
-                'payload' => $request->all()
+                'payload' => $request->all(),
             ]);
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Internal error processing webhook'
+                'message' => 'Internal error processing webhook',
             ], 500);
         }
     }
-
 
     /**
      * Handle a disbursement callback from TrendiPay.
@@ -126,15 +132,15 @@ class TrendiPayWebhookController extends Controller
 
         Log::info('TrendiPay disbursement webhook received', [
             'disbursement_reference' => $disbursementReference,
-            'withdrawal_reference'   => $withdrawalReference,
-            'status'                 => $webhookData['status'],
+            'withdrawal_reference' => $withdrawalReference,
+            'status' => $webhookData['status'],
         ]);
 
         // Try MoneyBox withdrawal first, then PiggyBox
         $withdrawal = MoneyBoxWithdrawal::where('reference', $withdrawalReference)->first()
             ?? PiggyBoxWithdrawal::where('reference', $withdrawalReference)->first();
 
-        if (!$withdrawal) {
+        if (! $withdrawal) {
             Log::warning('TrendiPay disbursement webhook: withdrawal not found', [
                 'withdrawal_reference' => $withdrawalReference,
             ]);
@@ -146,12 +152,12 @@ class TrendiPayWebhookController extends Controller
 
         if ($isSuccess) {
             $withdrawal->update([
-                'status'           => WithdrawalStatus::Disbursed,
-                'disbursed_at'     => now(),
+                'status' => WithdrawalStatus::Disbursed,
+                'disbursed_at' => now(),
                 'payment_metadata' => array_merge($withdrawal->payment_metadata ?? [], [
                     'disbursement_confirmed' => true,
-                    'disbursement_callback'  => $webhookData['raw_data'] ?? [],
-                    'confirmed_at'           => now()->toDateTimeString(),
+                    'disbursement_callback' => $webhookData['raw_data'] ?? [],
+                    'confirmed_at' => now()->toDateTimeString(),
                 ]),
             ]);
 
@@ -160,17 +166,17 @@ class TrendiPayWebhookController extends Controller
         } else {
             // Transfer ultimately failed — mark accordingly
             $withdrawal->update([
-                'status'         => WithdrawalStatus::Failed,
+                'status' => WithdrawalStatus::Failed,
                 'failure_reason' => $webhookData['reason'] ?? 'Disbursement failed via TrendiPay callback',
                 'payment_metadata' => array_merge($withdrawal->payment_metadata ?? [], [
                     'disbursement_failed_callback' => $webhookData['raw_data'] ?? [],
-                    'failed_at'                    => now()->toDateTimeString(),
+                    'failed_at' => now()->toDateTimeString(),
                 ]),
             ]);
 
             Log::warning('TrendiPay disbursement failed via callback', [
                 'reference' => $withdrawalReference,
-                'reason'    => $webhookData['reason'] ?? null,
+                'reason' => $webhookData['reason'] ?? null,
             ]);
         }
 
@@ -195,28 +201,32 @@ class TrendiPayWebhookController extends Controller
 
         if ($tickets->isEmpty()) {
             Log::warning('EventBox ticket webhook: ticket(s) not found', ['reference' => $reference]);
+
             return response()->json(['status' => 'error', 'message' => 'Ticket not found'], 404);
         }
 
         // Idempotency: all tickets already completed
-        if ($tickets->every(fn($t) => $t->payment_status === \App\Enums\PaymentStatus::Completed)) {
+        if ($tickets->every(fn ($t) => $t->payment_status === \App\Enums\PaymentStatus::Completed)) {
             return response()->json(['status' => 'success', 'message' => 'Already processed'], 200);
         }
 
-        $paymentStatus = match($webhookData['status']) {
+        $paymentStatus = match ($webhookData['status']) {
             'completed' => \App\Enums\PaymentStatus::Completed,
-            'failed'    => \App\Enums\PaymentStatus::Failed,
-            default     => \App\Enums\PaymentStatus::Pending,
+            'failed' => \App\Enums\PaymentStatus::Failed,
+            default => \App\Enums\PaymentStatus::Pending,
         };
 
         foreach ($tickets as $ticket) {
             $updates = [
-                'payment_status'   => $paymentStatus,
+                'payment_status' => $paymentStatus,
+                'payment_method' => $webhookData['payment_method'] ?? $ticket->payment_method,
+                'payment_account_number' => $webhookData['account_number'] ?? $ticket->payment_account_number,
+                'transaction_rrn' => $webhookData['transaction_rrn'] ?? $ticket->transaction_rrn,
                 'payment_metadata' => $webhookData['raw_data'] ?? null,
             ];
 
             if ($paymentStatus === \App\Enums\PaymentStatus::Completed) {
-                $updates['code']   = \App\Models\EventBoxTicket::generateCode();
+                $updates['code'] = \App\Models\EventBoxTicket::generateCode();
                 $updates['status'] = 'unused';
             }
 
@@ -242,10 +252,10 @@ class TrendiPayWebhookController extends Controller
 
         // Re-check sold-out after all tickets in the group are processed
         if ($paymentStatus === \App\Enums\PaymentStatus::Completed) {
-            $eventBox    = $tickets->first()->eventBox->fresh()->load('ticketTypes');
+            $eventBox = $tickets->first()->eventBox->fresh()->load('ticketTypes');
             $overallFull = $eventBox->capacity && $eventBox->tickets_sold >= $eventBox->capacity;
-            $typesFull   = $eventBox->ticketTypes->isNotEmpty()
-                && $eventBox->ticketTypes->every(fn($t) => !$t->isAvailable());
+            $typesFull = $eventBox->ticketTypes->isNotEmpty()
+                && $eventBox->ticketTypes->every(fn ($t) => ! $t->isAvailable());
 
             if ($overallFull || $typesFull) {
                 $eventBox->update(['status' => 'sold_out']);
@@ -254,11 +264,65 @@ class TrendiPayWebhookController extends Controller
 
         Log::info('EventBox ticket webhook processed', [
             'reference' => $reference,
-            'count'     => $tickets->count(),
-            'status'    => $paymentStatus->value,
+            'count' => $tickets->count(),
+            'status' => $paymentStatus->value,
         ]);
 
         return response()->json(['status' => 'success', 'message' => 'Ticket(s) processed'], 200);
+    }
+
+    private function handleEventTicketRefundCallback(array $webhookData, string $reference): JsonResponse
+    {
+        $refundReference = preg_replace('/-REFUND-\d+$/', '', $reference);
+
+        $refund = EventBoxTicketRefund::with('ticket.eventBox')
+            ->where('reference', $refundReference)
+            ->first();
+
+        if (! $refund) {
+            Log::warning('EventBox ticket refund webhook: refund not found', ['reference' => $reference]);
+
+            return response()->json(['status' => 'error', 'message' => 'Refund not found'], 404);
+        }
+
+        if (in_array($refund->status, [RefundStatus::Completed, RefundStatus::Failed], true)) {
+            return response()->json(['status' => 'success', 'message' => 'Already processed'], 200);
+        }
+
+        if ($webhookData['status'] === 'completed') {
+            $refund->update([
+                'status' => RefundStatus::Completed,
+                'completed_at' => now(),
+                'transaction_reference' => $webhookData['external_id'] ?? $webhookData['transaction_id'] ?? $refund->transaction_reference,
+                'payment_metadata' => array_merge($refund->payment_metadata ?? [], [
+                    'callback' => $webhookData['raw_data'] ?? [],
+                    'callback_at' => now()->toDateTimeString(),
+                ]),
+            ]);
+
+            activity('eventbox')
+                ->performedOn($refund->ticket->eventBox)
+                ->event('ticket_refund_completed')
+                ->withProperties([
+                    'ticket_id' => $refund->event_box_ticket_id,
+                    'refund_id' => $refund->id,
+                    'refund_reference' => $refund->reference,
+                    'refund_amount' => (float) $refund->refund_amount,
+                ])
+                ->log('Ticket refund completed');
+        } elseif ($webhookData['status'] === 'failed') {
+            $refund->update([
+                'status' => RefundStatus::Failed,
+                'failed_at' => now(),
+                'failure_reason' => $webhookData['reason'] ?? 'Refund failed via payment provider callback.',
+                'payment_metadata' => array_merge($refund->payment_metadata ?? [], [
+                    'failed_callback' => $webhookData['raw_data'] ?? [],
+                    'failed_at' => now()->toDateTimeString(),
+                ]),
+            ]);
+        }
+
+        return response()->json(['status' => 'success', 'message' => 'Refund callback processed'], 200);
     }
 
     /**
@@ -268,39 +332,39 @@ class TrendiPayWebhookController extends Controller
      */
     protected function validateWebhookPayload(array $payload): ?JsonResponse
     {
-        if (!isset($payload['data'])) {
+        if (! isset($payload['data'])) {
             Log::warning('TrendiPay webhook: Invalid payload - missing data field', [
-                'payload' => $payload
+                'payload' => $payload,
             ]);
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Invalid webhook payload: missing data field'
+                'message' => 'Invalid webhook payload: missing data field',
             ], 400);
         }
 
         $data = $payload['data'];
 
         // Check for required fields
-        if (!isset($data['reference'])) {
+        if (! isset($data['reference'])) {
             Log::warning('TrendiPay webhook: Invalid payload - missing reference', [
-                'payload' => $payload
+                'payload' => $payload,
             ]);
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Invalid webhook payload: missing reference'
+                'message' => 'Invalid webhook payload: missing reference',
             ], 400);
         }
 
-        if (!isset($data['status'])) {
+        if (! isset($data['status'])) {
             Log::warning('TrendiPay webhook: Invalid payload - missing status', [
-                'payload' => $payload
+                'payload' => $payload,
             ]);
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Invalid webhook payload: missing status'
+                'message' => 'Invalid webhook payload: missing status',
             ], 400);
         }
 

@@ -12,7 +12,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 class EventBox extends Model implements HasMedia
 {
-    use SoftDeletes, InteractsWithMedia;
+    use InteractsWithMedia, SoftDeletes;
 
     public function getRouteKeyName(): string
     {
@@ -35,14 +35,18 @@ class EventBox extends Model implements HasMedia
         'tickets_sold',
         'status',
         'fee_percentage',
+        'created_ip_address',
+        'created_user_agent',
+        'updated_ip_address',
+        'updated_user_agent',
     ];
 
     protected $casts = [
-        'event_date'     => 'datetime',
+        'event_date' => 'datetime',
         'fee_percentage' => 'decimal:2',
-        'tickets_sold'   => 'integer',
-        'capacity'       => 'integer',
-        'status'         => EventBoxStatus::class,
+        'tickets_sold' => 'integer',
+        'capacity' => 'integer',
+        'status' => EventBoxStatus::class,
     ];
 
     // Relationships
@@ -79,7 +83,7 @@ class EventBox extends Model implements HasMedia
 
         // All ticket types exhausted
         if ($this->relationLoaded('ticketTypes') && $this->ticketTypes->isNotEmpty()) {
-            return $this->ticketTypes->every(fn($t) => !$t->isAvailable());
+            return $this->ticketTypes->every(fn ($t) => ! $t->isAvailable());
         }
 
         return false;
@@ -96,7 +100,7 @@ class EventBox extends Model implements HasMedia
 
     public function canPurchase(): bool
     {
-        return $this->isActive() && !$this->isSoldOut();
+        return $this->isActive() && ! $this->isSoldOut();
     }
 
     public function getPublicUrl(): string

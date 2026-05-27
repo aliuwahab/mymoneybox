@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\UserType;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -19,7 +19,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable, SoftDeletes;
+    use HasFactory, Notifiable, SoftDeletes, TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -33,6 +33,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'country_id',
         'piggy_code',
         'user_type',
+        'ip_address',
     ];
 
     /**
@@ -146,9 +147,9 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     {
         return $this->hasOne(IdVerification::class)
             ->where('status', 'approved')
-            ->where(function($q) {
+            ->where(function ($q) {
                 $q->whereNull('expires_at')
-                  ->orWhere('expires_at', '>', now());
+                    ->orWhere('expires_at', '>', now());
             })
             ->latestOfMany();
     }
@@ -191,7 +192,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     public static function generateUniquePiggyCode(): string
     {
         do {
-            $code = strtoupper(Str::random(4) . rand(0, 9));
+            $code = strtoupper(Str::random(4).rand(0, 9));
         } while (self::where('piggy_code', $code)->exists());
 
         return $code;
@@ -199,7 +200,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify(new \App\Notifications\VerifyEmailNotification());
+        $this->notify(new \App\Notifications\VerifyEmailNotification);
     }
 
     public function sendPasswordResetNotification($token): void

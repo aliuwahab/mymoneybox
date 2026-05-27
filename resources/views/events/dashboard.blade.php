@@ -10,6 +10,11 @@
             loading: false,
             redeemLoading: false,
             redeemDone: false,
+            showVoidModal: false,
+            voidTicketData: null,
+            voidConfirmation: '',
+            voidReason: '',
+            voidLoading: false,
             scanner: null,
             scannerControls: null,
             scannerStarting: false,
@@ -27,6 +32,19 @@
             closeModal() {
                 this.showValidateModal = false;
                 this.stopScanner();
+            },
+            openVoidModal(ticket) {
+                this.voidTicketData = ticket;
+                this.voidConfirmation = '';
+                this.voidReason = '';
+                this.showVoidModal = true;
+            },
+            closeVoidModal() {
+                if (this.voidLoading) return;
+                this.showVoidModal = false;
+                this.voidTicketData = null;
+                this.voidConfirmation = '';
+                this.voidReason = '';
             },
             switchScanTab(t) {
                 this.scanTab = t;
@@ -163,16 +181,21 @@
                     this.redeemLoading = false;
                 }
             },
-            async voidTicket(ticketId) {
-                if (!confirm('Void this ticket? It will be marked refunded and can no longer be used.')) return;
+            async voidTicket() {
+                if (!this.voidTicketData) return;
+                this.voidLoading = true;
                 try {
-                    const resp = await fetch(`/events/{{ $eventBox->slug }}/tickets/${ticketId}/void`, {
+                    const resp = await fetch(`/events/{{ $eventBox->slug }}/tickets/${this.voidTicketData.id}/void`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
                             'Accept': 'application/json',
                         },
+                        body: JSON.stringify({
+                            code_confirmation: this.voidConfirmation.trim(),
+                            reason: this.voidReason.trim(),
+                        }),
                     });
                     const data = await resp.json();
                     if (data.status === 'voided') {
@@ -182,6 +205,8 @@
                     }
                 } catch(e) {
                     alert('Network error. Please try again.');
+                } finally {
+                    this.voidLoading = false;
                 }
             }
         }"
@@ -305,15 +330,49 @@
             <button class="tab" :class="tab === 'revenue' ? 'active' : ''" @click="tab = 'revenue'">Revenue report</button>
             <button class="tab" :class="tab === 'details' ? 'active' : ''" @click="tab = 'details'">Event details</button>
             <button class="tab" :class="tab === 'images' ? 'active' : ''" @click="tab = 'images'">Images</button>
+            <button class="tab" :class="tab === 'audit' ? 'active' : ''" @click="tab = 'audit'">Audit log</button>
         </div>
 
         {{-- Attendees tab --}}
         <div x-show="tab === 'attendees'" x-cloak>
             <div class="card">
                 <div class="card-head">
-                    <div class="card-title">Attendees ({{ $completedTickets->count() }} confirmed)</div>
+                    <div>
+                        <div class="card-title">Attendees ({{ $attendeeTickets->count() }} shown)</div>
+                        <div class="tiny">{{ $completedTickets->count() }} confirmed, {{ $voidedTickets->count() }} voided</div>
+                    </div>
+                    <a href="{{ route('events.attendees.export', $eventBox) }}?{{ http_build_query($attendeeFilters) }}" class="btn btn-sm">
+                        Export CSV
+                    </a>
                 </div>
-                @if($completedTickets->count() > 0)
+                <div class="card-body border-b border-[#E6E3DC]">
+                    <form method="GET" action="{{ route('events.dashboard', $eventBox) }}" class="grid grid-cols-1 md:grid-cols-[1fr_150px_180px_auto] gap-2">
+                        <input
+                            type="search"
+                            name="q"
+                            value="{{ $attendeeFilters['q'] }}"
+                            placeholder="Search name, email, phone, or code"
+                            class="w-full border border-[#E6E3DC] rounded-[7px] px-3 py-2 text-[13px] text-[#15140F] bg-white placeholder-[#9C998F] focus:outline-none focus:ring-2 focus:ring-[#1B6B4E]/30 focus:border-[#1B6B4E]"
+                        >
+                        <select name="status" class="w-full border border-[#E6E3DC] rounded-[7px] px-3 py-2 text-[13px] text-[#15140F] bg-white focus:outline-none focus:ring-2 focus:ring-[#1B6B4E]/30 focus:border-[#1B6B4E]">
+                            <option value="all" @selected($attendeeFilters['status'] === 'all')>All statuses</option>
+                            <option value="unused" @selected($attendeeFilters['status'] === 'unused')>Unused</option>
+                            <option value="redeemed" @selected($attendeeFilters['status'] === 'redeemed')>Redeemed</option>
+                            <option value="voided" @selected($attendeeFilters['status'] === 'voided')>Voided</option>
+                        </select>
+                        <select name="ticket_type" class="w-full border border-[#E6E3DC] rounded-[7px] px-3 py-2 text-[13px] text-[#15140F] bg-white focus:outline-none focus:ring-2 focus:ring-[#1B6B4E]/30 focus:border-[#1B6B4E]">
+                            <option value="all" @selected($attendeeFilters['ticket_type'] === 'all')>All ticket types</option>
+                            @foreach($ticketTypes as $type)
+                                <option value="{{ $type->id }}" @selected((string) $attendeeFilters['ticket_type'] === (string) $type->id)>{{ $type->name }}</option>
+                            @endforeach
+                        </select>
+                        <div class="flex gap-2">
+                            <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                            <a href="{{ route('events.dashboard', $eventBox) }}" class="btn btn-sm">Reset</a>
+                        </div>
+                    </form>
+                </div>
+                @if($attendeeTickets->count() > 0)
                     <table class="data-table">
                         <thead>
                             <tr>
@@ -328,7 +387,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($completedTickets as $ticket)
+                            @foreach($attendeeTickets as $ticket)
                                 <tr>
                                     <td class="font-medium text-[#15140F]">{{ $ticket->buyer_name }}</td>
                                     <td class="muted text-[12.5px]">{{ $ticket->buyer_email }}</td>
@@ -350,11 +409,19 @@
                                     </td>
                                     <td class="num font-semibold text-[#15140F] tnum">GH₵ {{ number_format((float) $ticket->amount, 2) }}</td>
                                     <td>
-                                        @if($ticket->status->value !== 'voided')
-                                            <button type="button" @click="voidTicket({{ $ticket->id }})"
+                                        @if($ticket->isVoidable())
+                                            <button type="button" @click="openVoidModal(@js([
+                                                'id' => $ticket->id,
+                                                'code' => $ticket->code,
+                                                'buyer_name' => $ticket->buyer_name,
+                                                'buyer_email' => $ticket->buyer_email,
+                                                'amount' => 'GH₵ ' . number_format((float) $ticket->amount, 2),
+                                            ]))"
                                                 class="text-[12px] text-red-500 hover:text-red-700 underline whitespace-nowrap">
                                                 Void
                                             </button>
+                                        @elseif($ticket->status->value === 'redeemed')
+                                            <span class="text-[11.5px] text-[#9C998F]">Locked</span>
                                         @else
                                             <span class="text-[11.5px] text-[#C5C2BC]">Voided</span>
                                         @endif
@@ -365,8 +432,8 @@
                     </table>
                 @else
                     <div class="card-body text-center py-12">
-                        <div class="text-[#9C998F] mb-1">No confirmed attendees yet</div>
-                        <div class="tiny">Share your event to start selling tickets.</div>
+                        <div class="text-[#9C998F] mb-1">No attendees match these filters</div>
+                        <div class="tiny">Adjust the search or status filters.</div>
                     </div>
                 @endif
             </div>
@@ -577,6 +644,44 @@
 
         </div>
 
+        {{-- Audit tab --}}
+        <div x-show="tab === 'audit'" x-cloak>
+            <div class="card">
+                <div class="card-head">
+                    <div class="card-title">Recent activity</div>
+                </div>
+                @if($activityLog->count() > 0)
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Actor</th>
+                                <th>When</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($activityLog as $activity)
+                                <tr>
+                                    <td class="font-medium text-[#15140F]">{{ $activity->description }}</td>
+                                    <td class="text-[12.5px] text-[#6B6862]">{{ $activity->causer?->name ?? 'System' }}</td>
+                                    <td class="text-[12px] text-[#6B6862]">{{ $activity->created_at?->format('M j, Y · g:ia') }}</td>
+                                    <td class="text-[12px] text-[#6B6862]">
+                                        @php
+                                            $props = collect($activity->properties ?? [])->only(['ticket_code', 'refund_reference', 'refund_amount', 'status', 'ip_address'])->filter();
+                                        @endphp
+                                        {{ $props->map(fn($value, $key) => str_replace('_', ' ', $key) . ': ' . (is_array($value) ? json_encode($value) : $value))->implode(' · ') ?: '—' }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @else
+                    <div class="card-body text-center py-8 text-[#9C998F] text-[13px]">No activity recorded yet.</div>
+                @endif
+            </div>
+        </div>
+
     {{-- ── Validate Ticket Modal ── --}}
     <div
         x-show="showValidateModal"
@@ -741,6 +846,85 @@
                             Check another ticket
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ── Void Ticket Modal ── --}}
+    <div
+        x-show="showVoidModal"
+        x-cloak
+        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+    >
+        <div class="absolute inset-0 bg-[#15140F]/60" @click="closeVoidModal()"></div>
+
+        <div
+            class="relative bg-white rounded-[14px] shadow-2xl w-full max-w-[480px] overflow-hidden"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+        >
+            <div class="flex items-center justify-between px-6 py-4 border-b border-[#E6E3DC]">
+                <div class="text-[15px] font-semibold text-[#15140F]">Confirm ticket void</div>
+                <button @click="closeVoidModal()" class="w-7 h-7 rounded-full bg-[#F3F1EB] flex items-center justify-center text-[#6B6862] hover:bg-[#E6E3DC]">
+                    <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="p-6">
+                <div class="rounded-[8px] bg-[#FBFAF6] border border-[#E6E3DC] p-4 mb-4">
+                    <div class="text-[12px] text-[#6B6862] mb-1">Ticket code</div>
+                    <div class="font-mono text-[15px] font-semibold text-[#15140F]" x-text="voidTicketData && voidTicketData.code"></div>
+                    <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 text-[12.5px]">
+                        <div>
+                            <div class="text-[#9C998F]">Buyer</div>
+                            <div class="font-medium text-[#15140F]" x-text="voidTicketData && voidTicketData.buyer_name"></div>
+                        </div>
+                        <div>
+                            <div class="text-[#9C998F]">Amount</div>
+                            <div class="font-medium text-[#15140F]" x-text="voidTicketData && voidTicketData.amount"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-[12.5px] font-medium text-[#6B6862] mb-1.5">Enter the ticket code to confirm</label>
+                    <input
+                        type="text"
+                        x-model="voidConfirmation"
+                        class="w-full border border-[#E6E3DC] rounded-[7px] px-3 py-2.5 text-[14px] font-mono text-[#15140F] bg-white placeholder-[#C5C2BC] focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500"
+                        :placeholder="voidTicketData ? voidTicketData.code : 'TKT-XXXX-XXXX-XXXX'"
+                    >
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-[12.5px] font-medium text-[#6B6862] mb-1.5">Reason</label>
+                    <textarea
+                        x-model="voidReason"
+                        rows="3"
+                        class="w-full border border-[#E6E3DC] rounded-[7px] px-3 py-2.5 text-[13px] text-[#15140F] bg-white placeholder-[#C5C2BC] focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500"
+                        placeholder="Optional note for audit history"
+                    ></textarea>
+                </div>
+
+                <div class="flex justify-end gap-2">
+                    <button type="button" @click="closeVoidModal()" class="btn">Cancel</button>
+                    <button
+                        type="button"
+                        @click="voidTicket()"
+                        :disabled="voidLoading || !voidTicketData || voidConfirmation.trim() !== voidTicketData.code"
+                        class="btn btn-sm bg-red-600 hover:bg-red-700 text-white disabled:opacity-50"
+                    >
+                        <span x-show="!voidLoading">Void and queue refund</span>
+                        <span x-show="voidLoading">Voiding...</span>
+                    </button>
                 </div>
             </div>
         </div>

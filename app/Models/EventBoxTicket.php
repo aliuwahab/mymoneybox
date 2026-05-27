@@ -6,6 +6,7 @@ use App\Enums\PaymentStatus;
 use App\Enums\TicketStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class EventBoxTicket extends Model
 {
@@ -16,24 +17,33 @@ class EventBoxTicket extends Model
         'buyer_name',
         'buyer_email',
         'buyer_phone',
+        'payment_account_number',
         'amount',
         'payment_reference',
         'payment_group',
         'quantity',
         'payment_status',
+        'payment_method',
+        'transaction_rrn',
         'code',
         'status',
         'redeemed_at',
         'redeemed_by',
+        'voided_at',
+        'voided_by',
+        'void_reason',
         'payment_metadata',
+        'purchase_ip_address',
+        'purchase_user_agent',
     ];
 
     protected $casts = [
-        'amount'           => 'decimal:2',
-        'payment_status'   => PaymentStatus::class,
-        'status'           => TicketStatus::class,
+        'amount' => 'decimal:2',
+        'payment_status' => PaymentStatus::class,
+        'status' => TicketStatus::class,
         'payment_metadata' => 'array',
-        'redeemed_at'      => 'datetime',
+        'redeemed_at' => 'datetime',
+        'voided_at' => 'datetime',
     ];
 
     // Relationships
@@ -53,6 +63,16 @@ class EventBoxTicket extends Model
         return $this->belongsTo(User::class, 'redeemed_by');
     }
 
+    public function voidedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'voided_by');
+    }
+
+    public function refund(): HasOne
+    {
+        return $this->hasOne(EventBoxTicketRefund::class);
+    }
+
     // Methods
 
     public static function generateCode(): string
@@ -68,7 +88,7 @@ class EventBoxTicket extends Model
                 }
                 $segments[] = $segment;
             }
-            $code = 'TKT-' . implode('-', $segments);
+            $code = 'TKT-'.implode('-', $segments);
         } while (self::where('code', $code)->exists());
 
         return $code;
@@ -80,10 +100,16 @@ class EventBoxTicket extends Model
             && $this->status === TicketStatus::Unused;
     }
 
+    public function isVoidable(): bool
+    {
+        return $this->payment_status === PaymentStatus::Completed
+            && $this->status === TicketStatus::Unused;
+    }
+
     public function redeem(int $userId): void
     {
         $this->update([
-            'status'      => TicketStatus::Redeemed,
+            'status' => TicketStatus::Redeemed,
             'redeemed_at' => now(),
             'redeemed_by' => $userId,
         ]);

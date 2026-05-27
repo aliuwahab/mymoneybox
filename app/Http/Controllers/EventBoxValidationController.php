@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreateEventBoxTicketRefundAction;
 use App\Enums\PaymentStatus;
 use App\Enums\TicketStatus;
 use App\Models\EventBox;
@@ -26,18 +27,18 @@ class EventBoxValidationController extends Controller
             ->where('event_box_id', $eventBox->id)
             ->first();
 
-        if (!$ticket) {
+        if (! $ticket) {
             return response()->json([
-                'status'  => 'not_found',
+                'status' => 'not_found',
                 'message' => 'Ticket not found for this event',
             ]);
         }
 
         if ($ticket->status === TicketStatus::Redeemed) {
             return response()->json([
-                'status'       => 'already_redeemed',
-                'redeemed_at'  => $ticket->redeemed_at?->toDateTimeString(),
-                'holder_name'  => $ticket->buyer_name,
+                'status' => 'already_redeemed',
+                'redeemed_at' => $ticket->redeemed_at?->toDateTimeString(),
+                'holder_name' => $ticket->buyer_name,
             ]);
         }
 
@@ -54,18 +55,18 @@ class EventBoxValidationController extends Controller
         }
 
         return response()->json([
-            'status'       => 'valid',
-            'ticket_id'    => $ticket->id,
-            'holder_name'  => $ticket->buyer_name,
+            'status' => 'valid',
+            'ticket_id' => $ticket->id,
+            'holder_name' => $ticket->buyer_name,
             'holder_email' => $ticket->buyer_email,
-            'code'         => $ticket->code,
+            'code' => $ticket->code,
         ]);
     }
 
     /**
      * Void a ticket (owner only). Decrements sold counts and marks refunded.
      */
-    public function void(Request $request, EventBox $eventBox, EventBoxTicket $ticket): JsonResponse
+    public function void(Request $request, EventBox $eventBox, EventBoxTicket $ticket, CreateEventBoxTicketRefundAction $refundAction): JsonResponse
     {
         abort_if(auth()->id() !== $eventBox->user_id, 403);
 
@@ -73,33 +74,39 @@ class EventBoxValidationController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Ticket does not belong to this event.'], 422);
         }
 
+        $validated = $request->validate([
+            'code_confirmation' => ['required', 'string'],
+            'reason' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        if (! hash_equals((string) $ticket->code, trim($validated['code_confirmation']))) {
+            return response()->json(['status' => 'error', 'message' => 'Ticket code confirmation does not match.'], 422);
+        }
+
         if ($ticket->status === TicketStatus::Voided) {
             return response()->json(['status' => 'error', 'message' => 'Ticket is already voided.'], 422);
         }
 
-        $wasCompleted = $ticket->payment_status === PaymentStatus::Completed;
-
-        $ticket->update([
-            'status'         => TicketStatus::Voided,
-            'payment_status' => PaymentStatus::Refunded,
-        ]);
-
-        if ($wasCompleted) {
-            $eventBox->decrement('tickets_sold');
-
-            if ($ticket->ticket_type_id) {
-                \App\Models\EventBoxTicketType::where('id', $ticket->ticket_type_id)
-                    ->where('sold', '>', 0)
-                    ->decrement('sold');
-            }
-
-            // Restore sold_out event back to active
-            if ($eventBox->fresh()->status->value === 'sold_out') {
-                $eventBox->update(['status' => 'active']);
-            }
+        if ($ticket->status === TicketStatus::Redeemed) {
+            return response()->json(['status' => 'error', 'message' => 'Redeemed tickets cannot be voided.'], 422);
         }
 
-        return response()->json(['status' => 'voided', 'message' => 'Ticket voided successfully.']);
+        if ($ticket->payment_status !== PaymentStatus::Completed || $ticket->status !== TicketStatus::Unused) {
+            return response()->json(['status' => 'error', 'message' => 'Only unused paid tickets can be voided.'], 422);
+        }
+
+        try {
+            $refund = $refundAction->execute($ticket, auth()->id(), $validated['reason'] ?? null);
+        } catch (\RuntimeException $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 422);
+        }
+
+        return response()->json([
+            'status' => 'voided',
+            'message' => 'Ticket voided and refund queued.',
+            'refund_reference' => $refund->reference,
+            'refund_amount' => (float) $refund->refund_amount,
+        ]);
     }
 
     /**
@@ -111,22 +118,33 @@ class EventBoxValidationController extends Controller
 
         if ($ticket->event_box_id !== $eventBox->id) {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Ticket does not belong to this event',
             ], 422);
         }
 
-        if (!$ticket->isRedeemable()) {
+        if (! $ticket->isRedeemable()) {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Ticket is not redeemable',
             ], 422);
         }
 
         $ticket->redeem(auth()->id());
 
+        activity('eventbox')
+            ->performedOn($eventBox)
+            ->causedBy(auth()->user())
+            ->event('ticket_redeemed')
+            ->withProperties([
+                'ticket_id' => $ticket->id,
+                'ticket_code' => $ticket->code,
+                'ip_address' => $request->ip(),
+            ])
+            ->log('Ticket redeemed');
+
         return response()->json([
-            'status'  => 'redeemed',
+            'status' => 'redeemed',
             'message' => 'Ticket redeemed successfully',
         ]);
     }

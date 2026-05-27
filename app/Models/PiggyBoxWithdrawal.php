@@ -134,6 +134,16 @@ class PiggyBoxWithdrawal extends Model
         return $this->piggyBox->formatAmount($this->net_amount);
     }
 
+    public function getFormattedNetAmount(): string
+    {
+        return $this->formatNetAmount();
+    }
+
+    public function getFormattedAmount(): string
+    {
+        return $this->formatAmount();
+    }
+
     public function formatFee(): string
     {
         return $this->piggyBox->formatAmount($this->fee);
@@ -142,6 +152,6 @@ class PiggyBoxWithdrawal extends Model
     // Generate unique reference
     public static function generateReference(): string
     {
-        return 'PB-WD-' . strtoupper(uniqid());
+        return 'PB-WD-'.strtoupper(uniqid());
     }
 }
