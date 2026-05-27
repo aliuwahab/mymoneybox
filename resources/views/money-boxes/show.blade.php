@@ -107,6 +107,10 @@
                     <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6L8 22H2v-6L14 4Z"/></svg>
                     Edit
                 </a>
+                <a href="{{ route('money-boxes.contributions.export', $moneyBox) }}" class="btn">
+                    <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12"/><path d="m6 10 6 6 6-6"/><path d="M4 20h16"/></svg>
+                    Export CSV
+                </a>
                 <a href="{{ route('money-boxes.share', $moneyBox) }}" wire:navigate class="btn">
                     <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M8.6 13.5 15.4 17"/><path d="M15.4 7 8.6 10.5"/></svg>
                     Share
@@ -317,11 +321,66 @@
 
         {{-- ── Contributions tab ── --}}
         <div x-show="tab === 'contributions'" x-cloak>
+            @php
+                $recoverableContributions = $moneyBox->contributions
+                    ->filter(fn($c) => in_array($c->payment_status->value, ['pending', 'failed'], true));
+            @endphp
+            @if($recoverableContributions->count() > 0)
+                <div class="card mb-4">
+                    <div class="card-head">
+                        <div>
+                            <div class="card-title">Pending and failed payments</div>
+                            <div class="tiny">Use verify to reconcile TrendiPay status before contacting the donor.</div>
+                        </div>
+                        <span class="pill pill-warn"><span class="pill-dot"></span>{{ $recoverableContributions->count() }} need review</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="data-table">
+                            <thead><tr>
+                                <th>Contributor</th><th>Reference</th><th>Status</th><th>Webhook</th><th class="num">Amount</th><th></th>
+                            </tr></thead>
+                            <tbody>
+                                @foreach($recoverableContributions as $c)
+                                    <tr>
+                                        <td>
+                                            <div class="font-medium text-[#15140F]">{{ $c->getDisplayName() }}</div>
+                                            <div class="tiny">{{ $c->contributor_email ?? 'No email' }}</div>
+                                        </td>
+                                        <td class="font-mono text-[12px]">{{ $c->payment_reference }}</td>
+                                        <td>
+                                            <span class="pill {{ $c->payment_status->value === 'failed' ? 'pill-danger' : 'pill-warn' }}">
+                                                <span class="pill-dot"></span>{{ ucfirst($c->payment_status->value) }}
+                                            </span>
+                                        </td>
+                                        <td class="text-[12px] text-[#6B6862]">
+                                            <div>{{ number_format((int) $c->webhook_attempts) }} attempt{{ (int) $c->webhook_attempts === 1 ? '' : 's' }}</div>
+                                            <div class="tiny">
+                                                {{ $c->webhook_last_received_at?->diffForHumans() ?? 'No webhook yet' }}
+                                                @if($c->webhook_last_signature_valid === false)
+                                                    · invalid signature
+                                                @endif
+                                            </div>
+                                        </td>
+                                        <td class="num font-semibold text-[#15140F]">{{ $sym }}{{ number_format($c->amount, 2) }}</td>
+                                        <td class="text-right">
+                                            <form action="{{ route('money-boxes.contributions.verify', [$moneyBox, $c]) }}" method="POST">
+                                                @csrf
+                                                <button class="btn btn-sm" type="submit">Verify</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @endif
+
             <div class="card">
                 @if($moneyBox->contributions->count() > 0)
                     <table class="data-table">
                         <thead><tr>
-                            <th>Contributor</th><th>Message</th><th>Method</th><th>Status</th><th class="num">Amount</th><th>Date</th><th></th>
+                            <th>Contributor</th><th>Message</th><th>Method</th><th>Status</th><th class="num">Amount</th><th>Date</th><th>Receipt</th><th></th>
                         </tr></thead>
                         <tbody>
                             @foreach($moneyBox->contributions as $c)
@@ -339,7 +398,7 @@
                                     <td class="muted text-[12.5px] max-w-[200px]">{{ $c->message ? Str::limit($c->message, 48) : '—' }}</td>
                                     <td><span class="pill pill-muted"><span class="pill-dot"></span>{{ $c->payment_method ?? 'Card' }}</span></td>
                                     <td>
-                                        <span class="pill {{ $c->payment_status->value === 'completed' ? 'pill-ok' : 'pill-warn' }}">
+                                        <span class="pill {{ $c->payment_status->value === 'completed' ? 'pill-ok' : ($c->payment_status->value === 'failed' ? 'pill-danger' : 'pill-warn') }}">
                                             <span class="pill-dot"></span>{{ ucfirst($c->payment_status->value) }}
                                         </span>
                                     </td>
@@ -348,7 +407,29 @@
                                         <div>{{ $c->created_at->format('M j, Y') }}</div>
                                         <div class="tiny">{{ $c->created_at->format('h:i A') }}</div>
                                     </td>
-                                    <td></td>
+                                    <td class="text-[12px] text-[#6B6862]">
+                                        @if($c->receipt_sent_at)
+                                            <div>Sent {{ $c->receipt_sent_at->diffForHumans() }}</div>
+                                            @if($c->receipt_resend_count > 0)
+                                                <div class="tiny">Resent {{ $c->receipt_resend_count }}x</div>
+                                            @endif
+                                        @else
+                                            <span class="tiny">Not sent</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-right">
+                                        @if($c->payment_status->value === 'completed' && $c->contributor_email && $c->contributor_email !== 'noreply@mypiggybox.com')
+                                            <form action="{{ route('money-boxes.contributions.resend-receipt', [$moneyBox, $c]) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn-ghost btn-sm">Resend</button>
+                                            </form>
+                                        @elseif(in_array($c->payment_status->value, ['pending', 'failed'], true))
+                                            <form action="{{ route('money-boxes.contributions.verify', [$moneyBox, $c]) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn-ghost btn-sm">Verify</button>
+                                            </form>
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

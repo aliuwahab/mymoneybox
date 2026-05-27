@@ -25,6 +25,14 @@ class Contribution extends Model
         'user_agent',
         'transaction_rrn',
         'payment_metadata',
+        'webhook_attempts',
+        'webhook_last_received_at',
+        'webhook_last_status',
+        'webhook_last_signature_valid',
+        'webhook_last_event_hash',
+        'receipt_sent_at',
+        'receipt_resent_at',
+        'receipt_resend_count',
     ];
 
     protected $casts = [
@@ -32,6 +40,10 @@ class Contribution extends Model
         'is_anonymous' => 'boolean',
         'payment_status' => PaymentStatus::class,
         'payment_metadata' => 'array',
+        'webhook_last_received_at' => 'datetime',
+        'webhook_last_signature_valid' => 'boolean',
+        'receipt_sent_at' => 'datetime',
+        'receipt_resent_at' => 'datetime',
     ];
 
     public function moneyBox(): BelongsTo
@@ -42,6 +54,15 @@ class Contribution extends Model
     public function getDisplayName(): string
     {
         return $this->is_anonymous ? 'Anonymous' : ($this->contributor_name ?? 'Anonymous');
+    }
+
+    public function matchesPaidAmount(mixed $paidAmount): bool
+    {
+        if ($paidAmount === null || (float) $paidAmount <= 0) {
+            return true;
+        }
+
+        return (int) round((float) $this->amount * 100) === (int) round((float) $paidAmount * 100);
     }
 
     public function scopeCompleted($query)
