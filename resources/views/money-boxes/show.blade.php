@@ -231,7 +231,7 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td><span class="pill pill-muted"><span class="pill-dot"></span>{{ $c->payment_method ?? 'Card' }}</span></td>
+                                        <td><span class="pill pill-muted"><span class="pill-dot"></span>{{ $c->getPaymentMethodLabel() }}</span></td>
                                         <td>
                                             <span class="pill {{ $c->payment_status->value === 'completed' ? 'pill-ok' : 'pill-warn' }}">
                                                 <span class="pill-dot"></span>{{ ucfirst($c->payment_status->value) }}
@@ -396,7 +396,7 @@
                                         </div>
                                     </td>
                                     <td class="muted text-[12.5px] max-w-[200px]">{{ $c->message ? Str::limit($c->message, 48) : '—' }}</td>
-                                    <td><span class="pill pill-muted"><span class="pill-dot"></span>{{ $c->payment_method ?? 'Card' }}</span></td>
+                                    <td><span class="pill pill-muted"><span class="pill-dot"></span>{{ $c->getPaymentMethodLabel() }}</span></td>
                                     <td>
                                         <span class="pill {{ $c->payment_status->value === 'completed' ? 'pill-ok' : ($c->payment_status->value === 'failed' ? 'pill-danger' : 'pill-warn') }}">
                                             <span class="pill-dot"></span>{{ ucfirst($c->payment_status->value) }}

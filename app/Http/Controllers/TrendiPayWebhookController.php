@@ -109,7 +109,8 @@ class TrendiPayWebhookController extends Controller
             }
 
             $contribution->update([
-                'payment_status' => $paymentStatus,
+                'payment_status'  => $paymentStatus,
+                'payment_method'  => $webhookData['payment_method'] ?? $contribution->payment_method,
                 'transaction_rrn' => $webhookData['transaction_rrn'] ?? null,
                 'payment_metadata' => $paymentMetadata,
             ]);

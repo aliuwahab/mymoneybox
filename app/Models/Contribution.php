@@ -56,6 +56,18 @@ class Contribution extends Model
         return $this->is_anonymous ? 'Anonymous' : ($this->contributor_name ?? 'Anonymous');
     }
 
+    public function getPaymentMethodLabel(): string
+    {
+        return match($this->payment_method) {
+            'MTN'    => 'MTN MoMo',
+            'VDF'    => 'Vodafone Cash',
+            'ATL'    => 'AirtelTigo',
+            'FLT'    => 'Card',
+            'GHipss' => 'GHIPSS',
+            default  => $this->payment_method ?? 'MoMo',
+        };
+    }
+
     public function matchesPaidAmount(mixed $paidAmount): bool
     {
         if ($paidAmount === null || (float) $paidAmount <= 0) {
