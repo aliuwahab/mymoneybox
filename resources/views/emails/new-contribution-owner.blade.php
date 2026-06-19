@@ -25,11 +25,10 @@
   .amount-sub { font-size: 12px; color: #2E8E60; margin-top: 4px; }
   h2 { margin: 0 0 8px; font-size: 20px; font-weight: 400; color: #15140F; letter-spacing: -0.01em; font-family: Georgia, 'Times New Roman', serif; }
   p { margin: 0 0 16px; font-size: 14px; line-height: 1.6; color: #6B6862; }
-  .meta-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #E6E3DC; font-size: 13px; }
-  .meta-row:last-child { border-bottom: none; }
-  .meta-label { color: #9C998F; }
-  .meta-value { color: #15140F; font-weight: 500; }
-  .meta-table { background: #FAFAF7; border: 1px solid #E6E3DC; border-radius: 8px; padding: 0 16px; margin-bottom: 24px; }
+  .meta-label { color: #9C998F; font-size: 13px; white-space: nowrap; padding: 10px 16px 10px 16px; vertical-align: top; }
+  .meta-value { color: #15140F; font-weight: 500; font-size: 13px; text-align: right; padding: 10px 16px 10px 12px; vertical-align: top; }
+  .meta-table { background: #FAFAF7; border: 1px solid #E6E3DC; border-radius: 8px; margin-bottom: 24px; border-collapse: collapse; width: 100%; }
+  .meta-row-divider { border-top: 1px solid #E6E3DC; }
   .progress-wrap { background: #ECEAE3; border-radius: 99px; height: 6px; margin: 4px 0 2px; overflow: hidden; }
   .progress-fill { background: #1B6B4E; height: 6px; border-radius: 99px; }
   .cta { display: inline-block; background: #15140F; color: #FFFFFF; text-decoration: none; padding: 12px 24px; border-radius: 7px; font-size: 14px; font-weight: 600; }
@@ -63,48 +62,50 @@
       <div class="amount-sub">from {{ $contribution->getDisplayName() }}</div>
     </div>
 
-    <div class="meta-table">
-      <div class="meta-row">
-        <span class="meta-label">PiggyBox</span>
-        <span class="meta-value">{{ $moneyBox->title }}</span>
-      </div>
-      <div class="meta-row">
-        <span class="meta-label">Contributor</span>
-        <span class="meta-value">{{ $contribution->getDisplayName() }}</span>
-      </div>
+    <table class="meta-table" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td class="meta-label">PiggyBox</td>
+        <td class="meta-value">{{ $moneyBox->title }}</td>
+      </tr>
+      <tr class="meta-row-divider">
+        <td class="meta-label">Contributor</td>
+        <td class="meta-value">{{ $contribution->getDisplayName() }}</td>
+      </tr>
       @if($contribution->contributor_email && !$contribution->is_anonymous)
-      <div class="meta-row">
-        <span class="meta-label">Email</span>
-        <span class="meta-value">{{ $contribution->contributor_email }}</span>
-      </div>
+      <tr class="meta-row-divider">
+        <td class="meta-label">Email</td>
+        <td class="meta-value">{{ $contribution->contributor_email }}</td>
+      </tr>
       @endif
       @if($contribution->message)
-      <div class="meta-row">
-        <span class="meta-label">Message</span>
-        <span class="meta-value" style="font-style:italic;">"{{ $contribution->message }}"</span>
-      </div>
+      <tr class="meta-row-divider">
+        <td class="meta-label">Message</td>
+        <td class="meta-value" style="font-style:italic;">"{{ $contribution->message }}"</td>
+      </tr>
       @endif
-      <div class="meta-row">
-        <span class="meta-label">Total raised</span>
-        <span class="meta-value" style="color:#1B6B4E;font-weight:600;">{{ $moneyBox->formatAmount($moneyBox->total_contributions) }}</span>
-      </div>
+      <tr class="meta-row-divider">
+        <td class="meta-label">Total raised</td>
+        <td class="meta-value" style="color:#1B6B4E;font-weight:600;">{{ $moneyBox->formatAmount($moneyBox->total_contributions) }}</td>
+      </tr>
       @if($moneyBox->goal_amount)
-      <div class="meta-row" style="display:block;padding:12px 0;">
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-          <span class="meta-label">Progress to goal</span>
-          <span class="meta-value">{{ number_format($moneyBox->getProgressPercentage(), 1) }}%</span>
-        </div>
-        <div class="progress-wrap">
-          <div class="progress-fill" style="width:{{ min(100, $moneyBox->getProgressPercentage()) }}%;"></div>
-        </div>
-        <span style="font-size:11px;color:#9C998F;">Goal: {{ $moneyBox->formatAmount($moneyBox->goal_amount) }}</span>
-      </div>
+      <tr class="meta-row-divider">
+        <td class="meta-label" style="padding-bottom:4px;">Progress to goal</td>
+        <td class="meta-value" style="padding-bottom:4px;">{{ number_format($moneyBox->getProgressPercentage(), 1) }}%</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="padding: 0 16px 10px;">
+          <div class="progress-wrap">
+            <div class="progress-fill" style="width:{{ min(100, $moneyBox->getProgressPercentage()) }}%;"></div>
+          </div>
+          <span style="font-size:11px;color:#9C998F;">Goal: {{ $moneyBox->formatAmount($moneyBox->goal_amount) }}</span>
+        </td>
+      </tr>
       @endif
-      <div class="meta-row">
-        <span class="meta-label">Reference</span>
-        <span class="meta-value" style="font-family:monospace;font-size:12px;">{{ $contribution->payment_reference }}</span>
-      </div>
-    </div>
+      <tr class="meta-row-divider">
+        <td class="meta-label">Reference</td>
+        <td class="meta-value" style="font-family:monospace;font-size:12px;">{{ $contribution->payment_reference }}</td>
+      </tr>
+    </table>
 
     <a href="{{ route('money-boxes.show', $moneyBox) }}" class="cta">View your PiggyBox →</a>
   </div>
