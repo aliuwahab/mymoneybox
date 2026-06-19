@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Enums\PaymentStatus;
 use App\Enums\TicketStatus;
+use App\Events\TicketRefundQueued;
 use App\Models\EventBoxTicket;
 use App\Models\EventBoxTicketRefund;
 use Illuminate\Support\Facades\DB;
@@ -85,6 +86,8 @@ class CreateEventBoxTicketRefundAction
                     'ip_address' => request()?->ip(),
                 ])
                 ->log('Ticket voided and refund queued');
+
+            event(new TicketRefundQueued($refund->load(['ticket.eventBox'])));
 
             return $refund;
         });
