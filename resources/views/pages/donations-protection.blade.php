@@ -23,14 +23,14 @@
             <!-- Introduction -->
             <div class="prose prose-lg max-w-none mb-12">
                 <p class="text-xl text-gray-700 leading-relaxed">
-                    At <strong>PiggyBox.Com</strong> the safety and security of every pesewa you contribute is our highest priority. Unlike many other crowdfunding platforms, we never mix user funds with our own operational accounts.
+                    At <strong>MyPiggyBox.Com</strong> the safety and security of every pesewa you contribute is our highest priority. Unlike many other crowdfunding platforms, we never mix user funds with our own operational accounts.
                 </p>
             </div>
 
             <!-- Trust Account Explanation -->
             <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-8 mb-12">
                 <p class="text-gray-700 leading-relaxed text-lg">
-                    All donations, contributions, and payments made via <strong>PiggyBox.Com</strong> are immediately and automatically deposited into a <strong>dedicated, segregated Trust Account</strong> held with <strong>BroadSpectrum Digital Payments</strong>, a licensed Payment Service Provider (PSP). BroadSpectrum Digital Payments is fully licensed and rigorously regulated by the <strong>Bank of Ghana</strong>, the highest financial authority in the Republic of Ghana.
+                    All donations, contributions, and payments made via <strong>MyPiggyBox.Com</strong> are immediately and automatically deposited into a <strong>dedicated, segregated Trust Account</strong> held with <strong>BroadSpectrum Digital Payments</strong>, a licensed Payment Service Provider (PSP). BroadSpectrum Digital Payments is fully licensed and rigorously regulated by the <strong>Bank of Ghana</strong>, the highest financial authority in the Republic of Ghana.
                 </p>
             </div>
 
@@ -46,7 +46,7 @@
                             </svg>
                         </div>
                         <h3 class="text-xl font-bold text-gray-900 mb-2">Segregated</h3>
-                        <p class="text-gray-600">Held completely separate from PiggyBox.Com's company funds and BroadSpectrum's operating accounts.</p>
+                        <p class="text-gray-600">Held completely separate from MyPiggyBox.Com's company funds and BroadSpectrum's operating accounts.</p>
                     </div>
 
                     <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition">
