@@ -39,6 +39,7 @@ Route::view('/contact', 'pages.contact')->name('contact');
 Route::view('/security', 'pages.security')->name('security');
 Route::view('/status', 'pages.status')->name('status');
 Route::view('/cookies', 'pages.cookies')->name('cookies');
+Route::view('/donations-protection', 'pages.donations-protection')->name('donations-protection');
 
 // EventBox public routes
 Route::get('/events', [EventBoxController::class, 'publicIndex'])->name('events.public.index');

@@ -182,6 +182,25 @@
             </div>
         </div>
 
+        <!-- Donations & Protections Callout -->
+        <div class="bg-emerald-50 border border-emerald-100 rounded-2xl px-8 py-10 mb-16 flex flex-col sm:flex-row items-center gap-6">
+            <div class="flex-shrink-0 w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center">
+                <svg class="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+            </div>
+            <div class="flex-1 text-center sm:text-left">
+                <h3 class="text-xl font-bold text-gray-900 mb-1">Your Donations Are Fully Protected</h3>
+                <p class="text-gray-600 text-sm leading-relaxed">All funds are held in a dedicated, segregated Trust Account regulated by the Bank of Ghana — never mixed with our operational accounts.</p>
+            </div>
+            <a href="{{ route('donations-protection') }}" class="flex-shrink-0 inline-flex items-center px-5 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700 transition whitespace-nowrap">
+                Learn More
+                <svg class="ml-1.5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                </svg>
+            </a>
+        </div>
+
         <!-- CTA Section -->
         <div class="bg-gradient-to-r from-primary-600 to-primary-700 py-16">
             <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
