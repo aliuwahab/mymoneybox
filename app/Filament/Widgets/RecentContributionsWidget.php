@@ -4,7 +4,6 @@ namespace App\Filament\Widgets;
 
 use App\Enums\PaymentStatus;
 use App\Models\Contribution;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
@@ -44,11 +43,12 @@ class RecentContributionsWidget extends BaseWidget
                     ->sortable(),
                 TextColumn::make('payment_status')
                     ->badge()
-                    ->colors([
-                        'success' => PaymentStatus::Completed,
-                        'warning' => PaymentStatus::Pending,
-                        'danger'  => PaymentStatus::Failed,
-                    ]),
+                    ->color(fn (PaymentStatus $state) => match ($state) {
+                        PaymentStatus::Completed => 'success',
+                        PaymentStatus::Pending   => 'warning',
+                        PaymentStatus::Failed    => 'danger',
+                        default                  => 'gray',
+                    }),
                 TextColumn::make('created_at')
                     ->label('When')
                     ->since()
