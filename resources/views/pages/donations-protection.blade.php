@@ -11,7 +11,7 @@
                     </div>
                     <h1 class="text-4xl md:text-5xl font-bold mb-4">Your Donations Are Fully Protected</h1>
                     <p class="text-xl md:text-2xl text-emerald-100 max-w-3xl mx-auto">
-                        Held in a Regulated Trust Account — Overseen by the Bank of Ghana
+                        Held in a Regulated Trust Account — In Partnership with BroadSpectrum Digital Payments
                     </p>
                 </div>
             </div>
