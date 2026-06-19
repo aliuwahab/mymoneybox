@@ -51,6 +51,8 @@ Route::get('/events/{slug}/ticket-status/{reference}', [EventBoxController::clas
 
 // Contribution Routes (Public)
 Route::post('/box/{slug}/contribute', [ContributionController::class, 'store'])->name('box.contribute');
+Route::get('/box/{slug}/confirm/{reference}', [ContributionController::class, 'confirm'])->name('box.confirm');
+Route::get('/box/{slug}/contribution-status/{reference}', [ContributionController::class, 'status'])->name('box.contribution-status');
 
 // Campaigns/Boxes webhook route (server-to-server notification)
 Route::put('/webhooks/trendipay', [TrendiPayWebhookController::class, 'handle'])->name('trendipay.webhook');

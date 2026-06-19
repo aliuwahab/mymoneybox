@@ -53,7 +53,7 @@ class ContributionController extends Controller
             'amount'      => $validated['amount'],
             'currency'    => $moneyBox->currency_code,
             'reference'   => $reference,
-            'return_url'  => route('box.show', $moneyBox->slug),
+            'return_url'  => route('box.confirm', ['slug' => $moneyBox->slug, 'reference' => $reference]),
             'webhook_url' => route('trendipay.webhook'),
             'description' => "Contribution to {$moneyBox->title}",
             'metadata'    => [
@@ -85,5 +85,30 @@ class ContributionController extends Controller
         $this->processContributionAction->execute($moneyBox, $contributionData);
 
         return redirect($payment['payment_url']);
+    }
+
+    public function confirm(string $slug, string $reference)
+    {
+        $moneyBox = MoneyBox::query()->where('slug', $slug)->firstOrFail();
+        $contribution = $moneyBox->contributions()->where('payment_reference', $reference)->first();
+        $pending = $contribution && $contribution->payment_status === PaymentStatus::Pending;
+
+        return view('contributions.confirmation', compact('moneyBox', 'contribution', 'reference', 'pending'));
+    }
+
+    public function status(string $slug, string $reference)
+    {
+        $moneyBox = MoneyBox::query()->where('slug', $slug)->firstOrFail();
+        $contribution = $moneyBox->contributions()->where('payment_reference', $reference)->first();
+
+        if (!$contribution) {
+            return response()->json(['status' => 'not_found']);
+        }
+
+        return response()->json([
+            'status' => $contribution->payment_status->value,
+            'amount' => $contribution->amount,
+            'name'   => $contribution->getDisplayName(),
+        ]);
     }
 }

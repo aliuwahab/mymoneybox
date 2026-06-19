@@ -59,17 +59,15 @@
                             <form wire:submit.prevent="save" class="space-y-4">
                                 {{-- Account Type --}}
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Account Type *</label>
-                                    <div class="grid grid-cols-2 gap-3">
-                                        <label class="relative flex items-center gap-3 p-3 rounded-lg border-2 border-green-500 bg-green-50 cursor-pointer">
-                                            <input type="radio" name="accountType" value="mobile_money" checked class="text-green-600 focus:ring-green-600">
-                                            <span class="text-sm font-medium text-green-800">Mobile Money</span>
-                                        </label>
-                                        <label class="relative flex items-center gap-3 p-3 rounded-lg border-2 border-gray-200 bg-gray-50 cursor-not-allowed opacity-60">
-                                            <input type="radio" name="accountType" value="bank_account" disabled class="text-gray-400">
-                                            <span class="text-sm font-medium text-gray-500">Bank Account</span>
-                                            <span class="ml-auto text-[10px] font-bold text-gray-400 uppercase tracking-wide">Coming Soon</span>
-                                        </label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Account Type</label>
+                                    <div class="flex items-center gap-3 p-3 rounded-lg border-2 border-green-500 bg-green-50">
+                                        <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                        </svg>
+                                        <span class="text-sm font-medium text-green-800">Mobile Money</span>
+                                        <svg class="w-4 h-4 text-green-600 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
                                     </div>
                                 </div>
 
@@ -92,12 +90,10 @@
                                     @error('accountName') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                                 </div>
 
-                                @if(true)
-                                    <div class="flex items-center space-x-2">
-                                        <input type="checkbox" wire:model="isDefault" id="isDefault" class="rounded border-gray-300 text-green-600 focus:ring-green-600">
-                                        <label for="isDefault" class="text-sm text-gray-700">Set as default withdrawal account</label>
-                                    </div>
-                                @endif
+                                <div class="flex items-center space-x-2">
+                                    <input type="checkbox" wire:model="isDefault" id="isDefault" class="rounded border-gray-300 text-green-600 focus:ring-green-600">
+                                    <label for="isDefault" class="text-sm text-gray-700">Set as default withdrawal account</label>
+                                </div>
 
                                 <div class="flex justify-end space-x-3 pt-4">
                                     <button type="button" wire:click.prevent="cancel" class="btn btn-ghost">Cancel</button>

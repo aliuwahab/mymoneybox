@@ -470,17 +470,18 @@ class MoneyBoxController extends Controller
             ]);
         }
 
-        // Top referral sources (placeholder - based on contribution metadata if available)
-        $topSources = collect([
-            ['source' => 'WhatsApp', 'percentage' => 48],
-            ['source' => 'Direct link', 'percentage' => 26],
-            ['source' => 'QR code', 'percentage' => 14],
-            ['source' => 'Facebook', 'percentage' => 8],
-            ['source' => 'Twitter / X', 'percentage' => 4],
-        ]);
+        $topBoxes = \App\Models\MoneyBox::where('user_id', auth()->id())
+            ->withSum(['contributions as total_raised' => fn($q) => $q->completed()], 'amount')
+            ->withCount(['contributions as contribution_count' => fn($q) => $q->completed()])
+            ->orderByDesc('total_raised')
+            ->limit(5)
+            ->get()
+            ->filter(fn($b) => $b->total_raised > 0);
+
+        $maxBoxRaised = $topBoxes->max('total_raised') ?: 1;
 
         return view('money-boxes.analytics', compact(
-            'totalRaised', 'totalContributors', 'daily', 'topSources'
+            'totalRaised', 'totalContributors', 'daily', 'topBoxes', 'maxBoxRaised'
         ));
     }
 

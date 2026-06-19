@@ -80,21 +80,25 @@
             </div>
         </div>
 
-        {{-- Top sources --}}
+        {{-- Top PiggyBoxes --}}
         <div class="card">
-            <div class="card-head"><div class="card-title">Top sources</div></div>
+            <div class="card-head"><div class="card-title">Top PiggyBoxes</div></div>
             <div class="card-body flex flex-col gap-3">
-                @foreach($topSources as $source)
+                @forelse($topBoxes as $box)
+                    @php $pct = $maxBoxRaised > 0 ? round(($box->total_raised / $maxBoxRaised) * 100) : 0; @endphp
                     <div>
-                        <div class="flex items-center justify-between mb-1">
-                            <span class="text-[13px]">{{ $source['source'] }}</span>
-                            <span class="tnum tiny">{{ $source['percentage'] }}%</span>
+                        <div class="flex items-center justify-between mb-1 gap-2">
+                            <span class="text-[13px] truncate">{{ $box->title }}</span>
+                            <span class="tnum tiny flex-shrink-0">{{ $sym }}{{ number_format($box->total_raised, 2) }}</span>
                         </div>
                         <div class="progress-track">
-                            <div class="progress-fill" style="width: {{ $source['percentage'] }}%"></div>
+                            <div class="progress-fill" style="width: {{ $pct }}%"></div>
                         </div>
+                        <div class="tiny mt-0.5">{{ number_format($box->contribution_count) }} {{ Str::plural('contribution', $box->contribution_count) }}</div>
                     </div>
-                @endforeach
+                @empty
+                    <p class="text-[13px] text-[#9C998F] text-center py-4">No completed contributions yet.</p>
+                @endforelse
             </div>
         </div>
     </div>
