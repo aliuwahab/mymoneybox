@@ -4,9 +4,9 @@ namespace App\Filament\Resources\EventBoxRefunds\Tables;
 
 use App\Actions\ProcessEventBoxTicketRefundAction;
 use App\Enums\RefundStatus;
+use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
