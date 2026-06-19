@@ -24,5 +24,12 @@ return Application::configure(basePath: dirname(__DIR__))
         // $schedule->command('withdrawals:disburse')->dailyAt('19:00')->withoutOverlapping()->runInBackground();
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->respond(function (\Illuminate\Session\TokenMismatchException $e, $request) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'CSRF token mismatch.'], 419);
+            }
+
+            return redirect()->route('login')
+                ->with('status', 'Your session expired. Please log in again.');
+        });
     })->create();
