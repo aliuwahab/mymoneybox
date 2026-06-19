@@ -280,13 +280,13 @@ class MoneyBox extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('main')
-            ->useDisk('s3')
-            ->singleFile(); // Only one main image
+            ->useDisk(config('media-library.disk_name'))
+            ->singleFile();
 
         $this->addMediaCollection('gallery')
-            ->useDisk('s3');
+            ->useDisk(config('media-library.disk_name'));
 
         $this->addMediaCollection('qr_code')
-            ->singleFile(); // Only one QR code
+            ->singleFile();
     }
 }
