@@ -42,11 +42,19 @@ class IdVerificationsTable
                     ->copyable(),
                 TextColumn::make('status')
                     ->badge()
-                    ->colors([
-                        'warning' => 'pending',
-                        'success' => 'approved',
-                        'danger' => 'rejected',
-                    ]),
+                    ->color(fn (string $state) => match ($state) {
+                        'pending'  => 'warning',
+                        'approved' => 'success',
+                        'rejected' => 'danger',
+                        default    => 'gray',
+                    }),
+                TextColumn::make('expires_at')
+                    ->label('Expires')
+                    ->date('M j, Y')
+                    ->sortable()
+                    ->placeholder('—')
+                    ->color(fn ($record) => $record?->expires_at?->isPast() ? 'danger' : null)
+                    ->toggleable(),
                 TextColumn::make('verifiedBy.name')
                     ->label('Verified By')
                     ->sortable()

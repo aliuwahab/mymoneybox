@@ -3,9 +3,12 @@
 namespace App\Filament\Resources\Contributions\Tables;
 
 use App\Enums\PaymentStatus;
+use App\Models\Contribution;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -36,12 +39,12 @@ class ContributionsTable
                     ->sortable(),
                 TextColumn::make('payment_status')
                     ->badge()
-                    ->colors([
-                        'success' => PaymentStatus::Completed,
-                        'warning' => PaymentStatus::Pending,
-                        'danger'  => PaymentStatus::Failed,
-                        'gray'    => PaymentStatus::Refunded,
-                    ])
+                    ->color(fn (PaymentStatus $state) => match ($state) {
+                        PaymentStatus::Completed => 'success',
+                        PaymentStatus::Pending   => 'warning',
+                        PaymentStatus::Failed    => 'danger',
+                        PaymentStatus::Refunded  => 'gray',
+                    })
                     ->sortable(),
                 TextColumn::make('payment_reference')
                     ->label('Reference')
@@ -66,6 +69,22 @@ class ContributionsTable
             ])
             ->recordActions([
                 ViewAction::make(),
+                Action::make('resendReceipt')
+                    ->label('Resend Receipt')
+                    ->icon('heroicon-o-envelope')
+                    ->color('gray')
+                    ->requiresConfirmation()
+                    ->modalHeading('Resend Contribution Receipt')
+                    ->modalDescription('This will queue the thank-you receipt email to be sent again to the contributor.')
+                    ->action(function (Contribution $record) {
+                        $record->update([
+                            'receipt_resent_at'    => now(),
+                            'receipt_resend_count' => $record->receipt_resend_count + 1,
+                        ]);
+                        event(new \App\Events\ContributionProcessed($record, $record->moneyBox));
+                        Notification::make()->success()->title('Receipt queued for resend')->send();
+                    })
+                    ->visible(fn (Contribution $record) => $record->payment_status === PaymentStatus::Completed),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

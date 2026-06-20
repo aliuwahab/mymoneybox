@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\IdVerifications\Schemas;
 
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -47,6 +48,21 @@ class IdVerificationInfolist
                             ->label('ID Expires')
                             ->date()
                             ->placeholder('—'),
+                    ]),
+
+                Section::make('ID Documents')
+                    ->columns(2)
+                    ->schema([
+                        ImageEntry::make('front_image')
+                            ->label('Front of ID')
+                            ->state(fn ($record) => $record->getFrontImageUrl())
+                            ->height(220)
+                            ->placeholder('No front image uploaded'),
+                        ImageEntry::make('back_image')
+                            ->label('Back of ID')
+                            ->state(fn ($record) => $record->getBackImageUrl())
+                            ->height(220)
+                            ->placeholder('No back image uploaded'),
                     ]),
 
                 Section::make('Review')

@@ -21,10 +21,11 @@ class UserInfolist
                             ->copyable(),
                         TextEntry::make('user_type')
                             ->badge()
-                            ->colors([
-                                'danger'  => 'admin',
-                                'success' => 'user',
-                            ]),
+                            ->color(fn (string $state) => match ($state) {
+                                'admin' => 'danger',
+                                'user'  => 'success',
+                                default => 'gray',
+                            }),
                         TextEntry::make('country.name')
                             ->label('Country')
                             ->placeholder('—'),
