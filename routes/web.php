@@ -31,6 +31,7 @@ Route::get('/offline', fn () => response()->view('offline')->header('Cache-Contr
 
 // Static Pages
 Route::view('/about', 'pages.about')->name('about');
+Route::view('/features', 'pages.features')->name('features');
 Route::view('/terms', 'pages.terms')->name('terms');
 Route::view('/privacy', 'pages.privacy')->name('privacy');
 Route::view('/careers', 'pages.careers')->name('careers');

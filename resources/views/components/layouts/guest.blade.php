@@ -34,6 +34,9 @@
                        class="px-3 py-1.5 text-[13px] font-medium rounded-[6px] transition-colors duration-100 {{ request()->is('events') || request()->is('events/*') ? 'text-[#15140F] bg-[#F3F1EB]' : 'text-[#6B6862] hover:text-[#15140F] hover:bg-[#F3F1EB]' }}">
                         Events
                     </a>
+                    <a href="{{ route('features') }}" class="px-3 py-1.5 text-[13px] font-medium rounded-[6px] transition-colors duration-100 {{ request()->routeIs('features') ? 'text-[#15140F] bg-[#F3F1EB]' : 'text-[#6B6862] hover:text-[#15140F] hover:bg-[#F3F1EB]' }}">
+                        Features
+                    </a>
                     <a href="{{ route('about') }}" class="px-3 py-1.5 text-[13px] font-medium rounded-[6px] transition-colors duration-100 {{ request()->routeIs('about') ? 'text-[#15140F] bg-[#F3F1EB]' : 'text-[#6B6862] hover:text-[#15140F] hover:bg-[#F3F1EB]' }}">
                         About
                     </a>
@@ -84,6 +87,7 @@
             <div class="px-4 py-3 space-y-1">
                 <a href="{{ route('browse') }}" class="block px-3 py-2 text-[13px] font-medium text-[#6B6862] hover:bg-[#F3F1EB] hover:text-[#15140F] rounded-[6px] transition-colors duration-100">Browse</a>
                 <a href="{{ '/events' }}" class="block px-3 py-2 text-[13px] font-medium text-[#6B6862] hover:bg-[#F3F1EB] hover:text-[#15140F] rounded-[6px] transition-colors duration-100">Events</a>
+                <a href="{{ route('features') }}" class="block px-3 py-2 text-[13px] font-medium text-[#6B6862] hover:bg-[#F3F1EB] hover:text-[#15140F] rounded-[6px] transition-colors duration-100">Features</a>
                 <a href="{{ route('about') }}" class="block px-3 py-2 text-[13px] font-medium text-[#6B6862] hover:bg-[#F3F1EB] hover:text-[#15140F] rounded-[6px] transition-colors duration-100">About</a>
                 <a href="{{ route('donations-protection') }}" class="block px-3 py-2 text-[13px] font-medium text-[#6B6862] hover:bg-[#F3F1EB] hover:text-[#15140F] rounded-[6px] transition-colors duration-100">Donations &amp; Protections</a>
                 @auth
@@ -118,6 +122,7 @@
                         <li><a href="{{ route('browse') }}" class="hover:text-[#FAFAF7] transition-colors duration-100">Browse PiggyBoxes</a></li>
                         <li><a href="{{ '/events' }}" class="hover:text-[#FAFAF7] transition-colors duration-100">Upcoming Events</a></li>
                         <li><a href="{{ route('register') }}" class="hover:text-[#FAFAF7] transition-colors duration-100">Create Account</a></li>
+                        <li><a href="{{ route('features') }}" class="hover:text-[#FAFAF7] transition-colors duration-100">Features</a></li>
                         <li><a href="{{ route('about') }}" class="hover:text-[#FAFAF7] transition-colors duration-100">About Us</a></li>
                         <li><a href="{{ route('donations-protection') }}" class="hover:text-[#FAFAF7] transition-colors duration-100">Donations &amp; Protections</a></li>
                     </ul>
