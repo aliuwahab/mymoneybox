@@ -8,7 +8,8 @@
     </div>
 
     {{-- Filters --}}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+    <div class="sticky top-14 z-40 bg-white border-b border-[#E6E3DC]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <form method="GET" action="{{ route('browse') }}" class="flex flex-col sm:flex-row gap-3">
             <div class="flex-1">
                 <input type="text" name="search" placeholder="Search PiggyBoxes…" value="{{ request('search') }}" />
@@ -42,6 +43,7 @@
                 @endif
             </div>
         @endif
+    </div>
     </div>
 
     {{-- Grid --}}
