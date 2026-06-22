@@ -16,5 +16,6 @@
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 @fluxAppearance
+@stack('head-styles')
 
 @include('partials.pwa')

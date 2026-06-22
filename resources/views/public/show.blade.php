@@ -1,4 +1,33 @@
 <x-layouts.guest>
+    @push('head-styles')
+    <style>
+        .pub-shell {
+            background: #F7F5EF;
+            border: 1px solid #E6E3DC;
+            border-radius: 10px;
+            padding: 28px;
+            display: grid;
+            grid-template-columns: 55fr 45fr;
+            gap: 24px;
+            align-items: start;
+        }
+        .pub-left  { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+        .pub-right { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+        @media (max-width: 768px) {
+            .pub-shell { grid-template-columns: 1fr; padding: 20px; }
+        }
+        @media (max-width: 600px) {
+            .pub-shell {
+                grid-template-columns: 1fr;
+                border-radius: 0;
+                border-left: 0; border-right: 0;
+                margin-left: -1rem; margin-right: -1rem;
+                padding: 16px;
+            }
+        }
+    </style>
+    @endpush
+
     @php
         $sym         = $moneyBox->getCurrencySymbol();
         $pct         = $moneyBox->goal_amount > 0 ? min(100, (int) $moneyBox->getProgressPercentage()) : 0;
