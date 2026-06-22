@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\CompletePiggyDonationAction;
 use App\Actions\CreatePiggyBoxForUser;
+use App\Actions\GeneratePiggyQRCodeAction;
 use App\Enums\PaymentStatus;
 use App\Models\PiggyBox;
 use App\Models\PiggyDonation;
@@ -47,6 +48,10 @@ class PiggyBoxController extends Controller
 
         if (! $user->piggyBox->canReceiveDonations()) {
             return back()->with('error', 'This Piggy Wallet is not currently accepting gifts.');
+        }
+
+        if (! $user->piggyBox->hasQrCode()) {
+            app(GeneratePiggyQRCodeAction::class)->execute($user->piggyBox);
         }
 
         return view('piggy.donate', [
@@ -266,6 +271,11 @@ class PiggyBoxController extends Controller
         if (! $user->piggyBox->canReceiveDonations()) {
             return redirect()->route('piggy.lookup')
                 ->with('error', 'This Piggy Wallet is not currently accepting gifts.');
+        }
+
+        // Auto-generate QR if missing (covers wallets created before auto-generation was added)
+        if (! $user->piggyBox->hasQrCode()) {
+            app(GeneratePiggyQRCodeAction::class)->execute($user->piggyBox);
         }
 
         return view('piggy.donate', [

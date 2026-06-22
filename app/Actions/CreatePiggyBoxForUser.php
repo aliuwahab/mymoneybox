@@ -22,12 +22,17 @@ class CreatePiggyBoxForUser
         }
 
         // Create Piggy Wallet for user
-        return PiggyBox::create([
+        $piggyBox = PiggyBox::create([
             'user_id' => $user->id,
             'title' => "{$user->name} Piggy Wallet",
             'description' => "Send me a gift!",
             'currency_code' => $user->country->currency_code ?? 'USD',
             'is_active' => true,
         ]);
+
+        // Generate QR code immediately, same as MoneyBox creation
+        app(GeneratePiggyQRCodeAction::class)->execute($piggyBox);
+
+        return $piggyBox;
     }
 }
