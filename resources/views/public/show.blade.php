@@ -396,19 +396,6 @@
 
     {{-- Public page design tokens (matches Figma design file) --}}
     <style>
-        .pub-shell {
-            background: #F7F5EF;
-            border: 1px solid #E6E3DC;
-            border-radius: 10px;
-            padding: 28px;
-            display: grid;
-            grid-template-columns: 55fr 45fr;
-            gap: 24px;
-            align-items: start;
-        }
-        .pub-left  { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-        .pub-right { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-
         .pub-form { display: flex; flex-direction: column; gap: 12px; }
 
         /* Cover image (200px per design) */
@@ -502,26 +489,13 @@
 
         /* Mobile: single column */
         @media (max-width: 768px) {
-            .pub-shell {
-                grid-template-columns: 1fr !important;
-                padding: 20px;
-            }
             .grid-2-equal { grid-template-columns: 1fr; }
             .pub-stats-row { flex-wrap: wrap; }
         }
 
-        /* Small mobile: edge-to-edge */
+        /* Small mobile */
         @media (max-width: 600px) {
             .pub-left h1 { overflow-wrap: anywhere; }
-            .pub-shell {
-                grid-template-columns: 1fr !important;
-                border-radius: 0;
-                border-left: 0;
-                border-right: 0;
-                margin-left: -1rem;
-                margin-right: -1rem;
-                padding: 16px;
-            }
             .pub-presets {
                 display: grid;
                 grid-template-columns: repeat(2, minmax(0, 1fr));
