@@ -517,15 +517,51 @@
             .placements-grid, .events-grid { grid-template-columns: 1fr; }
             .events-hero { padding: 60px 0 44px; }
         }
+        [x-cloak] { display: none !important; }
+
+        /* Mobile nav hamburger */
+        .nav-menu-btn {
+            display: none;
+            align-items: center; justify-content: center;
+            width: 34px; height: 34px;
+            background: none; border: 1px solid var(--border);
+            border-radius: 7px; color: var(--fg-2);
+            cursor: pointer; flex-shrink: 0;
+            transition: background .12s, border-color .12s;
+        }
+        .nav-menu-btn:hover { background: var(--bg-2); border-color: var(--border-2); }
+        .nav-mobile {
+            border-top: 1px solid var(--border);
+            background: var(--panel);
+            padding: 10px 0 14px;
+        }
+        .nav-mobile a {
+            display: block;
+            padding: 9px 20px;
+            font-size: 14px; font-weight: 500;
+            color: var(--fg-2);
+            transition: color .12s, background .12s;
+        }
+        .nav-mobile a:hover { color: var(--fg); background: var(--bg-2); }
+        .nav-mobile .nav-mobile-cta {
+            margin: 10px 16px 0;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .nav-mobile .nav-mobile-cta .btn {
+            width: 100%; justify-content: center;
+            padding: 9px 16px; font-size: 14px;
+        }
+
         @media (max-width: 640px) {
             body { font-size: 14px; }
             .nav-links { display: none; }
-            .nav-inner { height: 58px; gap: 12px; }
+            .nav-menu-btn { display: flex; }
+            .nav-inner { height: 58px; gap: 8px; }
             .brand { gap: 8px; min-width: 0; }
             .brand span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
             .nav-cta { gap: 6px; }
             .nav-cta .btn.ghost { display: none; }
-            .nav-cta .btn { padding: 7px 10px; font-size: 13px; white-space: nowrap; }
+            .nav-cta .btn:not(.nav-menu-btn) { padding: 7px 10px; font-size: 13px; white-space: nowrap; }
             .logos-row { grid-template-columns: repeat(var(--trusted-mobile-cols, 2), minmax(0, 1fr)); }
             .wrap { padding: 0 16px; }
             .hero { padding: 56px 0 44px; }
@@ -582,7 +618,7 @@
 <body>
 
 <!-- NAV -->
-<nav class="nav">
+<nav class="nav" x-data="{ menuOpen: false }">
     <div class="wrap nav-inner">
         <a href="{{ route('home') }}" class="brand">
             <span class="brand-mark">M</span>
@@ -604,6 +640,30 @@
             @else
                 <a class="btn ghost" href="{{ route('login') }}">Sign in</a>
                 <a class="btn primary" href="{{ route('register') }}">Get started</a>
+            @endauth
+            <button class="nav-menu-btn" @click="menuOpen = !menuOpen" :aria-expanded="menuOpen" aria-label="Toggle menu">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path x-show="!menuOpen" stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                    <path x-show="menuOpen" stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    <div class="nav-mobile" x-show="menuOpen" x-transition x-cloak @click.away="menuOpen = false">
+        <a href="#features" @click="menuOpen = false">Features</a>
+        <a href="#how" @click="menuOpen = false">How it works</a>
+        <a href="#cases" @click="menuOpen = false">Use cases</a>
+        <a href="{{ route('browse') }}" @click="menuOpen = false">Campaigns</a>
+        <a href="/events" @click="menuOpen = false">Events</a>
+        <a href="#pricing" @click="menuOpen = false">Pricing</a>
+        <a href="#faq" @click="menuOpen = false">FAQ</a>
+        <div class="nav-mobile-cta">
+            @auth
+                <a class="btn" href="{{ route('dashboard') }}">Dashboard</a>
+                <a class="btn primary" href="{{ route('money-boxes.create') }}">Create a PiggyBox</a>
+            @else
+                <a class="btn" href="{{ route('login') }}">Sign in</a>
+                <a class="btn primary" href="{{ route('register') }}">Get started — free</a>
             @endauth
         </div>
     </div>
