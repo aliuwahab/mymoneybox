@@ -45,12 +45,13 @@
 
         /* NAV */
         .nav {
-            position: sticky; top: 0; z-index: 50;
+            position: fixed; top: 0; left: 0; right: 0; z-index: 50;
             background: rgba(250,250,247,0.88);
             backdrop-filter: saturate(180%) blur(14px);
             -webkit-backdrop-filter: saturate(180%) blur(14px);
             border-bottom: 1px solid var(--border);
         }
+        body { padding-top: 64px; }
         .nav-inner { display: flex; align-items: center; gap: 28px; height: 64px; }
         .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: -0.01em; }
         .brand-mark {
@@ -553,7 +554,7 @@
         }
 
         @media (max-width: 640px) {
-            body { font-size: 14px; }
+            body { font-size: 14px; padding-top: 58px; }
             .nav-links { display: none; }
             .nav-menu-btn { display: flex; }
             .nav-inner { height: 58px; gap: 8px; }
