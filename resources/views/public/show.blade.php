@@ -1,32 +1,4 @@
 <x-layouts.guest>
-    @push('head-styles')
-    <style>
-        .pub-shell {
-            background: #F7F5EF;
-            border: 1px solid #E6E3DC;
-            border-radius: 10px;
-            padding: 28px;
-            display: grid;
-            grid-template-columns: 55fr 45fr;
-            gap: 24px;
-            align-items: start;
-        }
-        .pub-left  { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-        .pub-right { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-        @media (max-width: 768px) {
-            .pub-shell { grid-template-columns: 1fr; padding: 20px; }
-        }
-        @media (max-width: 600px) {
-            .pub-shell {
-                grid-template-columns: 1fr;
-                border-radius: 0;
-                border-left: 0; border-right: 0;
-                margin-left: -1rem; margin-right: -1rem;
-                padding: 16px;
-            }
-        }
-    </style>
-    @endpush
 
     @php
         $sym         = $moneyBox->getCurrencySymbol();
@@ -97,10 +69,11 @@
         </div>
 
         {{-- pub-shell: the campaign card ──────────────────────────────────────── --}}
-        <div class="pub-shell max-w-[980px] mx-auto">
+        <div class="pub-shell max-w-[980px] mx-auto"
+             style="background:#F7F5EF;border:1px solid #E6E3DC;border-radius:10px;padding:28px;display:grid;grid-template-columns:55fr 45fr;gap:24px;align-items:start;">
 
             {{-- ── LEFT: pill + title + description + progress + form ── --}}
-            <div id="contribute-form" class="pub-left">
+            <div id="contribute-form" class="pub-left" style="display:flex;flex-direction:column;gap:16px;min-width:0;">
 
                 {{-- Category / visibility pill --}}
                 <span class="pill pill-info" style="font-size:11.5px;">
@@ -303,7 +276,7 @@
             </div>
 
             {{-- ── RIGHT: cover visual + contributors + QR/share ── --}}
-            <div class="pub-right">
+            <div class="pub-right" style="display:flex;flex-direction:column;gap:16px;min-width:0;">
 
                 {{-- Campaign cover visual (200px tall per design) --}}
                 @php $coverUrl = $moneyBox->getMainImageUrl(); @endphp
@@ -516,14 +489,22 @@
               #fff;
         }
 
-        /* Mobile: single column */
+        /* Mobile: single column — !important overrides inline grid style */
         @media (max-width: 768px) {
+            .pub-shell { grid-template-columns: 1fr !important; padding: 20px !important; }
             .grid-2-equal { grid-template-columns: 1fr; }
             .pub-stats-row { flex-wrap: wrap; }
         }
 
         /* Small mobile */
         @media (max-width: 600px) {
+            .pub-shell {
+                grid-template-columns: 1fr !important;
+                border-radius: 0 !important;
+                border-left: 0 !important; border-right: 0 !important;
+                margin-left: -1rem; margin-right: -1rem;
+                padding: 16px !important;
+            }
             .pub-left h1 { overflow-wrap: anywhere; }
             .pub-presets {
                 display: grid;
