@@ -43,6 +43,7 @@
     @endif
 
     <div class="min-h-screen bg-[#FAFAF7] py-8 px-4 sm:px-6 lg:px-8 pb-24 lg:pb-10"
+         style="min-height:100vh;background:#FAFAF7;padding:32px 24px 96px;"
          x-data="{
              showToast: false,
              toastMsg: '',
@@ -70,7 +71,7 @@
 
         {{-- pub-shell: the campaign card ──────────────────────────────────────── --}}
         <div class="pub-shell max-w-[980px] mx-auto"
-             style="background:#F7F5EF;border:1px solid #E6E3DC;border-radius:10px;padding:28px;display:grid;grid-template-columns:55fr 45fr;gap:24px;align-items:start;">
+             style="max-width:980px;margin-left:auto;margin-right:auto;background:#F7F5EF;border:1px solid #E6E3DC;border-radius:10px;padding:28px;display:grid;grid-template-columns:55fr 45fr;gap:24px;align-items:start;">
 
             {{-- ── LEFT: pill + title + description + progress + form ── --}}
             <div id="contribute-form" class="pub-left" style="display:flex;flex-direction:column;gap:16px;min-width:0;">
