@@ -70,8 +70,7 @@
         </div>
 
         {{-- pub-shell: the campaign card ──────────────────────────────────────── --}}
-        <div class="pub-shell max-w-[980px] mx-auto"
-             style="max-width:980px;margin-left:auto;margin-right:auto;background:#F7F5EF;border:1px solid #E6E3DC;border-radius:10px;padding:28px;display:grid;grid-template-columns:55fr 45fr;gap:24px;align-items:start;">
+        <div class="pub-shell" style="max-width:980px;margin:0 auto;">
 
             {{-- ── LEFT: pill + title + description + progress + form ── --}}
             <div id="contribute-form" class="pub-left" style="display:flex;flex-direction:column;gap:16px;min-width:0;">
@@ -490,9 +489,21 @@
               #fff;
         }
 
-        /* Mobile: single column — !important overrides inline grid style */
-        @media (max-width: 768px) {
-            .pub-shell { grid-template-columns: 1fr !important; padding: 20px !important; }
+        /* Desktop two-column shell */
+        .pub-shell {
+            background: #F7F5EF;
+            border: 1px solid #E6E3DC;
+            border-radius: 10px;
+            padding: 28px;
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(300px, 1fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        /* Tablet: single column */
+        @media (max-width: 900px) {
+            .pub-shell { grid-template-columns: 1fr; padding: 20px; }
             .grid-2-equal { grid-template-columns: 1fr; }
             .pub-stats-row { flex-wrap: wrap; }
         }
@@ -500,23 +511,18 @@
         /* Small mobile */
         @media (max-width: 600px) {
             .pub-shell {
-                grid-template-columns: 1fr !important;
-                border-radius: 0 !important;
-                border-left: 0 !important; border-right: 0 !important;
+                border-radius: 0;
+                border-left: 0; border-right: 0;
                 margin-left: -1rem; margin-right: -1rem;
-                padding: 16px !important;
+                padding: 16px;
             }
             .pub-left h1 { overflow-wrap: anywhere; }
             .pub-presets {
                 display: grid;
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
-            .pub-presets .btn {
-                width: 100%;
-            }
-            .pub-cover {
-                height: 180px;
-            }
+            .pub-presets .btn { width: 100%; }
+            .pub-cover { height: 180px; }
             .qr-share-body {
                 flex-direction: column;
                 align-items: flex-start !important;
