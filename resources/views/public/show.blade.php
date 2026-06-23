@@ -190,6 +190,9 @@
                 transition: background .12s, border-color .12s, transform .08s;
                 cursor: pointer;
                 text-decoration: none;
+                -webkit-appearance: none;
+                appearance: none;
+                -webkit-tap-highlight-color: transparent;
             }
             .box-pub .btn:hover  { background: #FBFAF6; border-color: var(--border-2); }
             .box-pub .btn:active { transform: translateY(.5px); }
