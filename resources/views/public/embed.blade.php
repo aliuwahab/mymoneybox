@@ -23,7 +23,7 @@
     $amountType    = $moneyBox->amount_type;
     $identityRule  = $moneyBox->contributor_identity;
     $mustIdentify  = $identityRule === \App\Enums\ContributorIdentity::MustIdentify;
-    $neverIdentify = $identityRule === \App\Enums\ContributorIdentity::Anonymous;
+    $neverIdentify = $identityRule === \App\Enums\ContributorIdentity::AnonymousAllowed;
 
     $presets = match($amountType) {
         \App\Enums\AmountType::Fixed   => [$moneyBox->fixed_amount],
