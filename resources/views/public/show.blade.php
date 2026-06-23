@@ -405,7 +405,7 @@
 
                     <span class="pill" style="margin-bottom:14px;">
                         <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a13 13 0 0 1 0 20"/><path d="M12 2a13 13 0 0 0 0 20"/></svg>
-                        Public PiggyBox@if($moneyBox->category) · {{ $moneyBox->category->name }}@endif
+                        Public PiggyBox @if($moneyBox->category) · {{ $moneyBox->category->name }}@endif
                     </span>
 
                     <h1 style="font-family:'Instrument Serif',Georgia,serif;font-size:clamp(26px,3.6vw,36px);font-weight:400;line-height:1.1;letter-spacing:-0.01em;color:#15140F;margin:0 0 8px;">
