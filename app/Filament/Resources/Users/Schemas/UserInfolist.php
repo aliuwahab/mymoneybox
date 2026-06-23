@@ -21,7 +21,7 @@ class UserInfolist
                             ->copyable(),
                         TextEntry::make('user_type')
                             ->badge()
-                            ->color(fn (string $state) => match ($state) {
+                            ->color(fn ($state) => match (is_string($state) ? $state : $state->value) {
                                 'admin' => 'danger',
                                 'user'  => 'success',
                                 default => 'gray',
