@@ -47,7 +47,7 @@
             {{ $moneyBox->title }}
         </div>
         <div class="tiny mb-3">
-            by {{ $moneyBox->user->name }} · {{ $moneyBox->contribution_count }} {{ Str::plural('contributor', $moneyBox->contribution_count) }}
+            by {{ $moneyBox->user?->name ?? 'Unknown' }} · {{ $moneyBox->contribution_count }} {{ Str::plural('contributor', $moneyBox->contribution_count) }}
         </div>
 
         {{-- Progress --}}
