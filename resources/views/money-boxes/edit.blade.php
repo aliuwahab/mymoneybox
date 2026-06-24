@@ -167,8 +167,12 @@
                         @if($moneyBox->hasMedia('gallery'))
                             <div class="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-2">
                                 @foreach($moneyBox->getMedia('gallery') as $media)
+                                    @php
+                                        try { $galleryImgUrl = $media->getTemporaryUrl(now()->addHour()); }
+                                        catch (\Exception $e) { $galleryImgUrl = $media->getUrl(); }
+                                    @endphp
                                     <div class="relative">
-                                        <img src="{{ $media->getTemporaryUrl(now()->addHour()) }}" alt="Gallery image" class="w-full h-24 object-cover rounded-[6px] border border-[#E6E3DC]">
+                                        <img src="{{ $galleryImgUrl }}" alt="Gallery image" class="w-full h-24 object-cover rounded-[6px] border border-[#E6E3DC]">
                                         <button
                                             type="button"
                                             onclick="confirmDelete(() => { let input = document.getElementById('remove_gallery_images'); input.value = input.value ? input.value + ',' + {{ $media->id }} : {{ $media->id }}; this.parentElement.style.display='none'; }, { title: 'Remove Image?', text: 'This image will be removed when you save.', confirmText: 'Yes, remove it!' })"
