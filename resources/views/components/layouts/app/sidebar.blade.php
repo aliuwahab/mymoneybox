@@ -98,8 +98,11 @@
                     wire:navigate
                     class="mmb-nav-item"
                 >
-                    <span class="flex-1">My Piggy Wallet</span>
-                    <span class="ml-auto font-mono text-[10px] font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded tabular-nums">{{ auth()->user()->piggy_code }}</span>
+                    <span class="flex-1 flex flex-col gap-0.5">
+                        <span>My Piggy Wallet</span>
+                        <span class="text-[10.5px] text-[#9C998F] font-normal leading-tight">Your permanent payment link</span>
+                    </span>
+                    <span class="ml-auto font-mono text-[10px] font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded tabular-nums self-start mt-0.5">{{ auth()->user()->piggy_code }}</span>
                 </flux:navlist.item>
             </flux:navlist>
 
