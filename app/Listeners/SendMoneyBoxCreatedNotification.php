@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\MoneyBoxCreated;
+use App\Jobs\SendMoneyBoxNudgeJob;
 use App\Mail\MoneyBoxCreatedMail;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
@@ -15,13 +16,13 @@ class SendMoneyBoxCreatedNotification implements ShouldQueue
         $moneyBox = $event->moneyBox;
         $owner    = $moneyBox->user;
 
-        if (!$owner?->email) {
+        if (! $owner?->email) {
             return;
         }
 
+        // Immediate: "your PiggyBox is live" email
         try {
-            Mail::to($owner->email)
-                ->send(new MoneyBoxCreatedMail($moneyBox));
+            Mail::to($owner->email)->send(new MoneyBoxCreatedMail($moneyBox));
         } catch (\Throwable $e) {
             Log::error('Failed to send money box created notification', [
                 'money_box_id' => $moneyBox->id,
@@ -29,5 +30,10 @@ class SendMoneyBoxCreatedNotification implements ShouldQueue
                 'error'        => $e->getMessage(),
             ]);
         }
+
+        // Follow-up nudges
+        SendMoneyBoxNudgeJob::dispatch($moneyBox, '24h')->delay(now()->addHours(24));
+        SendMoneyBoxNudgeJob::dispatch($moneyBox, '5d')->delay(now()->addDays(5));
+        SendMoneyBoxNudgeJob::dispatch($moneyBox, '10d')->delay(now()->addDays(10));
     }
 }
