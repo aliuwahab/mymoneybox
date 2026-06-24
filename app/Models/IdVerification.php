@@ -70,13 +70,27 @@ class IdVerification extends Model implements HasMedia
     public function getFrontImageUrl(): ?string
     {
         $media = $this->getFirstMedia('front');
-        return $media ? $media->getTemporaryUrl(now()->addHour()) : null;
+        if (! $media) {
+            return null;
+        }
+        try {
+            return $media->getTemporaryUrl(now()->addHour());
+        } catch (\Exception $e) {
+            return $media->getUrl();
+        }
     }
 
     public function getBackImageUrl(): ?string
     {
         $media = $this->getFirstMedia('back');
-        return $media ? $media->getTemporaryUrl(now()->addHour()) : null;
+        if (! $media) {
+            return null;
+        }
+        try {
+            return $media->getTemporaryUrl(now()->addHour());
+        } catch (\Exception $e) {
+            return $media->getUrl();
+        }
     }
 
     public function getIdTypeLabel(): string
