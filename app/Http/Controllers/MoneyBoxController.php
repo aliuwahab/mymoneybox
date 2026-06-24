@@ -49,6 +49,11 @@ class MoneyBoxController extends Controller
      */
     public function create()
     {
+        if ($this->atLiveCampaignLimit()) {
+            return redirect()->route('money-boxes.index')
+                ->with('error', 'You already have 2 live campaigns. Close or deactivate one before creating a new PiggyBox.');
+        }
+
         $categories = Category::active()->ordered()->get();
 
         return view('money-boxes.create-steps', compact('categories'));
@@ -59,6 +64,16 @@ class MoneyBoxController extends Controller
      */
     public function store(Request $request, CreateMoneyBoxAction $createMoneyBoxAction)
     {
+        if ($this->atLiveCampaignLimit()) {
+            $message = 'You already have 2 live campaigns. Close or deactivate one before creating a new PiggyBox.';
+
+            if ($request->wantsJson() || $request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $message], 422);
+            }
+
+            return redirect()->route('money-boxes.index')->with('error', $message);
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -93,6 +108,11 @@ class MoneyBoxController extends Controller
         // Traditional redirect for non-AJAX
         return redirect()->route('money-boxes.show', $moneyBox)
             ->with('success', 'PiggyBox created successfully!');
+    }
+
+    private function atLiveCampaignLimit(): bool
+    {
+        return auth()->user()->moneyBoxes()->where('is_active', true)->count() >= 2;
     }
 
     /**
