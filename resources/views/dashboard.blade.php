@@ -114,6 +114,25 @@
                 </div>
             </div>
         </div>
+        {{-- Distinction note --}}
+        <div class="border-t border-amber-200/70 mt-4 pt-3.5 flex flex-col sm:flex-row gap-2.5 sm:gap-8">
+            <div class="flex items-start gap-2">
+                <div class="w-5 h-5 rounded-[5px] bg-amber-100 text-amber-600 grid place-items-center flex-none mt-px">
+                    <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><circle cx="17" cy="15" r="1"/></svg>
+                </div>
+                <p class="text-[12px] text-[#6B6862] leading-relaxed">
+                    <span class="font-semibold text-[#15140F]">Piggy Wallet</span> — receiving payment for a service, gift, or appreciation? Share your wallet link. It's always on, no setup needed.
+                </p>
+            </div>
+            <div class="flex items-start gap-2">
+                <div class="w-5 h-5 rounded-[5px] bg-primary-50 text-primary-600 grid place-items-center flex-none mt-px">
+                    <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14M5 8a2 2 0 1 0-4 0v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8m-4 0V4a2 2 0 0 0-4 0v4"/></svg>
+                </div>
+                <p class="text-[12px] text-[#6B6862] leading-relaxed">
+                    <span class="font-semibold text-[#15140F]">PiggyBox</span> — fundraising for a cause, event, or project? <a href="{{ route('money-boxes.create') }}" wire:navigate class="text-primary-600 font-medium hover:underline">Create a campaign →</a>
+                </p>
+            </div>
+        </div>
     </div>
 
     {{-- Fundraising campaigns section label --}}
