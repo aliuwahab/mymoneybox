@@ -341,4 +341,39 @@ class PiggyBoxController extends Controller
         // For local files, use regular download
         return response()->download($media->getPath(), $filename);
     }
+
+    /**
+     * Public QR code download — no auth required, accessible from the public piggy page.
+     */
+    public function publicDownloadQrCode(string $code)
+    {
+        $user = User::where('piggy_code', $code)->firstOrFail();
+        $piggyBox = $user->piggyBox;
+
+        if (! $piggyBox) {
+            abort(404, 'Piggy Wallet not found.');
+        }
+
+        if (! $piggyBox->hasQrCode()) {
+            app(GeneratePiggyQRCodeAction::class)->execute($piggyBox);
+        }
+
+        $media = $piggyBox->getFirstMedia('qr_code');
+
+        if (! $media) {
+            abort(404, 'QR Code not found.');
+        }
+
+        $filename = "piggy-wallet-{$code}-qr.png";
+
+        if ($media->getDiskDriverName() === 's3') {
+            $contents = \Storage::disk($media->disk)->get($media->getPath());
+
+            return response($contents, 200)
+                ->header('Content-Type', 'image/png')
+                ->header('Content-Disposition', 'attachment; filename="'.$filename.'"');
+        }
+
+        return response()->download($media->getPath(), $filename);
+    }
 }

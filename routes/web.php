@@ -22,6 +22,7 @@ use Laravel\Fortify\Features;
 Route::get('/', [PublicBoxController::class, 'home'])->name('home');
 Route::get('/browse', [PublicBoxController::class, 'index'])->name('browse');
 Route::get('/box/{slug}', [PublicBoxController::class, 'show'])->name('box.show');
+Route::get('/box/{slug}/qr', [PublicBoxController::class, 'downloadQr'])->name('box.download-qr');
 Route::get('/embed/box/{slug}', [PublicBoxController::class, 'embed'])
     ->name('box.embed')
     ->withoutMiddleware(\Illuminate\Http\Middleware\FrameGuard::class);
@@ -66,6 +67,7 @@ Route::get('/piggy-someone', [PiggyBoxController::class, 'lookup'])->name('piggy
 Route::post('/piggy-someone/find', [PiggyBoxController::class, 'findByCode'])->middleware('throttle:piggy-lookup')->name('piggy.find');
 Route::get('/piggy/callback', [PiggyBoxController::class, 'callback'])->name('piggy.callback');
 Route::get('/piggy/{code}', [PiggyBoxController::class, 'showByCode'])->middleware('throttle:piggy-public')->name('piggy.show');
+Route::get('/piggy/{code}/qr', [PiggyBoxController::class, 'publicDownloadQrCode'])->name('piggy.download-qr.public');
 Route::post('/piggy/{user}/donate', [PiggyBoxController::class, 'donate'])->middleware('throttle:10,1')->name('piggy.donate');
 
 // Webhook Routes (Provider-Specific)

@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\GenerateQRCodeAction;
 use App\Models\Category;
 use App\Models\EventBox;
 use App\Models\MoneyBox;
 use App\Models\TrustedLogo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PublicBoxController extends Controller
 {
@@ -81,6 +83,36 @@ class PublicBoxController extends Controller
         // This allows sharing private campaign links for contributions
 
         return view('public.show', compact('moneyBox'));
+    }
+
+    /**
+     * Public QR code download — no auth required, accessible from the public box page.
+     */
+    public function downloadQr(string $slug)
+    {
+        $moneyBox = MoneyBox::where('slug', $slug)->firstOrFail();
+
+        if (! $moneyBox->hasQrCode()) {
+            app(GenerateQRCodeAction::class)->execute($moneyBox);
+        }
+
+        $media = $moneyBox->getFirstMedia('qr_code');
+
+        if (! $media) {
+            abort(404, 'QR Code not found.');
+        }
+
+        $filename = "piggybox-{$moneyBox->slug}-qr.png";
+
+        if ($media->getDiskDriverName() === 's3') {
+            $contents = Storage::disk($media->disk)->get($media->getPath());
+
+            return response($contents, 200)
+                ->header('Content-Type', 'image/png')
+                ->header('Content-Disposition', 'attachment; filename="'.$filename.'"');
+        }
+
+        return response()->download($media->getPath(), $filename);
     }
 
     /**
