@@ -9,6 +9,8 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -64,6 +66,13 @@ class UsersTable
                     ->toggleable(),
             ])
             ->filters([
+                Filter::make('email')
+                    ->form([TextInput::make('email')->placeholder('e.g. user@example.com')])
+                    ->query(fn ($query, array $data) => $query->when(
+                        $data['email'] ?? null,
+                        fn ($q, $email) => $q->where('email', 'like', "%{$email}%")
+                    ))
+                    ->indicateUsing(fn (array $data) => filled($data['email'] ?? null) ? 'Email: '.$data['email'] : null),
                 TrashedFilter::make(),
                 SelectFilter::make('user_type')
                     ->options(UserType::class),
