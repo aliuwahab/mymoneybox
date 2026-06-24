@@ -64,11 +64,19 @@
                         <div class="text-[22px] font-bold tnum text-[#15140F] leading-none">{{ $sym }}{{ number_format($piggyBalance, 2) }}</div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <a href="{{ url('/piggy/' . auth()->user()->piggy_code) }}" target="_blank" rel="noopener"
-                           class="btn btn-sm" style="border-color:#D97706;color:#92400E;">
+                        <button type="button"
+                                @click="
+                                    const url = '{{ url('/piggy/' . auth()->user()->piggy_code) }}';
+                                    if (navigator.share) {
+                                        navigator.share({ title: 'My Piggy Wallet', text: 'Send me a gift or payment via my Piggy Wallet', url }).catch(() => {});
+                                    } else {
+                                        navigator.clipboard.writeText(url).then(() => { codeCopied = true; setTimeout(() => codeCopied = false, 2000) });
+                                    }
+                                "
+                                class="btn btn-sm" style="border-color:#D97706;color:#92400E;">
                             <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M8.6 13.5 15.4 17"/><path d="M15.4 7 8.6 10.5"/></svg>
                             Share wallet
-                        </a>
+                        </button>
                         <a href="{{ route('piggy.my-piggy-box') }}" wire:navigate
                            class="btn btn-sm" style="background:#B45309;border-color:#B45309;color:#fff;">
                             Open wallet
