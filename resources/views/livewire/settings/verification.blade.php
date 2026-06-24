@@ -63,31 +63,51 @@
                 <p class="text-sm text-gray-600">Upload a government-issued ID to verify your identity</p>
             </div>
 
-            <form wire:submit.prevent="submit" class="space-y-6">
+            <form method="POST" action="{{ route('settings.verification.store') }}" enctype="multipart/form-data" class="space-y-6">
+                @csrf
+
                 <!-- ID Type and Expiry Date -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">ID Type *</label>
-                        <select wire:model="idType" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">
+                        <select name="id_type" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">
                             <option value="">Select ID type...</option>
-                            <option value="passport">Passport</option>
-                            <option value="national_card">Ghana Card</option>
-                            <option value="drivers_license">Driver's License</option>
+                            <option value="passport" @selected(old('id_type') === 'passport')>Passport</option>
+                            <option value="national_card" @selected(old('id_type') === 'national_card')>Ghana Card</option>
+                            <option value="drivers_license" @selected(old('id_type') === 'drivers_license')>Driver's License</option>
                         </select>
-                        @error('idType') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                        @error('id_type') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                     </div>
-                    <flux:input wire:model="expiresAt" label="ID Expiry Date *" type="date" />
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">ID Expiry Date *</label>
+                        <input type="date" name="expires_at" value="{{ old('expires_at') }}" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600" />
+                        @error('expires_at') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
                 </div>
 
                 <!-- Names -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <flux:input wire:model="firstName" label="First Name *" type="text" placeholder="As shown on ID" />
-                    <flux:input wire:model="lastName" label="Last Name *" type="text" placeholder="As shown on ID" />
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+                        <input type="text" name="first_name" value="{{ old('first_name') }}" placeholder="As shown on ID" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600" />
+                        @error('first_name') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+                        <input type="text" name="last_name" value="{{ old('last_name') }}" placeholder="As shown on ID" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600" />
+                        @error('last_name') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <flux:input wire:model="otherNames" label="Other Names" type="text" placeholder="Middle name(s) if any" />
-                    <flux:input wire:model="idNumber" label="ID Number" type="text" placeholder="Optional" />
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Other Names</label>
+                        <input type="text" name="other_names" value="{{ old('other_names') }}" placeholder="Middle name(s) if any" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">ID Number</label>
+                        <input type="text" name="id_number" value="{{ old('id_number') }}" placeholder="Optional" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600" />
+                    </div>
                 </div>
 
                 <!-- File Uploads -->
@@ -96,40 +116,37 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Front of ID *</label>
                         <input
                             type="file"
-                            wire:model.live="frontImage"
-                            accept="image/*"
+                            name="front_image"
+                            accept="image/jpeg,image/png,image/jpg,application/pdf"
                             class="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer"
                             @change="preview = $event.target.files[0] ? URL.createObjectURL($event.target.files[0]) : null"
                         />
-                        <div wire:loading wire:target="frontImage" class="mt-2 text-sm text-green-600">Uploading...</div>
                         <template x-if="preview">
                             <img :src="preview" class="mt-2 w-full h-48 object-cover rounded-lg border border-gray-300">
                         </template>
-                        @error('frontImage') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                        @error('front_image') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                     </div>
 
                     <div x-data="{ preview: null }">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Back of ID</label>
                         <input
                             type="file"
-                            wire:model.live="backImage"
-                            accept="image/*"
+                            name="back_image"
+                            accept="image/jpeg,image/png,image/jpg,application/pdf"
                             class="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer"
                             @change="preview = $event.target.files[0] ? URL.createObjectURL($event.target.files[0]) : null"
                         />
-                        <div wire:loading wire:target="backImage" class="mt-2 text-sm text-green-600">Uploading...</div>
                         <template x-if="preview">
                             <img :src="preview" class="mt-2 w-full h-48 object-cover rounded-lg border border-gray-300">
                         </template>
-                        @error('backImage') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                        @error('back_image') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                         <p class="mt-1 text-xs text-gray-500">Required for Ghana Card and Driver's License</p>
                     </div>
                 </div>
 
                 <div class="flex justify-end">
-                    <flux:button type="submit" variant="primary" wire:loading.attr="disabled" wire:target="submit">
-                        <span wire:loading.remove wire:target="submit">{{ __('Submit for Verification') }}</span>
-                        <span wire:loading wire:target="submit">Submitting...</span>
+                    <flux:button type="submit" variant="primary">
+                        {{ __('Submit for Verification') }}
                     </flux:button>
                 </div>
             </form>

@@ -155,6 +155,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('settings/profile', Profile::class)->name('profile.edit');
     Route::get('settings/password', Password::class)->name('user-password.edit');
     Route::get('settings/verification', Verification::class)->name('settings.verification');
+    Route::post('settings/verification', [\App\Http\Controllers\VerificationController::class, 'store'])->name('settings.verification.store');
     Route::get('settings/withdrawal-accounts', WithdrawalAccounts::class)->name('settings.withdrawal-accounts');
     Route::get('settings/appearance', Appearance::class)->name('appearance.edit');
 
