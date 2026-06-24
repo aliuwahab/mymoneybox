@@ -57,7 +57,7 @@
   <div class="body">
     <div class="status-badge">&#10003; Approved</div>
     <h2>Your withdrawal has been approved!</h2>
-    <p>Great news, {{ explode(' ', $withdrawal->user->name)[0] }}! Your withdrawal request has been approved and funds are on their way.</p>
+    <p>Great news, {{ explode(' ', $withdrawal->user?->name ?? 'there')[0] }}! Your withdrawal request has been approved and funds are on their way.</p>
 
     <div class="amount-band">
       <div class="amount-label">Approved amount</div>

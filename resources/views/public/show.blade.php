@@ -18,7 +18,7 @@
         $avgGift     = $moneyBox->contribution_count > 0
                            ? $moneyBox->total_contributions / $moneyBox->contribution_count : 0;
         $daysLeft    = $moneyBox->end_date ? max(0, (int) now()->diffInDays($moneyBox->end_date, false)) : null;
-        $creatorName = $moneyBox->user->name;
+        $creatorName = $moneyBox->user?->name ?? 'Anonymous';
         $defaultAmt  = $fixedOnly ? number_format($moneyBox->fixed_amount, 2, '.', '') : '';
         $coverInitials = collect(preg_split('/\s+/', $moneyBox->title))
             ->map(fn($w) => mb_strtoupper(mb_substr($w, 0, 1)))

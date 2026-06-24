@@ -67,7 +67,7 @@
     <p>The Piggy Wallet owner can now see this gift in their wallet. If you have questions, reference <strong>{{ $donation->payment_reference }}</strong>.</p>
 
     @if($piggyBox->user?->piggy_code)
-      <a href="{{ route('piggy.show', $piggyBox->user->piggy_code) }}" class="cta">View Piggy Wallet</a>
+      <a href="{{ route('piggy.show', $piggyBox->user?->piggy_code) }}" class="cta">View Piggy Wallet</a>
     @endif
   </div>
 

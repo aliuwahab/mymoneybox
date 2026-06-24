@@ -45,8 +45,8 @@
 @php
     use App\Models\MoneyBoxWithdrawal;
     $isMoneyBox  = $withdrawal instanceof MoneyBoxWithdrawal;
-    $firstName   = explode(' ', $withdrawal->user->name)[0];
-    $sourceName  = $isMoneyBox ? $withdrawal->moneyBox->title : 'PiggyWallet';
+    $firstName   = explode(' ', $withdrawal->user?->name ?? 'there')[0];
+    $sourceName  = $isMoneyBox ? ($withdrawal->moneyBox?->title ?? 'Your PiggyBox') : 'PiggyWallet';
     $sourceLabel = $isMoneyBox ? 'PiggyBox' : 'PiggyWallet';
     $netFormatted   = $withdrawal->formatNetAmount();
     $grossFormatted = $withdrawal->formatAmount();

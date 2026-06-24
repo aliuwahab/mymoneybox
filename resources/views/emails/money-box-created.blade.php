@@ -58,7 +58,7 @@
   <div class="hero">
     <div class="hero-tag">🎉 PiggyBox live</div>
     <h2>Your PiggyBox is ready to collect!</h2>
-    <p>Hi {{ explode(' ', $moneyBox->user->name)[0] }}, your PiggyBox has been created and is ready to share.</p>
+    <p>Hi {{ explode(' ', $moneyBox->user?->name ?? 'there')[0] }}, your PiggyBox has been created and is ready to share.</p>
 
     <div class="box-card">
       <div class="box-name">{{ $moneyBox->title }}</div>

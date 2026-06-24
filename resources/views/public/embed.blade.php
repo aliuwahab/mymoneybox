@@ -58,7 +58,7 @@
         @endif
         <div class="flex-1 min-w-0">
             <div class="text-[13px] font-semibold text-white leading-tight truncate">{{ $moneyBox->title }}</div>
-            <div class="text-[11px] text-white/50 mt-0.5">by {{ $moneyBox->user->name }}</div>
+            <div class="text-[11px] text-white/50 mt-0.5">by {{ $moneyBox->user?->name ?? 'Anonymous' }}</div>
         </div>
         <a href="{{ route('box.show', $moneyBox->slug) }}" target="_blank"
            class="flex-none text-white/40 hover:text-white/80 transition" title="View full page">

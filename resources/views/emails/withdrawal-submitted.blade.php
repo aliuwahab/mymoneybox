@@ -57,7 +57,7 @@
   <div class="body">
     <div class="status-badge">Under Review</div>
     <h2>We've received your withdrawal request</h2>
-    <p>Hi {{ explode(' ', $withdrawal->user->name)[0] }}, your withdrawal request has been submitted successfully and is now under review by our team.</p>
+    <p>Hi {{ explode(' ', $withdrawal->user?->name ?? 'there')[0] }}, your withdrawal request has been submitted successfully and is now under review by our team.</p>
 
     <div class="amount-band">
       <div class="amount-label">Withdrawal amount</div>

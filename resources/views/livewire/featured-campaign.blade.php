@@ -9,7 +9,7 @@
             : null;
         $raised = $box ? $box->total_contributions : 0;
         $goal   = $box ? $box->goal_amount : null;
-        $initials = $box ? strtoupper(substr($box->user->name ?? 'U', 0, 1) . substr(strstr($box->user->name ?? ' X', ' ') ?: 'X', 1, 1)) : 'MB';
+        $initials = $box ? strtoupper(substr($box->user?->name ?? 'U', 0, 1) . substr(strstr($box->user?->name ?? ' X', ' ') ?: 'X', 1, 1)) : 'MB';
         $categoryName = $box?->category?->name ?? 'Community';
         $location = 'Ghana';
         $coverImage = $box?->getMainImageUrl();
@@ -136,7 +136,7 @@
                             <h3 class="cover-title">{{ Str::limit($box->title, 40) }}</h3>
                             <div class="cover-byline">
                                 <div class="avatar" style="width:30px;height:30px;background:#B8E6CB;color:#0E3C2C;font-size:11px">{{ $initials }}</div>
-                                <div>Started by <b>{{ $box->user->name }}</b></div>
+                                <div>Started by <b>{{ $box->user?->name ?? 'Anonymous' }}</b></div>
                             </div>
                         </div>
                     </a>
@@ -145,7 +145,7 @@
                     <div class="featured-body">
                         <div class="featured-tags">
                             <span class="ftag">{{ $categoryName }}</span>
-                            @if($box->user->currentVerification)
+                            @if($box->user?->currentVerification)
                                 <span class="ftag muted">Verified creator</span>
                             @endif
                             <span class="ftag muted">Public · {{ number_format($contributorCount) }} contributors</span>
@@ -205,7 +205,7 @@
                         </div>
 
                         <div class="featured-cta">
-                            @php $firstName = trim(explode(' ', $box->user->name ?? '')[0] ?? ''); @endphp
+                            @php $firstName = trim(explode(' ', $box->user?->name ?? '')[0] ?? ''); @endphp
                             <a class="btn primary lg" href="{{ $box->getPublicUrl() }}">
                                 {{ $firstName ? "Contribute to {$firstName}'s journey" : 'Contribute now' }}
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>

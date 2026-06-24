@@ -54,7 +54,7 @@
 
   <div class="body">
     <h2>New contribution 🎉</h2>
-    <p>Great news, <strong>{{ explode(' ', $moneyBox->user->name)[0] }}</strong>! Someone just contributed to your PiggyBox.</p>
+    <p>Great news, <strong>{{ explode(' ', $moneyBox->user?->name ?? 'there')[0] }}</strong>! Someone just contributed to your PiggyBox.</p>
 
     <div class="amount-band">
       <div class="amount-label">New contribution</div>

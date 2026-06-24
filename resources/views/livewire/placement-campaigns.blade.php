@@ -32,7 +32,7 @@
                             $palette = $coverPalettes[$catSlug] ?? $coverPalettes['community'];
                             $pct = (int) $box->getProgressPercentage();
                             $daysLeft = ($box->end_date && !$box->is_ongoing) ? max(0, (int) now()->diffInDays($box->end_date, false)) : null;
-                            $initials = strtoupper(substr($box->user->name ?? 'U', 0, 1) . substr(strstr($box->user->name ?? ' X', ' ') ?: 'X', 1, 1));
+                            $initials = strtoupper(substr($box->user?->name ?? 'U', 0, 1) . substr(strstr($box->user?->name ?? ' X', ' ') ?: 'X', 1, 1));
                             $avColor = $avatarColors[$i % count($avatarColors)];
                             $svgId = 'pl' . $i . '_' . uniqid();
                         @endphp
@@ -187,7 +187,7 @@
                                 </div>
                                 <div class="pl-creator">
                                     <div class="avatar" style="width:22px;height:22px;font-size:9px;background:{{ $avColor }}">{{ $initials }}</div>
-                                    <div>by <b>{{ $box->user->name }}</b></div>
+                                    <div>by <b>{{ $box->user?->name ?? 'Anonymous' }}</b></div>
                                 </div>
                             </div>
                         </a>
