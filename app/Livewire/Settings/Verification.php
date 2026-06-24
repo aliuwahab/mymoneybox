@@ -3,6 +3,7 @@
 namespace App\Livewire\Settings;
 
 use App\Models\IdVerification;
+use League\Flysystem\UnableToRetrieveMetadata;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -57,7 +58,18 @@ class Verification extends Component
             'backImage_type' => gettype($this->backImage),
         ]);
 
-        $this->validate();
+        try {
+            $this->validate();
+        } catch (UnableToRetrieveMetadata $e) {
+            \Log::error('Verification temp file unreachable during validation', [
+                'userId' => auth()->id(),
+                'error' => $e->getMessage(),
+                'frontImage' => $this->frontImage,
+                'backImage' => $this->backImage,
+            ]);
+            $this->addError('frontImage', 'Your uploaded file could not be read. Please re-upload and try again.');
+            return;
+        }
 
         $verification = IdVerification::create([
             'user_id' => auth()->id(),
