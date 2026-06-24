@@ -129,7 +129,7 @@
                     <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14M5 8a2 2 0 1 0-4 0v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8m-4 0V4a2 2 0 0 0-4 0v4"/></svg>
                 </div>
                 <p class="text-[12px] text-[#6B6862] leading-relaxed">
-                    <span class="font-semibold text-[#15140F]">PiggyBox</span> — fundraising for a cause, event, or project? <a href="{{ route('money-boxes.create') }}" wire:navigate class="text-primary-600 font-medium hover:underline">Create a campaign →</a>
+                    <span class="font-semibold text-[#15140F]">PiggyBox</span> — fundraising for a cause, event, or project? <a href="{{ route('money-boxes.create') }}" wire:navigate class="text-primary-600 font-medium hover:underline">Create Campaign (PiggyBox) →</a>
                 </p>
             </div>
         </div>
