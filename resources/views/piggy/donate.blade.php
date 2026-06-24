@@ -600,6 +600,18 @@
                                         <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12"/><path d="m6 10 6 6 6-6"/><path d="M4 20h16"/></svg>
                                         QR
                                     </a>
+                                    <button type="button" class="btn sm"
+                                            @click="
+                                                const url = '{{ url('/piggy/' . $user->piggy_code) }}';
+                                                if (navigator.share) {
+                                                    navigator.share({ title: '{{ addslashes($user->name) }}\'s Piggy Wallet', text: 'Send a gift or payment to {{ addslashes($user->name) }} via MyPiggyBox', url }).catch(() => {});
+                                                } else {
+                                                    navigator.clipboard.writeText(url).then(() => { linkCopied = true; setTimeout(() => linkCopied = false, 2000) });
+                                                }
+                                            ">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M8.6 13.5 15.4 17"/><path d="M15.4 7 8.6 10.5"/></svg>
+                                        Share
+                                    </button>
                                 </div>
                             </div>
                         </div>
