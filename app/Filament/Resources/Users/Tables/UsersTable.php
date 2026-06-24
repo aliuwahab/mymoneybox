@@ -14,6 +14,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Actions\Action;
 use App\Enums\UserType;
+use Illuminate\Support\Facades\Auth;
 
 class UsersTable
 {
@@ -72,6 +73,24 @@ class UsersTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                Action::make('impersonate')
+                    ->icon('heroicon-o-eye')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->modalHeading('Impersonate user')
+                    ->modalDescription(fn ($record) => "You will be logged in as {$record->name} ({$record->email}). Use the banner on the app to stop.")
+                    ->action(function ($record) {
+                        $adminId = Auth::id();
+                        session()->put('impersonating_admin_id', $adminId);
+                        \Log::info('Impersonation started', [
+                            'admin_id' => $adminId,
+                            'target_id' => $record->id,
+                            'target_email' => $record->email,
+                        ]);
+                        Auth::loginUsingId($record->id);
+                        return redirect()->route('dashboard');
+                    })
+                    ->visible(fn ($record) => Auth::user()?->isSuperAdmin() && ! $record->isSuperAdmin()),
                 Action::make('ban')
                     ->icon('heroicon-o-no-symbol')
                     ->color('danger')

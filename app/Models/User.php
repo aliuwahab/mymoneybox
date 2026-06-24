@@ -82,6 +82,11 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         return $this->user_type == UserType::Admin;
     }
 
+    public function isSuperAdmin(): bool
+    {
+        return $this->email === 'aliuwahab@gmail.com';
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         return $this->isAdmin();

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ContributionController;
+use App\Http\Controllers\ImpersonateController;
 use App\Http\Controllers\EventBoxController;
 use App\Http\Controllers\EventBoxValidationController;
 use App\Http\Controllers\MoneyBoxController;
@@ -71,6 +72,12 @@ Route::get('/piggy/{code}/qr', [PiggyBoxController::class, 'publicDownloadQrCode
 Route::post('/piggy/{user}/donate', [PiggyBoxController::class, 'donate'])->middleware('throttle:10,1')->name('piggy.donate');
 
 // Webhook Routes (Provider-Specific)
+
+// Impersonation (super admin only, no CSRF issues via POST)
+Route::middleware(['auth'])->group(function () {
+    Route::post('/impersonate/{user}', [ImpersonateController::class, 'start'])->name('impersonate.start');
+    Route::post('/impersonate/stop', [ImpersonateController::class, 'stop'])->name('impersonate.stop');
+});
 
 // Authenticated Routes
 Route::middleware(['auth', 'verified'])->group(function () {

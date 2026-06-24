@@ -217,6 +217,22 @@
             </flux:dropdown>
         </flux:header>
 
+        {{-- Impersonation banner --}}
+        @if(session('impersonating_admin_id'))
+            <div class="w-full bg-amber-500 text-white text-[13px] font-medium flex items-center justify-between px-4 py-2 gap-3">
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    Viewing as <strong class="mx-1">{{ auth()->user()->name }}</strong> ({{ auth()->user()->email }})
+                </div>
+                <form method="POST" action="{{ route('impersonate.stop') }}">
+                    @csrf
+                    <button type="submit" class="bg-white/20 hover:bg-white/30 text-white text-[12px] font-semibold px-3 py-1 rounded-[5px] transition-colors">
+                        Stop impersonating
+                    </button>
+                </form>
+            </div>
+        @endif
+
         {{-- Topbar --}}
         <div class="sticky top-0 z-10 hidden lg:flex items-center gap-3 px-5 lg:px-7 py-3 border-b border-[#E6E3DC] bg-[#FAFAF7]">
             {{-- Breadcrumbs --}}
