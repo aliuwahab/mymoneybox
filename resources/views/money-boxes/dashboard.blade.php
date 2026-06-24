@@ -49,9 +49,9 @@
                         <div class="flex items-center gap-2.5 mt-3 flex-wrap">
                             <span class="text-[11.5px] text-[#9C998F]">Your code</span>
                             <code class="font-mono text-[13.5px] font-bold text-amber-800 bg-amber-100 border border-amber-200 px-2.5 py-0.5 rounded-[6px] tracking-widest">{{ auth()->user()->piggy_code }}</code>
-                            <button @click="navigator.clipboard.writeText('{{ auth()->user()->piggy_code }}').then(() => { codeCopied = true; setTimeout(() => codeCopied = false, 2000) })"
+                            <button @click="navigator.clipboard.writeText('{{ url('/piggy/' . auth()->user()->piggy_code) }}').then(() => { codeCopied = true; setTimeout(() => codeCopied = false, 2000) })"
                                     class="text-[11.5px] font-medium text-amber-600 hover:text-amber-900 transition-colors">
-                                <span x-show="!codeCopied">Copy</span>
+                                <span x-show="!codeCopied">Copy link</span>
                                 <span x-show="codeCopied" x-cloak>✓ Copied!</span>
                             </button>
                         </div>
