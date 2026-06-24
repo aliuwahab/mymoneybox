@@ -23,6 +23,10 @@
     $availableBalance = $userMoneyBoxes->sum(fn($b) => $b->getAvailableBalance());
     $withdrawBox = $userMoneyBoxes->first(fn($b) => $b->getAvailableBalance() > 0) ?? $firstActiveBox ?? $userMoneyBoxes->first();
 
+    // Piggy Wallet
+    $piggyBox = $user->piggyBox;
+    $piggyBalance = $piggyBox ? $piggyBox->getAvailableBalance() : 0;
+
     // Weekly bar chart data (last 7 days)
     $boxIds = $user->moneyBoxes->pluck('id');
     $weeklyData = collect();
@@ -48,7 +52,7 @@
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
         <div>
             <h1 class="page-title">Good {{ now()->hour < 12 ? 'morning' : (now()->hour < 18 ? 'afternoon' : 'evening') }}, {{ $firstName }}.</h1>
-            <p class="text-[13.5px] text-[#6B6862] mt-1.5">Here's what's happening across your PiggyBoxes this week.</p>
+            <p class="text-[13.5px] text-[#6B6862] mt-1.5">Here's your fundraising campaigns overview for this week.</p>
         </div>
         <div class="flex items-center gap-2">
             <button class="btn">
@@ -61,6 +65,59 @@
             </a>
         </div>
     </div>
+
+    {{-- Piggy Wallet banner --}}
+    <div class="rounded-[10px] border border-amber-200 bg-gradient-to-br from-[#FFFBF0] to-[#FFF8E6] p-4 sm:p-5 mb-6"
+         x-data="{ codeCopied: false }">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+            {{-- Left: icon + info --}}
+            <div class="flex items-start gap-3 flex-1 min-w-0">
+                <div class="w-10 h-10 rounded-[9px] bg-amber-100 text-amber-700 grid place-items-center flex-none mt-0.5">
+                    <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><circle cx="17" cy="15" r="1"/></svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-[14.5px] font-semibold text-[#15140F]">Piggy Wallet</span>
+                        <span class="text-[10px] font-semibold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full tracking-wide uppercase">Always on</span>
+                    </div>
+                    <p class="text-[12.5px] text-[#6B6862] leading-relaxed">
+                        Your permanent payment link — share it to receive money for services, appreciation, or anything. No campaign needed, no deadline.
+                    </p>
+                    <div class="flex items-center gap-2.5 mt-3 flex-wrap">
+                        <span class="text-[11.5px] text-[#9C998F]">Your code</span>
+                        <code class="font-mono text-[13.5px] font-bold text-amber-800 bg-amber-100 border border-amber-200 px-2.5 py-0.5 rounded-[6px] tracking-widest">{{ auth()->user()->piggy_code }}</code>
+                        <button @click="navigator.clipboard.writeText('{{ auth()->user()->piggy_code }}').then(() => { codeCopied = true; setTimeout(() => codeCopied = false, 2000) })"
+                                class="text-[11.5px] font-medium text-amber-600 hover:text-amber-900 transition-colors">
+                            <span x-show="!codeCopied">Copy</span>
+                            <span x-show="codeCopied" x-cloak>✓ Copied!</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {{-- Right: balance + actions --}}
+            <div class="flex flex-col items-start sm:items-end gap-3 flex-none">
+                <div class="text-left sm:text-right">
+                    <div class="text-[11px] text-[#9C998F] mb-0.5">Available balance</div>
+                    <div class="text-[22px] font-bold tnum text-[#15140F] leading-none">{{ $sym }}{{ number_format($piggyBalance, 2) }}</div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="{{ url('/piggy/' . auth()->user()->piggy_code) }}" target="_blank" rel="noopener"
+                       class="btn btn-sm" style="border-color:#D97706;color:#92400E;">
+                        <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M8.6 13.5 15.4 17"/><path d="M15.4 7 8.6 10.5"/></svg>
+                        Share wallet
+                    </a>
+                    <a href="{{ route('piggy.my-piggy-box') }}" wire:navigate
+                       class="btn btn-sm" style="background:#B45309;border-color:#B45309;color:#fff;">
+                        Open wallet
+                        <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Fundraising campaigns section label --}}
+    <div class="text-[10.5px] font-medium uppercase tracking-[0.08em] text-[#9C998F] mb-3">Fundraising Campaigns</div>
 
     {{-- Stat grid --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 mb-6">

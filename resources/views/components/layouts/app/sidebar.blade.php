@@ -85,6 +85,24 @@
                 </flux:navlist.item>
             </flux:navlist>
 
+            {{-- Piggy Wallet nav --}}
+            <div class="text-[10.5px] font-medium uppercase tracking-[0.08em] text-[#9C998F] px-2.5 pt-4 pb-1.5">
+                Piggy Wallet
+            </div>
+
+            <flux:navlist>
+                <flux:navlist.item
+                    icon="wallet"
+                    :href="route('piggy.my-piggy-box')"
+                    :current="request()->routeIs('piggy.my-piggy-box')"
+                    wire:navigate
+                    class="mmb-nav-item"
+                >
+                    <span class="flex-1">My Piggy Wallet</span>
+                    <span class="ml-auto font-mono text-[10px] font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded tabular-nums">{{ auth()->user()->piggy_code }}</span>
+                </flux:navlist.item>
+            </flux:navlist>
+
             {{-- Events nav --}}
             <div class="text-[10.5px] font-medium uppercase tracking-[0.08em] text-[#9C998F] px-2.5 pt-4 pb-1.5">
                 Events
@@ -112,16 +130,6 @@
             </div>
 
             <flux:navlist>
-                <flux:navlist.item
-                    icon="gift"
-                    :href="route('piggy.my-piggy-box')"
-                    :current="request()->routeIs('piggy.my-piggy-box')"
-                    wire:navigate
-                    class="mmb-nav-item"
-                >
-                    My Piggy Wallet
-                </flux:navlist.item>
-
                 <flux:navlist.item
                     icon="globe-alt"
                     :href="route('browse')"
@@ -226,7 +234,7 @@
                         request()->routeIs('events.create') => ['Events', 'My EventBoxes', 'Create EventBox'],
                         request()->routeIs('events.edit') => ['Events', 'My EventBoxes', 'Edit Event'],
                         request()->routeIs('events.dashboard') => ['Events', 'My EventBoxes', 'Dashboard'],
-                        request()->routeIs('piggy.my-piggy-box') => ['Account', 'My Piggy Wallet'],
+                        request()->routeIs('piggy.my-piggy-box') => ['Piggy Wallet', 'Overview'],
                         request()->routeIs('browse') => ['Account', 'Browse'],
                         request()->routeIs('profile.edit') || request()->routeIs('user-password.edit') || request()->routeIs('settings.*') || request()->routeIs('two-factor.show') || request()->routeIs('appearance.edit') => ['Account', 'Settings'],
                         default => ['Workspace'],
