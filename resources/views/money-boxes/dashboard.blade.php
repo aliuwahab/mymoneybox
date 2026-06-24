@@ -18,7 +18,7 @@
         {{-- Page header --}}
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-6 mb-6">
             <div>
-                <h1 class="page-title">Good morning, {{ explode(' ', auth()->user()->name)[0] }}.</h1>
+                <h1 class="page-title">Good {{ now()->hour < 12 ? 'morning' : (now()->hour < 18 ? 'afternoon' : 'evening') }}, {{ explode(' ', auth()->user()->name)[0] }}.</h1>
                 <p class="text-[13.5px] text-[#6B6862] mt-1.5">Here's your fundraising campaigns overview for this week.</p>
             </div>
             <div class="flex items-center gap-2 flex-none">
