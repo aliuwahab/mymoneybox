@@ -69,28 +69,20 @@ class IdVerification extends Model implements HasMedia
 
     public function getFrontImageUrl(): ?string
     {
-        $media = $this->getFirstMedia('front');
-        if (! $media) {
+        if (! $this->getFirstMedia('front')) {
             return null;
         }
-        try {
-            return $media->getTemporaryUrl(now()->addHour());
-        } catch (\Exception $e) {
-            return $media->getUrl();
-        }
+
+        return route('kyc.image', [$this, 'front']);
     }
 
     public function getBackImageUrl(): ?string
     {
-        $media = $this->getFirstMedia('back');
-        if (! $media) {
+        if (! $this->getFirstMedia('back')) {
             return null;
         }
-        try {
-            return $media->getTemporaryUrl(now()->addHour());
-        } catch (\Exception $e) {
-            return $media->getUrl();
-        }
+
+        return route('kyc.image', [$this, 'back']);
     }
 
     public function getIdTypeLabel(): string
@@ -106,15 +98,12 @@ class IdVerification extends Model implements HasMedia
     // Media Collections
     public function registerMediaCollections(): void
     {
-        // Use S3 for sensitive KYC documents (requires private access with temporary URLs)
-        $privateDisk = config('media-library.private_disk', 's3');
-        
         $this->addMediaCollection('front')
-            ->useDisk($privateDisk)
+            ->useDisk('local')
             ->singleFile();
 
         $this->addMediaCollection('back')
-            ->useDisk($privateDisk)
+            ->useDisk('local')
             ->singleFile();
     }
 

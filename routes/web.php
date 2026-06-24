@@ -79,6 +79,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/impersonate/stop', [ImpersonateController::class, 'stop'])->name('impersonate.stop');
 });
 
+// KYC image serving — admin only, private
+Route::middleware(['auth'])->get(
+    '/kyc/{verification}/{collection}',
+    [\App\Http\Controllers\KycImageController::class, 'show']
+)->name('kyc.image');
+
 // Authenticated Routes
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard
