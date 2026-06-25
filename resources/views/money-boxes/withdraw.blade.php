@@ -3,7 +3,6 @@
         $sym = auth()->user()->country?->currency_symbol ?? '₵';
         $feePercent = $moneyBox->getEffectiveFeePercentage();
         $minFee = config('withdrawal.min_fee', 2);
-        $maxFee = config('withdrawal.max_fee', 20);
         $minAmount = config('withdrawal.min_amount', 10);
     @endphp
 
@@ -58,13 +57,12 @@
                         amount: '{{ old('amount', '') }}',
                         feePercent: {{ $feePercent }},
                         minFee: {{ $minFee }},
-                        maxFee: {{ $maxFee }},
                         sym: '{{ $sym }}',
                         get fee() {
                             const a = parseFloat(this.amount);
                             if (!a || a <= 0) return null;
                             let f = (a * this.feePercent) / 100;
-                            f = Math.max(this.minFee, Math.min(this.maxFee, f));
+                            f = Math.max(this.minFee, f);
                             return Math.round(f * 100) / 100;
                         },
                         get net() {
@@ -129,7 +127,7 @@
                     <template x-if="fee === null">
                         <div class="bg-[#ECEAE3] rounded-[8px] px-4 py-3 text-[12.5px] text-[#6B6862]">
                             A platform fee of <strong class="text-[#15140F]">{{ $feePercent }}%</strong> applies
-                            (min {{ $sym }}{{ number_format($minFee, 2) }}, max {{ $sym }}{{ number_format($maxFee, 2) }}).
+                            (minimum fee {{ $sym }}{{ number_format($minFee, 2) }}).
                             Enter an amount above to see the exact breakdown.
                         </div>
                     </template>
