@@ -20,7 +20,7 @@ return [
     | The percentage fee charged on withdrawals (e.g., 2.5 = 2.5%)
     |
     */
-    'fee_percentage' => env('WITHDRAWAL_FEE_PERCENTAGE', 2.5),
+    'fee_percentage' => env('WITHDRAWAL_FEE_PERCENTAGE', 1.5),
 
     /*
     |--------------------------------------------------------------------------
